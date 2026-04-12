@@ -520,7 +520,7 @@ function SettingsContent() {
             <h2 className="font-sans text-lg font-bold text-foreground mb-6">Theme</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Alucard (Light) */}
+              {/* Light Mode */}
               <button
                 onClick={() => setTheme("light")}
                 className={cn(
@@ -543,14 +543,14 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Sun size={16} className="text-[var(--amber)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">Alucard</span>
+                  <span className="font-mono text-sm font-bold text-foreground">Light Mode</span>
                 </div>
                 <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Sharp, clinical light mode
+                  Sharp, clinical light theme
                 </p>
               </button>
 
-              {/* Dracula (Dark) */}
+              {/* Dark Mode */}
               <button
                 onClick={() => setTheme("dark")}
                 className={cn(
@@ -573,10 +573,10 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Moon size={16} className="text-[var(--purple)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">Dracula</span>
+                  <span className="font-mono text-sm font-bold text-foreground">Dark Mode</span>
                 </div>
                 <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Soft, dramatic dark mode
+                  Soft, dramatic dark theme
                 </p>
               </button>
             </div>

@@ -657,7 +657,7 @@ Based on: ${assetNames}`
 
             {/* Right controls */}
             <div className="flex items-center gap-3">
-              {/* Dracula (dark) / Alucard (light) — always clickable */}
+              {/* Dark / Light mode toggle — always clickable */}
               <button
                 onClick={onToggleTheme}
                 className={cn(
@@ -671,7 +671,7 @@ Based on: ${assetNames}`
               >
                 <Moon size={12} />
                 {mounted && isDark && <span className="w-1.5 h-1.5 rounded-full bg-purple animate-pulse" />}
-                DRACULA
+                DARK
               </button>
               <button
                 onClick={onToggleTheme}
@@ -686,7 +686,7 @@ Based on: ${assetNames}`
               >
                 <Sun size={12} />
                 {mounted && !isDark && <span className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />}
-                ALUCARD
+                LIGHT
               </button>
 
               {/* Divider */}

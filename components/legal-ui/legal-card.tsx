@@ -20,7 +20,7 @@ export function LegalCard({ children, color, animated = false, delay = 0, classN
         "p-4",
         // Light mode
         "shadow-brut",
-        // Dark mode (Dracula)
+        // Dark mode
         " dark:shadow-brut",
         animated && "animate-card-in",
         onClick && "cursor-pointer hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",

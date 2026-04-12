@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ALUCARD LIGHT (default) — Editorial Mission Control */
+/* Light mode (default) — Editorial Mission Control */
 :root {
   --background: #FFF9EC;
   --foreground: #1F1F1F;
@@ -65,7 +65,7 @@
   --sidebar-ring: #EF9F27;
 }
 
-/* DRACULA DARK — Editorial Mission Control */
+/* Dark mode — Editorial Mission Control */
 .dark {
   --background: #1C1810;
   --foreground: #FFF9EC;

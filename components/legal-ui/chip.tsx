@@ -21,7 +21,7 @@ export function Chip({ children, color, mono = false, bold = false, className }:
         bold ? "font-extrabold" : "font-semibold",
         // Light mode
         "border-border shadow-[2px_2px_0_var(--shadow-color)]",
-        // Dark mode (Dracula glow)
+        // Dark mode
         "-sm dark:shadow-none",
         className
       )}

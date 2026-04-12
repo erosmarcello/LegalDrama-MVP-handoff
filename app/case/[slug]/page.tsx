@@ -20,7 +20,7 @@ import {
   FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, TIMELINE_EVENTS,
   type DocketEntry, type Chapter, type ChapterSection, getDatePercent, getLaneColor
 } from "@/lib/case-data"
-import { AssetPanel } from "@/components/asset-panel"
+
 import { SettingsModal } from "@/components/settings-modal"
 import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
@@ -75,8 +75,6 @@ function CaseWorkspaceContent() {
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0)
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [assetPanelOpen, setAssetPanelOpen] = useState(false)
-  const [assetPanelTab, setAssetPanelTab] = useState<"files" | "characters" | "ai" | "share">("files")
 
   // Screenplay editing state
   const [chapters, setChapters] = useState<Chapter[]>(CHAPTER_DATA)
@@ -327,9 +325,6 @@ function CaseWorkspaceContent() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col pb-12">
-      {/* Asset Panel */}
-      <AssetPanel isOpen={assetPanelOpen} onClose={() => setAssetPanelOpen(false)} initialTab={assetPanelTab} />
-      
       {/* Settings Modal */}
       <SettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
       
@@ -559,20 +554,6 @@ function CaseWorkspaceContent() {
             <span className="hidden xl:inline">Mission-Control</span>
           </button>
 
-          {/* AI Inference — opens asset panel AI tab */}
-          <button
-            onClick={() => { setAssetPanelTab("ai"); setAssetPanelOpen(true) }}
-            className={cn(
-              "px-3 md:px-4 py-2.5 flex items-center gap-2",
-              "border-[2.5px] font-mono text-[10px] font-bold",
-              "transition-all duration-200 click-scale brut-press",
-              "border-[var(--purple)] bg-[var(--purple)]/10 text-[var(--purple)] shadow-[2px_2px_0px_var(--shadow-color)]",
-              "hover:bg-[var(--purple)] hover:text-white"
-            )}
-          >
-            <Sparkles size={14} className="animate-pulse-soft" />
-            <span className="hidden lg:inline">AI Inference</span>
-          </button>
         </div>
       </div>
 
@@ -1206,7 +1187,7 @@ function CaseWorkspaceContent() {
                     {/* Actions */}
                     <div className="flex items-center justify-between mt-3">
                       <button
-                        onClick={() => { setAssetPanelTab("files"); setAssetPanelOpen(true) }}
+                        onClick={() => toast("Upload coming soon...", "var(--cyan)")}
                         className="flex items-center gap-1.5 px-3 py-1.5 border-[2.5px] border-[var(--border)] font-mono text-[10px] font-bold text-[var(--foreground)] brut-press shadow-[2px_2px_0px_var(--shadow-color)] hover:border-[var(--cyan)]"
                       >
                         <Plus size={12} /> Add More Evidence

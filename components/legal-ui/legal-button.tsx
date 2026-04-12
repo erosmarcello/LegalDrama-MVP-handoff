@@ -24,7 +24,7 @@ export const LegalButton = forwardRef<HTMLButtonElement, LegalButtonProps>(
           small ? "px-2.5 py-1 text-[10px]" : "px-3.5 py-1.5 text-[11px]",
           // Light mode
           "border-border",
-          // Dark mode (Dracula)
+          // Dark mode
           "",
           // States
           active
