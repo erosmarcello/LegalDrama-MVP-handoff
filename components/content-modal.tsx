@@ -184,10 +184,6 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   const [activityLog, setActivityLog] = useState(ACTIVITY_LOG)
   const [inviteSending, setInviteSending] = useState(false)
   
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-  
   // Count enabled assets
   const enabledCount = [...caseEvidence, ...secondaryEvidence].filter(a => a.enabled).length
   const totalCount = caseEvidence.length + secondaryEvidence.length
