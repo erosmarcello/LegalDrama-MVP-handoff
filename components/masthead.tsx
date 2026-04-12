@@ -1,8 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
-import { Moon, Sun } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -24,15 +21,7 @@ const NAV_LINKS = [
 ]
 
 export function Masthead({ onSignIn, user, onSignOut, className }: MastheadProps) {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const isDark = mounted ? resolvedTheme === "dark" : false
 
   return (
     <header
@@ -82,25 +71,6 @@ export function Masthead({ onSignIn, user, onSignOut, className }: MastheadProps
 
         {/* Right controls */}
         <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={cn(
-              "w-9 h-9 flex items-center justify-center",
-              "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-              "text-[var(--muted-foreground)] hover:text-[var(--amber)] hover:border-[var(--amber)]",
-              "transition-all brut-press",
-              "shadow-[2px_2px_0px_var(--shadow-color)]"
-            )}
-            suppressHydrationWarning
-          >
-            {mounted ? (
-              isDark ? <Moon size={16} /> : <Sun size={16} />
-            ) : (
-              <Sun size={16} />
-            )}
-          </button>
-
           {user ? (
             <div className="flex items-center gap-2">
               <button

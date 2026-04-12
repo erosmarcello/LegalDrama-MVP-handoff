@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
+import { useState } from "react"
 import Link from "next/link"
 import {
-  Moon, Sun, CheckCircle, Zap, Users, Crown,
+  CheckCircle, Zap, Users, Crown,
   ChevronDown, ChevronUp, HelpCircle, ArrowRight,
   Sparkles
 } from "lucide-react"
@@ -107,16 +106,8 @@ const NAV_LINKS = [
 /* ------------------------------------------------------------------ */
 
 function PricingContent() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
   const { toast } = useToast()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const isDark = mounted ? resolvedTheme === "dark" : true
 
   const handlePlanClick = (planName: string) => {
     toast(`${planName} selected -- checkout coming soon`, "var(--green)")
@@ -169,27 +160,6 @@ function PricingContent() {
 
         {/* Right controls */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={cn(
-              "p-1.5 flex items-center gap-1.5",
-              "border border-border transition-all duration-150",
-              "font-mono text-[10px] font-bold text-background dark:text-muted-foreground",
-              "rounded-none bg-background  dark:bg-surface-alt"
-            )}
-            suppressHydrationWarning
-          >
-            {mounted ? (
-              isDark ? (
-                <Moon size={12} />
-              ) : (
-                <Sun size={12} />
-              )
-            ) : (
-              <Moon size={12} />
-            )}
-          </button>
-
           <Link href="/">
             <LegalButton small>Sign in</LegalButton>
           </Link>

@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect, useMemo, Fragment } from "react"
-import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  Moon, Sun, ArrowLeft, Bookmark, Star, ChevronLeft, ChevronRight,
+  ArrowLeft, Bookmark, Star, ChevronLeft, ChevronRight,
   Play, Pause, Pencil, Check, X, Share, Download, Settings,
   Database, FileText, Clock, Users, Sparkles, Plus, Minus,
   RefreshCw, Loader2, ExternalLink, Copy, Eye, MessageSquare,
@@ -57,7 +56,6 @@ const AI_SUMMARIES: Record<number, { text: string; keyPoints: string[] }> = {
 }
 
 function CaseWorkspaceContent() {
-  const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -65,8 +63,6 @@ function CaseWorkspaceContent() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  const isDark = mounted ? resolvedTheme === "dark" : true
 
   // Main state - default to "all" view
   const [activeTab, setActiveTab] = useState<ViewTab>("all")
@@ -341,8 +337,6 @@ function CaseWorkspaceContent() {
         isOpen={contentModalOpen}
         onClose={() => setContentModalOpen(false)}
         initialTab={contentModalTab}
-        isDark={isDark}
-        onToggleTheme={() => setTheme(isDark ? "light" : "dark")}
         onOpenSettings={() => { setContentModalOpen(false); setTimeout(() => setSettingsModalOpen(true), 200) }}
       />
 
@@ -403,26 +397,6 @@ function CaseWorkspaceContent() {
 
           {/* Action buttons - all same size */}
           <div className="relative z-10 flex items-center gap-2">
-            {/* Theme toggle - icon only */}
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                "border-2 transition-all duration-300 click-scale",
-                "rounded-none",
-                isDark 
-                  ? "bg-surface-alt text-purple border-purple/50 hover:border-purple hover:shadow-[0_0_15px_var(--purple)]" 
-                  : "bg-background text-orange border-orange/50 hover:border-orange hover:shadow-[0_0_15px_var(--orange)]"
-              )}
-              suppressHydrationWarning
-            >
-              {mounted ? (
-                isDark ? <Moon size={18} className="animate-bounce-subtle" /> : <Sun size={18} className="animate-bounce-subtle" />
-              ) : (
-                <Moon size={18} />
-              )}
-            </button>
-
             {/* Upload/Content button */}
             <button
               onClick={() => {

@@ -1,9 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { useTheme } from "next-themes"
 import Link from "next/link"
-import { Moon, Sun, Search, Scale, Gavel, BookOpen } from "lucide-react"
+import { Search, Scale, Gavel, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 
@@ -175,7 +174,6 @@ function SkeletonCard() {
 /* ------------------------------------------------------------------ */
 
 function BrowseContent() {
-  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
@@ -185,8 +183,6 @@ function BrowseContent() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  const isDark = mounted ? resolvedTheme === "dark" : true
 
   // Simulate initial load
   useEffect(() => {
@@ -265,30 +261,6 @@ function BrowseContent() {
             >
               Pricing
             </span>
-
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={cn(
-                "brut-press w-10 h-10 flex items-center justify-center",
-                "border-[2.5px] transition-all duration-300",
-                isDark
-                  ? "bg-surface-alt text-purple border-purple/50 hover:border-purple"
-                  : "bg-background text-orange border-orange/50 hover:border-orange"
-              )}
-              style={{ boxShadow: "4px 4px 0px var(--shadow-color)" }}
-              suppressHydrationWarning
-            >
-              {mounted ? (
-                isDark ? (
-                  <Moon size={18} />
-                ) : (
-                  <Sun size={18} />
-                )
-              ) : (
-                <Moon size={18} />
-              )}
-            </button>
 
             {/* Sign In */}
             <Link

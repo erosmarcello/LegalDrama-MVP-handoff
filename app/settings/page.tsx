@@ -358,19 +358,6 @@ function SettingsContent() {
               <span className="font-mono text-sm text-[var(--pink)]">.ai</span>
             </Link>
           </div>
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={cn(
-              "w-9 h-9 flex items-center justify-center",
-              "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-              "text-[var(--muted-foreground)] hover:text-[var(--amber)] hover:border-[var(--amber)]",
-              "transition-all shadow-[2px_2px_0px_var(--shadow-color)]",
-              "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-            )}
-            suppressHydrationWarning
-          >
-            {mounted ? (isDark ? <Moon size={16} /> : <Sun size={16} />) : <Sun size={16} />}
-          </button>
         </div>
       </nav>
 

@@ -9,7 +9,7 @@ import {
   RefreshCw, Edit3, Save, Share2, Settings, Link2, Eye,
   Download, Mic, Film, Wand2, ExternalLink, MoreHorizontal,
   ChevronRight, ChevronLeft, Layers, Grid3X3, List, Search, Filter,
-  Flame, Scale, Target, Gavel, Box, ImagePlus, Moon, Sun,
+  Flame, Scale, Target, Gavel, Box, ImagePlus,
   Shield, AlertTriangle as AlertTriangleIcon, BarChart3, Timer,
   BookMarked, FileSearch, TrendingUp, Activity, Hash
 } from "lucide-react"
@@ -20,8 +20,6 @@ interface ContentModalProps {
   isOpen: boolean
   onClose: () => void
   initialTab?: "upload" | "organize" | "screenplay" | "collab"
-  isDark?: boolean
-  onToggleTheme?: () => void
   onOpenSettings?: () => void
 }
 
@@ -157,7 +155,7 @@ const LANES = {
   scheduling: { color: "var(--yellow)", label: "SCHEDULING" },
 }
 
-export function ContentModal({ isOpen, onClose, initialTab = "upload", isDark, onToggleTheme, onOpenSettings }: ContentModalProps) {
+export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSettings }: ContentModalProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "organize" | "screenplay" | "collab">(initialTab)
   const [dramatization, setDramatization] = useState(75)
   const [caseEvidence, setCaseEvidence] = useState(CASE_EVIDENCE)
@@ -167,7 +165,6 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", isDark, o
   const [inviteRole, setInviteRole] = useState("Collaborator")
   const [uploadMode, setUploadMode] = useState<"case" | "secondary">("case")
   const [visibleLanes, setVisibleLanes] = useState(new Set(["factual", "procedural", "scheduling"]))
-  const [mounted, setMounted] = useState(false)
   const [inferenceOpen, setInferenceOpen] = useState(true)
   
   // Screenplay tab state
@@ -657,41 +654,6 @@ Based on: ${assetNames}`
 
             {/* Right controls */}
             <div className="flex items-center gap-3">
-              {/* Dark / Light mode toggle — always clickable */}
-              <button
-                onClick={onToggleTheme}
-                className={cn(
-                  "px-3 py-1.5 flex items-center gap-2",
-                  "border-2 font-mono text-[10px] font-bold",
-                  "transition-all duration-200 cursor-pointer",
-                  isDark
-                    ? "border-purple text-purple hover:bg-purple/20 shadow-[0_0_8px_var(--purple)]"
-                    : "border-border text-muted-foreground hover:border-purple hover:text-purple"
-                )}
-              >
-                <Moon size={12} />
-                {mounted && isDark && <span className="w-1.5 h-1.5 rounded-full bg-purple animate-pulse" />}
-                DARK
-              </button>
-              <button
-                onClick={onToggleTheme}
-                className={cn(
-                  "px-3 py-1.5 flex items-center gap-2",
-                  "border-2 font-mono text-[10px] font-bold",
-                  "transition-all duration-200 cursor-pointer",
-                  !isDark
-                    ? "border-orange text-orange hover:bg-orange/20 shadow-[0_0_8px_var(--orange)]"
-                    : "border-border text-muted-foreground hover:border-orange hover:text-orange"
-                )}
-              >
-                <Sun size={12} />
-                {mounted && !isDark && <span className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />}
-                LIGHT
-              </button>
-
-              {/* Divider */}
-              <div className="w-px h-6 bg-border/50" />
-
               {/* Settings — always accessible */}
               <button
                 onClick={() => { onOpenSettings?.(); }}

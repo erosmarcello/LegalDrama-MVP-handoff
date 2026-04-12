@@ -1,12 +1,9 @@
 "use client"
 
 import { useState, useCallback, useEffect, useRef } from "react"
-import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  Moon,
-  Sun,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -158,7 +155,6 @@ interface SearchResult {
 
 function HomePage() {
   const router = useRouter()
-  const { theme, setTheme, resolvedTheme } = useTheme()
   const { toast } = useToast()
   const [mounted, setMounted] = useState(false)
 
@@ -302,8 +298,6 @@ function HomePage() {
     requireAuth(() => toast(`Bookmarked: ${title}`, "var(--green)"))
   }
 
-  const isDark = mounted ? resolvedTheme === "dark" : false
-
   /* ---------------------------------------------------------------- */
   /*  Render                                                           */
   /* ---------------------------------------------------------------- */
@@ -378,26 +372,6 @@ function HomePage() {
               }}
             >
               Get Started
-            </button>
-
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="brut-press flex items-center justify-center"
-              style={{
-                width: 36,
-                height: 36,
-                border: "2.5px solid var(--border)",
-                background: "var(--surface)",
-                boxShadow: "3px 3px 0px var(--shadow-color)",
-                borderRadius: 0,
-              }}
-              aria-label="Toggle theme"
-            >
-              {mounted && isDark ? (
-                <Sun size={16} style={{ color: "var(--amber)" }} />
-              ) : (
-                <Moon size={16} className="text-foreground" />
-              )}
             </button>
 
             {user ? (
