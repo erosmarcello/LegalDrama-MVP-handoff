@@ -42,6 +42,23 @@ const QUICK_REPLIES: QuickReply[] = [
     prompt:
       "Suggest a defense-side character (archetype) that would complement the lead prosecutor in the Mangione case for a dramatization.",
   },
+  // Develop — writers-room journeys (added without altering nav IA)
+  {
+    label: "What's the truth here?",
+    prompt: "What is the truth of the Mangione story?",
+  },
+  {
+    label: "Themes — why care?",
+    prompt: "What are the central themes of this case and why should an audience care?",
+  },
+  {
+    label: "City as character",
+    prompt: "How would you write New York City as a character in this story?",
+  },
+  {
+    label: "What's getting funded?",
+    prompt: "What kinds of true-crime and legal-drama themes are getting funded right now?",
+  },
 ]
 
 const GREETING: ChatMessage = {
@@ -58,6 +75,53 @@ const PATH_PILL_REGEX = /`(\/[a-z0-9\-\/#]*)`/g
 type Script = { test: RegExp; reply: string }
 
 const SCRIPTS: Script[] = [
+  // ── Develop / writers-room journeys ─────────────────────────
+  {
+    test: /\b(truth (of|to|in|behind)|what'?s the truth|real story|actual story|what really happened)\b/i,
+    reply:
+      "Strip the headlines and the truth is smaller and harder.\n\nA young man with elite-school polish and a back injury walked out of his life, traveled across state lines, and shot a stranger on a Midtown sidewalk because of what that stranger represented to him. The killing was personal in motive and impersonal in target — that contradiction is the story.\n\nEverything else — the manifesto, the McDonald's, the internet sainthood — is the country reacting to the act. Treat the act as the spine and the reaction as the chorus and the show writes itself.",
+  },
+  {
+    test: /\b(themes?|why (should|would).*care|what'?s it about|deeper meaning|what does it mean|stakes for (the )?audience)\b/i,
+    reply:
+      "Three themes do the heavy lifting.\n\nFirst, **grievance as ideology** — the modern radicalization arc isn't a basement and a manifesto, it's a back surgery and a Reddit thread. That's new and it's terrifying.\n\nSecond, **healthcare as a moral injury** — the case sits on top of a public rage at insurers that the courtroom can't acknowledge but every viewer feels. Write around that pressure, never directly into it.\n\nThird, **the spectator economy** — a defendant becomes a folk hero in real time. The show is partly about us.\n\nAudiences care because all three themes are pointed at them. There's no comfortable distance.",
+  },
+  {
+    test: /\b(p\.?o\.?v\.?|perspective|whose (story|point of view)|told from)\b/i,
+    reply:
+      "Default trap is the defendant's POV — feels prestige but makes the show about a single character's psychology, which the public record can't actually support.\n\nBetter: a **dual-track structure**. Track A is the lead defense attorney, post-arraignment forward — she has access, she has stakes, she carries the courtroom. Track B is the NYPD detective who ran the Midtown canvass — she has the city, the bodies, the pre-arrest investigation.\n\nThe two tracks meet at trial. The defendant is a force in the show, not the narrator. That keeps you honest about what's known.",
+  },
+  {
+    test: /\b(backstory|past incident|origin|bruce wayne|formative|childhood|what made him|how did .* become)\b/i,
+    reply:
+      "Two real, public threads to pull, neither speculative.\n\nThe **back surgery** — chronic pain, opioid exposure, a body that stopped being reliable. That's a Bruce Wayne moment without the cape: the day the world stops feeling fixable. Stage it as a flashback, single scene, no dialogue.\n\nThe **family** — Maryland old money, Gilman School, Penn engineering. He wasn't the kid who slipped through the cracks; he was the kid the system was built for. The cost of that pedigree, and the silence inside it, is your second flashback.\n\nThose two together explain everything you need to explain without inventing a past.",
+  },
+  {
+    test: /\b(antagonist|villain|opposing force|who'?s the bad guy)\b/i,
+    reply:
+      "The trap is casting the prosecutor or the FBI as the antagonist. They're not — they're doing the job.\n\nThe real antagonistic force in this story is **the system the defendant claims to be punishing**: insurance denial machines, prior-auth queues, the quiet bureaucracies that wear people down. You can't put that in a chair, so personify it — a UnitedHealthcare communications VP managing the post-shooting narrative is your in. Not a monster. A professional doing damage control on a death.\n\nThat character is the show's shadow antagonist. The defendant is the protagonist of his own delusion.",
+  },
+  {
+    test: /\b(city as.*character|new york.*character|nyc.*character|setting as character|location.*character)\b/i,
+    reply:
+      "New York earns it here. The shooting happens on **a sidewalk in front of the Hilton at 6:45 a.m.** — not an alley, not a back room, the lobby of the city's business engine, in working light. That's a setting choice the show should never let you forget.\n\nLean into the contrasts: Midtown corporate sterility versus the messy hostel uptown where he stayed; the Altoona McDonald's that ended it versus the Manhattan courthouse where it'll end again. Use the **subway** as the only place every character — defendant, prosecutor, detective, victim — has been at some point.\n\nNew York isn't backdrop. It's the room the country is arguing in. Treat it that way.",
+  },
+  {
+    test: /\b(interview|where to (dig|look)|sources?|research|reporters?|who to talk to|location.*scout|on the ground)\b/i,
+    reply:
+      "Three tiers, in order of payoff.\n\n**Court personnel and bar adjacent** — defense investigators on the team (not lead counsel; they don't talk), former S.D.N.Y. AUSAs who'll background, capital defense lawyers who can speak to why the death notice fell.\n\n**Reporters who own the beat** — the New York Times metro and federal-courts crew, NY1's courthouse regulars, ProPublica on the healthcare angle. They know what's not in the filings.\n\n**Locations** — the Hilton sidewalk, the M Social Hotel where he stayed, the Altoona McDonald's, the federal courthouse at 500 Pearl. Walk all four. The show lives in the geography.",
+  },
+  {
+    test: /\b(what'?s (getting )?funded|trends?|market|greenlit|deadline|getting bought|what (are|sells))\b/i,
+    reply:
+      "Streamers are buying three flavors right now.\n\n**Limited-series true crime with a systemic angle** — Dahmer's afterlife proved the appetite, and recent buys lean toward stories where the crime is a symptom of something larger (insurance, opioids, immigration enforcement). Mangione lives here.\n\n**Defense-side legal drama** — Presumed Innocent and The Lincoln Lawyer reset the bar; networks want morally serious, courtroom-heavy, anti-procedural. Eight episodes, not twenty-two.\n\n**Real-time-adjacent** — shows about events the audience already has a take on, written so the audience has to question that take. The Staircase, American Crime Story, Painkiller. This case slots straight in.\n\nPitch the systemic-symptom angle first. That's the door.",
+  },
+  {
+    test: /\b(find.*detective|real detective|nypd detective|case detective|lead detective)\b/i,
+    reply:
+      "The federal filings name the lead FBI case agent and the AUSAs; NYPD detectives on the Midtown shooting aren't named in the docket I'm working from.\n\nFor a real lookup, the press conference footage from December 2024 named two NYPD chiefs publicly — start there and follow the bylines in coverage from the Daily News and NY1, which had the most NYPD-source-driven reporting in the first two weeks.\n\nFor the show, write a composite: a Manhattan South Homicide detective, mid-career, who carried the canvass before the federal team took over. Mark her as a composite in your notes and you're clear of any real-person liability.",
+  },
+
   // ── Chip prompts ────────────────────────────────────────────
   {
     test: /weak points|government'?s case|weak.*government|holes in the case/i,
