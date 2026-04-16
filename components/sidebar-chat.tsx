@@ -326,7 +326,7 @@ export function SidebarChat() {
             "fixed bottom-6 right-6 z-[60]",
             "flex items-center gap-2 px-4 h-12",
             "border-[2.5px] border-[var(--border)]",
-            "bg-[var(--red)] text-white",
+            "bg-[var(--purple)] text-white",
             "font-mono text-xs font-bold uppercase tracking-widest",
             "shadow-[4px_4px_0px_var(--shadow-color)]",
             "hover:translate-x-[-1px] hover:translate-y-[-1px]",
@@ -368,7 +368,7 @@ export function SidebarChat() {
                 className={cn(
                   "w-9 h-9 flex items-center justify-center",
                   "border-[2.5px] border-[var(--border)]",
-                  "bg-[var(--red)] text-white",
+                  "bg-[var(--purple)] text-white",
                   "shadow-[2px_2px_0px_var(--shadow-color)]",
                 )}
               >
@@ -393,7 +393,7 @@ export function SidebarChat() {
                 "w-8 h-8 flex items-center justify-center",
                 "border-2 border-[var(--border)]",
                 "bg-[var(--background)] text-[var(--foreground)]",
-                "hover:border-[var(--red)] hover:text-[var(--red)]",
+                "hover:border-[var(--purple)] hover:text-[var(--purple)]",
                 "transition-colors",
               )}
             >
@@ -437,7 +437,7 @@ export function SidebarChat() {
                   "font-mono text-[10px] font-bold uppercase tracking-wider",
                   "border-2 border-[var(--border)] bg-[var(--card)]",
                   "text-[var(--foreground)]",
-                  "hover:border-[var(--red)] hover:text-[var(--red)]",
+                  "hover:border-[var(--purple)] hover:text-[var(--purple)]",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   "transition-colors",
                 )}
@@ -469,7 +469,7 @@ export function SidebarChat() {
                 "font-serif text-sm leading-snug",
                 "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
                 "text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]",
-                "focus:outline-none focus:border-[var(--red)]",
+                "focus:outline-none focus:border-[var(--purple)]",
                 "disabled:opacity-60",
               )}
             />
@@ -480,7 +480,7 @@ export function SidebarChat() {
               className={cn(
                 "h-10 w-10 flex items-center justify-center shrink-0",
                 "border-[2.5px] border-[var(--border)]",
-                "bg-[var(--red)] text-white",
+                "bg-[var(--purple)] text-white",
                 "shadow-[2px_2px_0px_var(--shadow-color)]",
                 "hover:translate-x-[-1px] hover:translate-y-[-1px]",
                 "hover:shadow-[3px_3px_0px_var(--shadow-color)]",
@@ -560,8 +560,8 @@ function renderContentWithPills(
           "inline-flex items-center gap-1 px-1.5 py-0.5 mx-0.5",
           "font-mono text-[11px] font-bold",
           "border-2 border-[var(--border)] bg-[var(--background)]",
-          "text-[var(--red)]",
-          "hover:bg-[var(--red)] hover:text-white",
+          "text-[var(--purple)]",
+          "hover:bg-[var(--purple)] hover:text-white",
           "transition-colors",
         )}
       >
