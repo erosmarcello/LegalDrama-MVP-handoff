@@ -1,7 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest } from "next/server"
 
-// Run on the edge-compatible Node runtime so the stream can flush continuously.
+// Use the Node.js runtime so the Anthropic SDK (which depends on Node APIs)
+// works and the SSE stream can flush continuously.
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
