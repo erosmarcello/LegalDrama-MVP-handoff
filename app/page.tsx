@@ -719,9 +719,10 @@ function HomePage() {
           }}
         >
           <div className="flex flex-col md:flex-row">
-            {/* Left — Courtroom image placeholder */}
-            <div
-              className="flex items-center justify-center md:w-[45%] min-h-[280px]"
+            {/* Left — Courtroom image placeholder (clickable) */}
+            <Link
+              href="/case/usa-v-mangione"
+              className="flex items-center justify-center md:w-[45%] min-h-[280px] cursor-pointer transition-transform hover:scale-[1.01]"
               style={{
                 background: "linear-gradient(135deg, var(--red), var(--amber), var(--purple))",
                 borderRight: "0px",
@@ -745,7 +746,7 @@ function HomePage() {
                   Courtroom Photo
                 </span>
               </div>
-            </div>
+            </Link>
 
             {/* Right — Case details */}
             <div className="flex-1 p-5 md:p-6" style={{ borderLeft: "0px" }}>
@@ -762,9 +763,14 @@ function HomePage() {
                 Featured Case
               </p>
 
-              <h3 className="mt-2 font-sans text-2xl font-black md:text-3xl">
-                USA v. Mangione
-              </h3>
+              <Link
+                href="/case/usa-v-mangione"
+                className="inline-block mt-2 transition-colors hover:text-[var(--red)]"
+              >
+                <h3 className="font-sans text-2xl font-black md:text-3xl">
+                  USA v. Mangione
+                </h3>
+              </Link>
 
               <p
                 className="mt-1 font-mono text-xs"
@@ -844,21 +850,25 @@ function HomePage() {
                 })}
               </div>
 
-              {/* Timeline placeholder */}
-              <div
-                className="mt-4 p-3"
+              {/* Timeline — clickable, opens the Story So Far on the case page */}
+              <Link
+                href="/case/usa-v-mangione"
+                className="block mt-4 p-3 transition-all hover:shadow-[3px_3px_0px_var(--shadow-color)] hover:border-[var(--red)] cursor-pointer"
                 style={{
                   border: "2.5px solid var(--border)",
                   background: "var(--surface-alt)",
                   borderRadius: 0,
                 }}
               >
-                <p
-                  className="font-mono text-[10px] font-bold uppercase tracking-widest"
-                  style={{ color: "var(--muted-foreground)" }}
-                >
-                  Timeline
-                </p>
+                <div className="flex items-center justify-between">
+                  <p
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest"
+                    style={{ color: "var(--muted-foreground)" }}
+                  >
+                    Timeline — Story So Far
+                  </p>
+                  <ArrowRight size={12} style={{ color: "var(--muted-foreground)" }} />
+                </div>
                 <div className="mt-2 flex items-center gap-3">
                   {[
                     { date: "Dec 2024", event: "Arrest" },
@@ -894,7 +904,7 @@ function HomePage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Link>
 
               {/* Reference Files button */}
               <Link
