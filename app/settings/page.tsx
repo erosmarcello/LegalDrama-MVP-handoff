@@ -530,10 +530,10 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Sun size={16} className="text-[var(--amber)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">Light Mode</span>
+                  <span className="font-mono text-sm font-bold text-foreground">Open Court</span>
                 </div>
                 <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Sharp, clinical light theme
+                  Public session — bright, on the record
                 </p>
               </button>
 
@@ -560,10 +560,10 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Moon size={16} className="text-[var(--purple)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">Dark Mode</span>
+                  <span className="font-mono text-sm font-bold text-foreground">In Camera</span>
                 </div>
                 <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Soft, dramatic dark theme
+                  Chambers session — sealed, off the record
                 </p>
               </button>
             </div>

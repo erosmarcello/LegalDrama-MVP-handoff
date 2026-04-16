@@ -23,6 +23,7 @@ import {
 import { SettingsModal } from "@/components/settings-modal"
 import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
+import { SidebarChat } from "@/components/sidebar-chat"
 
 // Lane definitions for timeline
 const LANES = [
@@ -104,8 +105,6 @@ function CaseWorkspaceContent() {
   const [contentModalOpen, setContentModalOpen] = useState(false)
   const [contentModalTab, setContentModalTab] = useState<"upload" | "organize" | "collab">("upload")
   
-  // Story vs Analysis mode for ALL view
-  const [viewMode, setViewMode] = useState<"story" | "analysis">("story")
 
   // Current chapter & section
   const currentChapter = chapters[currentChapterIndex]
@@ -564,19 +563,12 @@ function CaseWorkspaceContent() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <div className="font-mono text-[10px] text-muted-foreground">INFERENCE</div>
-                    <div className={cn(
-                      "px-3 py-1.5 border-2 border-border font-mono text-sm font-bold",
-                      "rounded-none rounded-none bg-surface"
-                    )}>
-                      8/9 active
-                    </div>
-                    <LegalButton 
-                      small 
+                    <LegalButton
+                      small
                       onClick={() => {
                         setContentModalTab("upload")
                         setContentModalOpen(true)
-                      }} 
+                      }}
                       className="hover-lift"
                     >
                       <Plus size={12} />
@@ -587,44 +579,10 @@ function CaseWorkspaceContent() {
               </div>
             </div>
 
-            {/* Story/Analysis Mode Toggle + Assets Button - Sticky within scroll */}
+            {/* Lane counts - Sticky within scroll */}
             <div className="px-4 md:px-6 py-4 border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-30">
-              <div className="max-w-6xl mx-auto flex items-center justify-between">
-                {/* Mode Toggle */}
-                <div className="flex items-center gap-1 p-1.5 bg-surface-alt/80 rounded-lg rounded-none-xl shadow-sm">
-                  <button
-                    onClick={() => setViewMode("story")}
-                    className={cn(
-                      "px-5 py-2.5 font-mono text-sm font-bold",
-                      "rounded-md rounded-none",
-                      "transition-all duration-300 press-scale",
-                      viewMode === "story"
-                        ? "bg-background dark:bg-surface text-foreground shadow-md"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                    style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
-                  >
-                    Story
-                  </button>
-                  <button
-                    onClick={() => setViewMode("analysis")}
-                    className={cn(
-                      "px-5 py-2.5 font-mono text-sm font-bold",
-                      "rounded-md rounded-none",
-                      "transition-all duration-300 press-scale",
-                      viewMode === "analysis"
-                        ? "bg-background dark:bg-surface text-foreground shadow-md"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                    style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
-                  >
-                    Analysis
-                  </button>
-                </div>
-                
-                {/* Lane counts + Assets button */}
+              <div className="max-w-6xl mx-auto flex items-center justify-end">
                 <div className="flex items-center gap-3">
-                  {/* Lane counts with hover effect */}
                   <div className="hidden md:flex items-center gap-2">
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 border border-border/60 rounded-lg text-xs font-mono transition-all duration-200 hover:border-lane-factual/50 hover:bg-lane-factual/5 cursor-default">
                       <div className="w-2 h-2 rounded-full animate-pulse-soft" style={{ backgroundColor: "var(--lane-factual)", boxShadow: '0 0 4px var(--lane-factual)' }} />
@@ -642,13 +600,11 @@ function CaseWorkspaceContent() {
                       <span className="font-bold text-lane-scheduling">2</span>
                     </div>
                   </div>
-                  
                 </div>
               </div>
             </div>
             
-            {/* THE STORY SO FAR Banner - only in Story mode */}
-            {viewMode === "story" && (
+            {/* THE STORY SO FAR Banner */}
             <div className="story-banner px-4 md:px-6 py-8 md:py-10 relative overflow-hidden">
               {/* Subtle animated background */}
               <div className="absolute inset-0 opacity-20">
@@ -707,60 +663,6 @@ function CaseWorkspaceContent() {
                 </div>
               </div>
             </div>
-            )}
-            
-            {/* Analysis Mode View */}
-            {viewMode === "analysis" && (
-              <div className="px-4 md:px-6 py-4">
-                <div className="max-w-6xl mx-auto">
-                  {/* Analysis Header with filters */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      {LANES.slice(0, 3).map((lane) => (
-                        <button
-                          key={lane.id}
-                          onClick={() => toggleLane(lane.id)}
-                          className={cn(
-                            "px-3 py-1.5 flex items-center gap-2 transition-all",
-                            "font-mono text-[10px] font-bold border-2",
-                            "rounded-none rounded-none",
-                            visibleLanes.has(lane.id)
-                              ? "border-current"
-                              : "border-border text-muted-foreground opacity-50"
-                          )}
-                          style={{ 
-                            color: visibleLanes.has(lane.id) ? lane.color : undefined,
-                            backgroundColor: visibleLanes.has(lane.id) ? `color-mix(in srgb, ${lane.color} 10%, transparent)` : undefined
-                          }}
-                        >
-                          <lane.icon size={12} />
-                          {lane.label}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <button className={cn(
-                        "px-3 py-1.5 border-2 border-border",
-                        "font-mono text-[10px] font-bold",
-                        "rounded-none rounded-none",
-                        "hover:border-foreground transition-colors"
-                      )}>
-                        CRITICAL
-                      </button>
-                      <button className={cn(
-                        "px-3 py-1.5 border-2 border-border",
-                        "font-mono text-[10px] font-bold",
-                        "rounded-none rounded-none",
-                        "hover:border-foreground transition-colors"
-                      )}>
-                        IMPORTANT
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Combined Timeline + Docket Section */}
             <div className="p-4 md:p-6">
@@ -1126,7 +1028,7 @@ function CaseWorkspaceContent() {
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <div className="font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">
-                      Uploaded Evidence Dataset <span className="text-[var(--green)] normal-case">— Private evidence for inference analysis</span>
+                      Uploaded Evidence Dataset <span className="text-[var(--green)] normal-case">— Private evidence uploads</span>
                     </div>
                     <div className="border-[2.5px] border-[var(--border)] bg-[var(--surface)]">
                       {/* Header */}
@@ -1835,6 +1737,7 @@ function CaseWorkspaceContent() {
           </div>
         )}
       </main>
+      <SidebarChat />
     </div>
   )
 }
