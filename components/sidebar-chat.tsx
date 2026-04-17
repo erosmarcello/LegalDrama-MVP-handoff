@@ -21,43 +21,64 @@ type QuickReply = {
   href?: string
 }
 
-const QUICK_REPLIES: QuickReply[] = [
-  { label: "Story So Far", href: "/case/usa-v-mangione#story" },
-  { label: "Timeline & Docket", href: "/case/usa-v-mangione#timeline" },
-  { label: "Characters", href: "/case/usa-v-mangione#characters" },
-  { label: "Browse cases", href: "/browse" },
-  { label: "Settings", href: "/settings" },
+type QuickReplyGroup = {
+  heading: string
+  items: QuickReply[]
+}
+
+const QUICK_REPLY_GROUPS: QuickReplyGroup[] = [
   {
-    label: "Weak points in gov's case?",
-    prompt:
-      "What are the likely weak points in the government's case against Luigi Mangione?",
+    heading: "Navigate",
+    items: [
+      { label: "Story So Far", href: "/case/usa-v-mangione#story" },
+      { label: "Timeline & Docket", href: "/case/usa-v-mangione#timeline" },
+      { label: "Characters", href: "/case/usa-v-mangione#characters" },
+      { label: "Browse", href: "/browse" },
+      { label: "Settings", href: "/settings" },
+    ],
   },
   {
-    label: "Any female detectives?",
-    prompt:
-      "Were there any female detectives or agents involved in the Mangione investigation?",
+    heading: "Case Q&A",
+    items: [
+      {
+        label: "Weak points",
+        prompt:
+          "What are the likely weak points in the government's case against Luigi Mangione?",
+      },
+      {
+        label: "Female detectives?",
+        prompt:
+          "Were there any female detectives or agents involved in the Mangione investigation?",
+      },
+      {
+        label: "Complementing character",
+        prompt:
+          "Suggest a defense-side character (archetype) that would complement the lead prosecutor in the Mangione case for a dramatization.",
+      },
+    ],
   },
   {
-    label: "Suggest a complementing character",
-    prompt:
-      "Suggest a defense-side character (archetype) that would complement the lead prosecutor in the Mangione case for a dramatization.",
-  },
-  // Develop — writers-room journeys (added without altering nav IA)
-  {
-    label: "What's the truth here?",
-    prompt: "What is the truth of the Mangione story?",
-  },
-  {
-    label: "Themes — why care?",
-    prompt: "What are the central themes of this case and why should an audience care?",
-  },
-  {
-    label: "City as character",
-    prompt: "How would you write New York City as a character in this story?",
-  },
-  {
-    label: "What's getting funded?",
-    prompt: "What kinds of true-crime and legal-drama themes are getting funded right now?",
+    heading: "Develop",
+    items: [
+      {
+        label: "Truth of this story",
+        prompt: "What is the truth of the Mangione story?",
+      },
+      {
+        label: "Themes",
+        prompt:
+          "What are the central themes of this case and why should an audience care?",
+      },
+      {
+        label: "City as character",
+        prompt: "How would you write New York City as a character in this story?",
+      },
+      {
+        label: "What's getting funded",
+        prompt:
+          "What kinds of true-crime and legal-drama themes are getting funded right now?",
+      },
+    ],
   },
 ]
 
@@ -294,7 +315,14 @@ export function SidebarChat() {
   const [streaming, setStreaming] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const launcherRef = useRef<HTMLButtonElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+
+  const closePanel = () => {
+    abortRef.current?.abort()
+    setOpen(false)
+  }
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -302,9 +330,19 @@ export function SidebarChat() {
     }
   }, [messages, streaming])
 
+  const mountedRef = useRef(false)
   useEffect(() => {
+    if (!mountedRef.current) {
+      // don't steal focus on initial page load
+      mountedRef.current = true
+      return
+    }
     if (open && textareaRef.current) {
       textareaRef.current.focus()
+    } else if (!open && launcherRef.current) {
+      // return focus to the launcher when the panel closes so keyboard users
+      // don't lose their place in the tab order
+      launcherRef.current.focus()
     }
   }, [open])
 
@@ -313,6 +351,57 @@ export function SidebarChat() {
       abortRef.current?.abort()
     }
   }, [])
+
+  // ⌘K / Ctrl+K toggles the panel from anywhere in the app
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const isToggle =
+        (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k"
+      if (isToggle) {
+        e.preventDefault()
+        setOpen((o) => !o)
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [])
+
+  // Escape closes the panel; Tab / Shift+Tab wraps inside it (focus trap)
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault()
+        closePanel()
+        return
+      }
+      if (e.key !== "Tab") return
+      const panel = panelRef.current
+      if (!panel) return
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.hasAttribute("aria-hidden"))
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      if (e.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (active === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [open])
 
   const sendMessage = async (content: string) => {
     const trimmed = content.trim()
@@ -384,8 +473,10 @@ export function SidebarChat() {
       {/* Floating launcher button */}
       {!open && (
         <button
+          ref={launcherRef}
           onClick={() => setOpen(true)}
-          aria-label="Open Sidebar — AI counsel"
+          aria-label="Open Sidebar — AI counsel (⌘K)"
+          title="Sidebar — AI counsel (⌘K)"
           className={cn(
             "fixed bottom-6 right-6 z-[60]",
             "flex items-center gap-2 px-4 h-12",
@@ -408,6 +499,7 @@ export function SidebarChat() {
       {/* Chat panel */}
       {open && (
         <div
+          ref={panelRef}
           className={cn(
             "fixed bottom-6 right-6 z-[60]",
             "w-[min(92vw,420px)] h-[min(80vh,600px)]",
@@ -417,7 +509,8 @@ export function SidebarChat() {
             "shadow-[6px_6px_0px_var(--shadow-color)]",
           )}
           role="dialog"
-          aria-label="Sidebar chat"
+          aria-modal="true"
+          aria-label="Sidebar — AI counsel"
         >
           {/* Header */}
           <div
@@ -448,14 +541,12 @@ export function SidebarChat() {
               </div>
             </div>
             <button
-              onClick={() => {
-                abortRef.current?.abort()
-                setOpen(false)
-              }}
-              aria-label="Close Sidebar"
+              onClick={closePanel}
+              aria-label="Close Sidebar (Esc)"
+              title="Close (Esc)"
               className={cn(
                 "w-8 h-8 flex items-center justify-center",
-                "border-2 border-[var(--border)]",
+                "border-[2.5px] border-[var(--border)]",
                 "bg-[var(--background)] text-[var(--foreground)]",
                 "hover:border-[var(--purple)] hover:text-[var(--purple)]",
                 "transition-colors",
@@ -484,31 +575,49 @@ export function SidebarChat() {
             ))}
           </div>
 
-          {/* Quick replies */}
+          {/* Quick replies — grouped by intent */}
           <div
             className={cn(
-              "px-3 py-2 border-t-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]",
-              "flex flex-wrap gap-1.5",
+              "px-3 pt-2 pb-2.5 border-t-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]",
+              "space-y-1.5",
             )}
           >
-            {QUICK_REPLIES.map((q) => (
-              <button
-                key={q.label}
-                onClick={() => handleQuickReply(q)}
-                disabled={streaming}
-                className={cn(
-                  "inline-flex items-center gap-1 px-2 py-1",
-                  "font-mono text-[10px] font-bold uppercase tracking-wider",
-                  "border-2 border-[var(--border)] bg-[var(--card)]",
-                  "text-[var(--foreground)]",
-                  "hover:border-[var(--purple)] hover:text-[var(--purple)]",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  "transition-colors",
-                )}
-              >
-                {q.href ? <ArrowUpRight size={10} /> : <Scale size={10} />}
-                {q.label}
-              </button>
+            {QUICK_REPLY_GROUPS.map((group) => (
+              <div key={group.heading}>
+                <div
+                  className={cn(
+                    "font-mono text-[9px] font-bold uppercase tracking-[0.18em]",
+                    "text-[var(--muted-foreground)]",
+                    "pl-0.5 mb-1",
+                  )}
+                >
+                  {group.heading}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {group.items.map((q) => (
+                    <button
+                      key={q.label}
+                      onClick={() => handleQuickReply(q)}
+                      disabled={streaming}
+                      className={cn(
+                        "inline-flex items-center gap-1 px-2 py-1",
+                        "font-mono text-[11px] font-bold uppercase tracking-wider",
+                        "border-[2.5px] border-[var(--border)]",
+                        q.href
+                          ? "bg-[var(--surface)]"
+                          : "bg-[var(--card)]",
+                        "text-[var(--foreground)]",
+                        "hover:border-[var(--purple)] hover:text-[var(--purple)]",
+                        "disabled:opacity-50 disabled:cursor-not-allowed",
+                        "transition-colors",
+                      )}
+                    >
+                      {q.href ? <ArrowUpRight size={10} /> : <Scale size={10} />}
+                      {q.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
 
@@ -584,7 +693,9 @@ function MessageBubble({
           "border-[2.5px] border-[var(--border)]",
           "shadow-[2px_2px_0px_var(--shadow-color)]",
           isUser
-            ? "bg-[var(--amber)] text-[var(--background)] font-sans font-semibold"
+            ? // Amber is a saturated light fill in both themes, so text must stay
+              // near-black for AA contrast (≈9.2:1 on #EF9F27).
+              "bg-[var(--amber)] text-[#1C1810] font-sans font-semibold"
             : "bg-[var(--card)] text-[var(--foreground)] font-serif",
           "text-sm leading-relaxed whitespace-pre-wrap",
         )}
