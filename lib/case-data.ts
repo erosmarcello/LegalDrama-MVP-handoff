@@ -355,14 +355,49 @@ export const TIMELINE_EVENTS = [
   { id: "s5", lane: "scheduling" as const, date: "2026-10-13", title: "TRIAL BEGINS", description: "Opening statements scheduled", tier: 1 },
 ]
 
-// Character profiles — real case participants (not actors)
-export const CHARACTER_PROFILES = [
+// ──────────────────────────────────────────────────────────────
+// DRAMA LEVELS — 5-stop parametric drama axis (per-entity)
+// ──────────────────────────────────────────────────────────────
+// Levels 0..4 swap the displayed prose for characters / locations / stakes.
+// Each level name implies a distinct editorial register; see descs[0..4]
+// on every entity. Colors come from the existing brutalist palette.
+export const DRAMA_LEVELS = [
+  { id: 0, label: "Court Record", short: "RECORD", color: "var(--green)" },
+  { id: 1, label: "Docudrama",    short: "DOCU",   color: "var(--cyan)" },
+  { id: 2, label: "Thriller",     short: "THRLR",  color: "var(--amber)" },
+  { id: 3, label: "Alt-History",  short: "ALT",    color: "var(--purple)" },
+  { id: 4, label: "Mythic",       short: "MYTH",   color: "var(--red)" },
+] as const
+
+export type DramaLevel = 0 | 1 | 2 | 3 | 4
+
+// Character profiles — real case participants (not actors).
+// descs[0..4] correspond to DRAMA_LEVELS above.
+export interface CharacterProfile {
+  id: string
+  name: string
+  role: string
+  roleColor: string
+  profile: string            // legacy one-line summary; preserved for backwards compat
+  descs: [string, string, string, string, string]
+  evidenceCount: number
+  thumbnail: string | null
+}
+
+export const CHARACTER_PROFILES: CharacterProfile[] = [
   {
     id: "char-1",
     name: "Luigi Nicholas Mangione",
     role: "Defendant",
     roleColor: "var(--orange)",
     profile: "26-year-old Ivy League graduate charged with the murder of UnitedHealthcare CEO Brian Thompson. Arrested in Altoona, PA after a nationwide manhunt.",
+    descs: [
+      "26-year-old Ivy League graduate. Charged with the murder of UnitedHealthcare CEO Brian Thompson. Arrested Dec 9, 2024 at a McDonald's in Altoona, PA.",
+      "Valedictorian turned fugitive. Manifesto in his backpack, ghost gun in his jacket. A nationwide manhunt ended at a cashier's second glance.",
+      "The most-wanted man in America for five days. Four states of evasion, one employee's phone call, and the biggest murder trial of the decade snaps into place.",
+      "Folk hero in Brooklyn, villain on cable news, Rorschach test for a country sick of its own healthcare system. Depending on the outlet, he's either a murderer or a medic.",
+      "The Cipher — a brilliant engineer radicalized against the machine. The hand that mailed a reckoning to a skyscraper at 6:47 AM.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },
@@ -372,6 +407,13 @@ export const CHARACTER_PROFILES = [
     role: "Judge",
     roleColor: "var(--amber)",
     profile: "U.S. District Judge presiding over the case. Issued key rulings on suppression motion and dismissed Counts 3 and 4 for insufficient federal nexus.",
+    descs: [
+      "U.S. District Judge, S.D.N.Y. Issued the suppression denial (Dkt 102) and partial dismissal (Dkt 103). Sets trial for October 13, 2026.",
+      "Rising SDNY jurist with a reputation for tight courtroom control. Clean written opinions, no tolerance for theatrics on either side.",
+      "The gatekeeper. Her suppression order stamped every piece of evidence admissible; her dismissal gutted two counts. Every motion passes through her pen.",
+      "In another timeline she'd be on the short list for the Second Circuit — but this case is the one that defines her tenure on the district bench.",
+      "The Arbiter. One gavel, one courtroom, a country watching every ruling she writes.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },
@@ -381,6 +423,13 @@ export const CHARACTER_PROFILES = [
     role: "Lead Defense",
     roleColor: "var(--green)",
     profile: "Prominent defense attorney and former Manhattan Chief ADA. Leads the defense strategy challenging the constitutionality of charges and arrest circumstances.",
+    descs: [
+      "Former Manhattan Chief ADA. Lead defense counsel. Entered appearance Dec 19, 2024 (Dkt 3). Filed the motion to suppress and the motion to dismiss.",
+      "Career prosecutor turned A-list defender. She's tried murders, she's seen indictments fall, and she filed the suppression motion herself.",
+      "The only lawyer in New York who scares the U.S. Attorney's Office. She picked apart the Altoona stop on live television before discovery had even landed.",
+      "The ex-insider dismantling the system she helped build. Every cross-examination is a slow unspooling of institutional memory.",
+      "The Shield — the voice that stands between the Defendant and the machinery of federal prosecution.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },
@@ -390,6 +439,13 @@ export const CHARACTER_PROFILES = [
     role: "Co-Counsel",
     roleColor: "var(--cyan)",
     profile: "Admitted pro hac vice as additional counsel for the capital case. Experienced federal defense attorney specializing in complex criminal matters.",
+    descs: [
+      "Admitted pro hac vice as learned counsel for the capital case (Dkt 35). Federal defense specialist in complex criminal matters.",
+      "The quiet half of the Agnifilo partnership. Complex federal work, RICO defenses, Sean Combs — he does his best work on the briefing page.",
+      "The strategist. While Karen runs press, Marc runs precedent — the learned-counsel motion, the post-hearing brief, the Rule 29 memo all trace to him.",
+      "The architect of a defense built to survive a jury pool poisoned by eighteen months of cable coverage. He plans three motions ahead of the government.",
+      "The Cartographer — maps the legal terrain his partner walks into every morning.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },
@@ -399,6 +455,13 @@ export const CHARACTER_PROFILES = [
     role: "Lead Prosecutor",
     roleColor: "var(--cyan)",
     profile: "Assistant United States Attorney leading the prosecution. Filed the death penalty notice and later withdrew it after Counts 3 and 4 were dismissed.",
+    descs: [
+      "Assistant U.S. Attorney, S.D.N.Y. Filed the death penalty notice Apr 24, 2025 (Dkt 25). Formally withdrew capital punishment Feb 27, 2026 (Dkt 113).",
+      "Career fed. Years at SDNY, a wall of conviction plaques, and one of the hardest cases in the district sitting on the desk.",
+      "The face of the Department of Justice in the biggest political murder trial of the decade. The DP withdrawal was the first public crack in the government's posture.",
+      "The prosecutor whose career pivoted the day Counts 3 and 4 fell. Still has Count 1 and Count 2 — still has a life sentence in reach.",
+      "The Law Itself, in a pantsuit. The state's voice, speaking through a microphone that has never been louder.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },
@@ -408,6 +471,13 @@ export const CHARACTER_PROFILES = [
     role: "Victim",
     roleColor: "var(--red)",
     profile: "CEO of UnitedHealthcare, shot outside the Hilton Midtown in Manhattan on December 4, 2024. The killing sparked nationwide debate about healthcare industry practices.",
+    descs: [
+      "CEO of UnitedHealthcare. Shot outside the Hilton Midtown, Manhattan, at 6:47 AM on December 4, 2024.",
+      "50-year-old father of two. 20-year Minnesota commute. A shareholder letter in his briefcase, an investor conference thirty minutes away.",
+      "The face the country picked to hate when it ran out of faces. His death unlocked a conversation no press release ever did.",
+      "The human who stood in for a system. Not the architect of denial, not the executive behind the algorithm — but the man who drew fire meant for all of them.",
+      "The Sacrificial King — the figure whose death, coded in three-word inscriptions, lit a cultural fuse that hasn't stopped burning.",
+    ],
     evidenceCount: 0,
     thumbnail: null,
   },

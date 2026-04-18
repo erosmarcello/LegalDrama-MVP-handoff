@@ -16,8 +16,8 @@ import {
 import { cn } from "@/lib/utils"
 import { LegalButton, LegalCard, Chip, ToastProvider, useToast, LegalInput, LegalTabs } from "@/components/legal-ui"
 import {
-  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, TIMELINE_EVENTS,
-  type DocketEntry, type Chapter, type ChapterSection, getDatePercent, getLaneColor
+  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, TIMELINE_EVENTS, DRAMA_LEVELS,
+  type DocketEntry, type Chapter, type ChapterSection, type DramaLevel, getDatePercent, getLaneColor
 } from "@/lib/case-data"
 
 import { SettingsModal } from "@/components/settings-modal"
@@ -98,7 +98,10 @@ function CaseWorkspaceContent() {
 
   // View state
   const [compactView, setCompactView] = useState(false)
-  
+
+  // Per-character drama level (0 = Court Record, 4 = Mythic). Defaults to 0.
+  const [charLevels, setCharLevels] = useState<Record<string, DramaLevel>>({})
+
   // Modal state
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
@@ -1696,7 +1699,11 @@ function CaseWorkspaceContent() {
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-5">
-                  {CHARACTER_PROFILES.map((char, i) => (
+                  {CHARACTER_PROFILES.map((char, i) => {
+                    const lvl: DramaLevel = (charLevels[char.id] ?? 0) as DramaLevel
+                    const activeLevel = DRAMA_LEVELS[lvl]
+                    const setLvl = (v: DramaLevel) => setCharLevels((p) => ({ ...p, [char.id]: v }))
+                    return (
                     <div
                       key={char.id}
                       className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
@@ -1714,7 +1721,70 @@ function CaseWorkspaceContent() {
                         <div className="flex-1 min-w-0">
                           <div className="font-mono text-[10px] font-bold uppercase mb-1" style={{ color: char.roleColor }}>{char.role}</div>
                           <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{char.name}</div>
-                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-2">{char.profile}</p>
+                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{char.descs[lvl]}</p>
+
+                          {/* Drama level — 5-stop parametric slider */}
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                                Drama · L{lvl}
+                              </div>
+                              <div
+                                className="font-mono text-[9px] font-bold uppercase tracking-wider"
+                                style={{ color: activeLevel.color }}
+                              >
+                                {activeLevel.label}
+                              </div>
+                            </div>
+                            <div
+                              role="radiogroup"
+                              aria-label={`Drama level for ${char.name}`}
+                              className="flex gap-1"
+                            >
+                              {DRAMA_LEVELS.map((dl) => {
+                                const active = dl.id === lvl
+                                const filled = dl.id <= lvl
+                                return (
+                                  <button
+                                    key={dl.id}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={active}
+                                    aria-label={`${dl.label} (level ${dl.id})`}
+                                    tabIndex={active ? 0 : -1}
+                                    onClick={() => setLvl(dl.id as DramaLevel)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                                        e.preventDefault()
+                                        setLvl(Math.min(4, lvl + 1) as DramaLevel)
+                                      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                                        e.preventDefault()
+                                        setLvl(Math.max(0, lvl - 1) as DramaLevel)
+                                      } else if (e.key === "Home") {
+                                        e.preventDefault()
+                                        setLvl(0)
+                                      } else if (e.key === "End") {
+                                        e.preventDefault()
+                                        setLvl(4)
+                                      }
+                                    }}
+                                    title={dl.label}
+                                    className={cn(
+                                      "flex-1 h-3.5 border-[2px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+                                      active
+                                        ? "border-[var(--foreground)] shadow-[1px_1px_0_var(--shadow-color)]"
+                                        : "border-[var(--border)] hover:border-[var(--foreground)]/60",
+                                    )}
+                                    style={{
+                                      backgroundColor: filled ? dl.color : "transparent",
+                                      opacity: filled ? 1 : 0.35,
+                                    }}
+                                  />
+                                )
+                              })}
+                            </div>
+                          </div>
+
                           <div className="flex items-center gap-2">
                             <button
                               className="flex items-center gap-1.5 px-3 py-1.5 border-[2.5px] border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)] hover:bg-[var(--cyan)] hover:text-white transition-colors"
@@ -1730,7 +1800,8 @@ function CaseWorkspaceContent() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )
+                  })}
                 </div>
               )}
             </div>
