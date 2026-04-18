@@ -11,12 +11,13 @@ import {
   Lock, Unlock, Save, RotateCcw, Wand2, AlertTriangle,
   Search, Filter, ChevronDown, Zap, Calendar, Target, Layers,
   Volume2, VolumeX, Flame, Scale, BookOpen, LayoutGrid, List,
-  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload, Folder
+  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload, Folder,
+  MapPin
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LegalButton, LegalCard, Chip, ToastProvider, useToast, LegalInput, LegalTabs } from "@/components/legal-ui"
 import {
-  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, TIMELINE_EVENTS, DRAMA_LEVELS,
+  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, LOCATION_PROFILES, TIMELINE_EVENTS, DRAMA_LEVELS,
   type DocketEntry, type Chapter, type ChapterSection, type DramaLevel, getDatePercent, getLaneColor
 } from "@/lib/case-data"
 
@@ -101,6 +102,9 @@ function CaseWorkspaceContent() {
 
   // Per-character drama level (0 = Court Record, 4 = Mythic). Defaults to 0.
   const [charLevels, setCharLevels] = useState<Record<string, DramaLevel>>({})
+
+  // Per-location drama level. Same axis as characters.
+  const [locLevels, setLocLevels] = useState<Record<string, DramaLevel>>({})
 
   // Modal state
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
@@ -1804,6 +1808,103 @@ function CaseWorkspaceContent() {
                   })}
                 </div>
               )}
+
+              {/* ─── LOCATIONS (drama-axis places) ─── */}
+              <h2 className="font-sans text-xl font-bold text-[var(--foreground)] mb-6 mt-12 flex items-center gap-3">
+                <MapPin size={22} style={{ color: "var(--cyan)" }} />
+                <span className="tracking-tight">Locations</span>
+                <span className="font-mono text-[10px] font-bold uppercase text-[var(--muted-foreground)] tracking-wider ml-1">
+                  {LOCATION_PROFILES.length}
+                </span>
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                {LOCATION_PROFILES.map((loc) => {
+                  const lvl: DramaLevel = (locLevels[loc.id] ?? 0) as DramaLevel
+                  const activeLevel = DRAMA_LEVELS[lvl]
+                  const setLvl = (v: DramaLevel) => setLocLevels((p) => ({ ...p, [loc.id]: v }))
+                  return (
+                    <div
+                      key={loc.id}
+                      className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
+                      style={{ borderLeftColor: loc.roleColor, borderLeftWidth: "5px" }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="relative w-16 h-16 flex-shrink-0 border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center shadow-[2px_2px_0px_var(--shadow-color)]">
+                          <MapPin size={24} style={{ color: loc.roleColor }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-mono text-[10px] font-bold uppercase mb-1" style={{ color: loc.roleColor }}>{loc.role}</div>
+                          <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{loc.name}</div>
+                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{loc.descs[lvl]}</p>
+
+                          {/* Drama level slider — identical pattern to characters */}
+                          <div className="mb-1">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+                                Drama · L{lvl}
+                              </div>
+                              <div
+                                className="font-mono text-[9px] font-bold uppercase tracking-wider"
+                                style={{ color: activeLevel.color }}
+                              >
+                                {activeLevel.label}
+                              </div>
+                            </div>
+                            <div
+                              role="radiogroup"
+                              aria-label={`Drama level for ${loc.name}`}
+                              className="flex gap-1"
+                            >
+                              {DRAMA_LEVELS.map((dl) => {
+                                const active = dl.id === lvl
+                                const filled = dl.id <= lvl
+                                return (
+                                  <button
+                                    key={dl.id}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={active}
+                                    aria-label={`${dl.label} (level ${dl.id})`}
+                                    tabIndex={active ? 0 : -1}
+                                    onClick={() => setLvl(dl.id as DramaLevel)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                                        e.preventDefault()
+                                        setLvl(Math.min(4, lvl + 1) as DramaLevel)
+                                      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                                        e.preventDefault()
+                                        setLvl(Math.max(0, lvl - 1) as DramaLevel)
+                                      } else if (e.key === "Home") {
+                                        e.preventDefault()
+                                        setLvl(0)
+                                      } else if (e.key === "End") {
+                                        e.preventDefault()
+                                        setLvl(4)
+                                      }
+                                    }}
+                                    title={dl.label}
+                                    className={cn(
+                                      "flex-1 h-3.5 border-[2px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+                                      active
+                                        ? "border-[var(--foreground)] shadow-[1px_1px_0_var(--shadow-color)]"
+                                        : "border-[var(--border)] hover:border-[var(--foreground)]/60",
+                                    )}
+                                    style={{
+                                      backgroundColor: filled ? dl.color : "transparent",
+                                      opacity: filled ? 1 : 0.35,
+                                    }}
+                                  />
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}

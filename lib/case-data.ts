@@ -483,6 +483,100 @@ export const CHARACTER_PROFILES: CharacterProfile[] = [
   },
 ]
 
+// ──────────────────────────────────────────────────────────────
+// LOCATION PROFILES — physical places that anchor the story.
+// Same drama-axis pattern as characters: descs[0..4] matched to
+// DRAMA_LEVELS (Court Record → Mythic).
+// ──────────────────────────────────────────────────────────────
+export interface LocationProfile {
+  id: string
+  name: string
+  role: string
+  roleColor: string
+  descs: [string, string, string, string, string]
+}
+
+export const LOCATION_PROFILES: LocationProfile[] = [
+  {
+    id: "loc-1",
+    name: "Hilton Midtown",
+    role: "Crime Scene",
+    roleColor: "var(--red)",
+    descs: [
+      "1335 Avenue of the Americas, Manhattan. Brian Thompson shot at 6:47 AM on December 4, 2024 at the West 54th Street entrance.",
+      "Pre-dawn Midtown — streetlights, idling cabs, a gunman in a black puffer who waited behind a scaffolding stairwell until the CEO stepped out toward a shareholder breakfast.",
+      "The intersection where the country's most-photographed murder unfolded on cameras already rolling when the first shot fired. Three shell casings on the sidewalk. Three words inked into each.",
+      "The address that became a symbol — the corporate Midtown rendezvous where every quarterly investor breakfast starts, and where one of them ended at the speed of a 9mm round.",
+      "The Altar — the 54th Street sidewalk where a nation's grievance was offered up in a single aimed round before sunrise.",
+    ],
+  },
+  {
+    id: "loc-2",
+    name: "Altoona McDonald's",
+    role: "Arrest Scene",
+    roleColor: "var(--orange)",
+    descs: [
+      "2329 Plank Road, Altoona, PA. Mangione arrested here December 9, 2024 at approximately 9:15 AM after a customer tip to the manager.",
+      "Small-town Pennsylvania fast-food booth. A laptop, a fake New Jersey ID, a hash brown on the tray. Three officers walked in. One employee had made the call.",
+      "The end of the five-day manhunt. Interstate 80 outside, a ghost gun in the backpack, and a cashier's eyes that didn't look away fast enough.",
+      "The McDonald's that closed the most-watched fugitive case of the decade. Altoona became a noun, a punchline, and a pilgrimage site, all in one week.",
+      "The Crossroads Diner — the anonymous roadside inn where destiny reached across a Formica table and put a hand on the Cipher's shoulder.",
+    ],
+  },
+  {
+    id: "loc-3",
+    name: "HI NYC Hostel (UWS)",
+    role: "Safehouse",
+    roleColor: "var(--purple)",
+    descs: [
+      "891 Amsterdam Avenue, Manhattan. Defendant checked in November 24 using a false New Jersey ID; checked out the morning of December 4.",
+      "Upper West Side backpacker bunk room. Ten-bed dormitory, shared bathroom. Ten days of staging — maps, writings, range time at a southern Pennsylvania club.",
+      "The staging ground. A hostel bed, a laptop, and a list of New York investor-conference venues narrowed down to one corner at 6:47 AM.",
+      "The anonymous bunk that housed a plot no one in the room suspected. The clerk remembered a quiet guest who paid cash and always returned before 11.",
+      "The Hermit's Cell — ten days of silent preparation in a room full of strangers who never looked up from their phones.",
+    ],
+  },
+  {
+    id: "loc-4",
+    name: "Moynihan U.S. Courthouse",
+    role: "Battlefield",
+    roleColor: "var(--cyan)",
+    descs: [
+      "500 Pearl Street, New York. Daniel Patrick Moynihan U.S. Courthouse. Judge Garnett presides on the 17th floor.",
+      "A granite-clad federal block with Lower Manhattan's tightest security perimeter. Press corps out front every ruling day since April 2025.",
+      "The battlefield. Every motion, every ruling, every witness runs through Courtroom 17. The war room where the capital case was won on DP withdrawal and lost on suppression.",
+      "The stage of record — where the Mangione case stopped being a cable story and became a constitutional argument about what the federal stalking statute means in 2026.",
+      "The Tower — the granite pillar where the machinery of federal justice grinds, eighteen stories above the street and one gavel at a time.",
+    ],
+  },
+  {
+    id: "loc-5",
+    name: "GWB Bus Terminal",
+    role: "Escape Route",
+    roleColor: "var(--amber)",
+    descs: [
+      "4211 Broadway, Washington Heights. Suspect boarded a Greyhound bus northwest out of Manhattan at approximately 7:30 AM on December 4.",
+      "Upper Manhattan interstate bus terminal. Security footage caught him at 7:12 AM, backpack over shoulder, walking to the departures platform.",
+      "The exit route. Forty-three minutes after the shooting, the suspect was on an outbound bus crossing the Hudson. Ghost gun still on him. No one looked twice.",
+      "The portal. A commuter terminal most New Yorkers have never noticed became the bottleneck the federal manhunt ran through for five days.",
+      "The Gate of the River — the crossing where the Cipher slipped out of the city and into the mythology of the open road.",
+    ],
+  },
+  {
+    id: "loc-6",
+    name: "Central Park (CPW)",
+    role: "Flight Path",
+    roleColor: "var(--green)",
+    descs: [
+      "Central Park West escape route. Suspect seen on e-bike at 6:54 AM entering the park at 65th Street; bike abandoned near 86th Street.",
+      "A pre-dawn bike ride north through Central Park on an e-bike with the registration plate scraped off. Twelve minutes later the bike was left in the grass.",
+      "The cover. Seven minutes after the shooting, the suspect was threading the park's path system on a rented e-bike — the one variable NYPD command couldn't predict.",
+      "The route that mapped itself in real time — a park escape that turned Central Park's bridle paths into the most scrutinized 1.3 miles of asphalt in New York.",
+      "The Wild Grove — the emerald corridor through which the assassin rode out of the polis, leaving the body of a king on the pavement behind.",
+    ],
+  },
+]
+
 // Events timeline data (legacy format for compatibility)
 export const EVENTS = [
   { id: "f1", lane: "factual", date: "2024-12-18", docket: "1", title: "Sealed Complaint Filed", description: "Charges under Sections 2261A, 924(j), 924(c).", tier: 1, type: "filing" },
