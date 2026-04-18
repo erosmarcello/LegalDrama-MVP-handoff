@@ -11,19 +11,21 @@ import {
   Lock, Unlock, Save, RotateCcw, Wand2, AlertTriangle,
   Search, Filter, ChevronDown, Zap, Calendar, Target, Layers,
   Volume2, VolumeX, Flame, Scale, BookOpen, LayoutGrid, List,
-  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload, Folder
+  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload, Folder,
+  MapPin
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LegalButton, LegalCard, Chip, ToastProvider, useToast, LegalInput, LegalTabs } from "@/components/legal-ui"
 import {
-  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, TIMELINE_EVENTS,
-  type DocketEntry, type Chapter, type ChapterSection, getDatePercent, getLaneColor
+  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, LOCATION_PROFILES, TIMELINE_EVENTS,
+  type DocketEntry, type Chapter, type ChapterSection, type DramaLevel, getDatePercent, getLaneColor
 } from "@/lib/case-data"
 
 import { SettingsModal } from "@/components/settings-modal"
 import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
+import { DramaLevelSlider } from "@/components/drama-level-slider"
 
 // Lane definitions for timeline
 const LANES = [
@@ -98,7 +100,13 @@ function CaseWorkspaceContent() {
 
   // View state
   const [compactView, setCompactView] = useState(false)
-  
+
+  // Per-character drama level (0 = Court Record, 4 = Mythic). Defaults to 0.
+  const [charLevels, setCharLevels] = useState<Record<string, DramaLevel>>({})
+
+  // Per-location drama level. Same axis as characters.
+  const [locLevels, setLocLevels] = useState<Record<string, DramaLevel>>({})
+
   // Modal state
   const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
@@ -1696,7 +1704,10 @@ function CaseWorkspaceContent() {
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-5">
-                  {CHARACTER_PROFILES.map((char, i) => (
+                  {CHARACTER_PROFILES.map((char) => {
+                    const lvl: DramaLevel = (charLevels[char.id] ?? 0) as DramaLevel
+                    const setLvl = (v: DramaLevel) => setCharLevels((p) => ({ ...p, [char.id]: v }))
+                    return (
                     <div
                       key={char.id}
                       className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
@@ -1714,7 +1725,15 @@ function CaseWorkspaceContent() {
                         <div className="flex-1 min-w-0">
                           <div className="font-mono text-[10px] font-bold uppercase mb-1" style={{ color: char.roleColor }}>{char.role}</div>
                           <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{char.name}</div>
-                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-2">{char.profile}</p>
+                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{char.descs[lvl]}</p>
+
+                          <DramaLevelSlider
+                            value={lvl}
+                            onChange={setLvl}
+                            entityName={char.name}
+                            className="mb-3"
+                          />
+
                           <div className="flex items-center gap-2">
                             <button
                               className="flex items-center gap-1.5 px-3 py-1.5 border-[2.5px] border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)] hover:bg-[var(--cyan)] hover:text-white transition-colors"
@@ -1730,9 +1749,51 @@ function CaseWorkspaceContent() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )
+                  })}
                 </div>
               )}
+
+              {/* ─── LOCATIONS (drama-axis places) ─── */}
+              <h2 className="font-sans text-xl font-bold text-[var(--foreground)] mb-6 mt-12 flex items-center gap-3">
+                <MapPin size={22} style={{ color: "var(--cyan)" }} />
+                <span className="tracking-tight">Locations</span>
+                <span className="font-mono text-[10px] font-bold uppercase text-[var(--muted-foreground)] tracking-wider ml-1">
+                  {LOCATION_PROFILES.length}
+                </span>
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                {LOCATION_PROFILES.map((loc) => {
+                  const lvl: DramaLevel = (locLevels[loc.id] ?? 0) as DramaLevel
+                  const setLvl = (v: DramaLevel) => setLocLevels((p) => ({ ...p, [loc.id]: v }))
+                  return (
+                    <div
+                      key={loc.id}
+                      className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
+                      style={{ borderLeftColor: loc.roleColor, borderLeftWidth: "5px" }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="relative w-16 h-16 flex-shrink-0 border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center shadow-[2px_2px_0px_var(--shadow-color)]">
+                          <MapPin size={24} style={{ color: loc.roleColor }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-mono text-[10px] font-bold uppercase mb-1" style={{ color: loc.roleColor }}>{loc.role}</div>
+                          <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{loc.name}</div>
+                          <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{loc.descs[lvl]}</p>
+
+                          <DramaLevelSlider
+                            value={lvl}
+                            onChange={setLvl}
+                            entityName={loc.name}
+                            className="mb-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}

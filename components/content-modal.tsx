@@ -92,7 +92,7 @@ const MOOD_CATEGORIES = [
 const LEGAL_INTELLIGENCE = [
   { id: "strength", label: "Case Strength", value: 72, unit: "%", color: "var(--green)", trend: "+3", desc: "AI-estimated prosecution strength" },
   { id: "deadline", label: "Next Deadline", value: "Apr 25", unit: "", color: "var(--red)", trend: "17d", desc: "Mot. in Limine responses due" },
-  { id: "judge", label: "Judge Gentry", value: "64%", unit: "gov", color: "var(--cyan)", trend: "±4", desc: "Historical govt win rate" },
+  { id: "judge", label: "Judge Garnett", value: "64%", unit: "gov", color: "var(--cyan)", trend: "±4", desc: "Historical govt win rate" },
   { id: "motions", label: "Suppression Rate", value: "23%", unit: "grant", color: "var(--orange)", trend: "S.D.N.Y.", desc: "District average for this motion type" },
 ]
 
