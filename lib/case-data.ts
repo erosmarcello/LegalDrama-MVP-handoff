@@ -369,7 +369,29 @@ export const DRAMA_LEVELS = [
   { id: 4, label: "Mythic",       short: "MYTH",   color: "var(--red)" },
 ] as const
 
-export type DramaLevel = 0 | 1 | 2 | 3 | 4
+// Derived from the array so DramaLevel and DRAMA_LEVELS cannot silently diverge.
+export type DramaLevel = (typeof DRAMA_LEVELS)[number]["id"]
+
+// Dev-mode contiguity guard. Every consumer below (descs tuples, tab state,
+// slider math) assumes ids are 0..n-1 in array order. If someone adds /
+// removes / reorders a level, crash loudly at module load so the drift is
+// caught in CI rather than silently producing stale UI.
+if (process.env.NODE_ENV !== "production") {
+  if (DRAMA_LEVELS.length !== 5) {
+    throw new Error(
+      `DRAMA_LEVELS must contain exactly 5 levels (0–4); found ${DRAMA_LEVELS.length}. ` +
+      `If you change the number of drama levels, update all consumers that assume 5 contiguous levels.`,
+    )
+  }
+  for (let i = 0; i < DRAMA_LEVELS.length; i++) {
+    if (DRAMA_LEVELS[i].id !== i) {
+      throw new Error(
+        `DRAMA_LEVELS ids must be contiguous from 0–${DRAMA_LEVELS.length - 1} in array order; ` +
+        `found id=${DRAMA_LEVELS[i].id} at index ${i}.`,
+      )
+    }
+  }
+}
 
 // Character profiles — real case participants (not actors).
 // descs[0..4] correspond to DRAMA_LEVELS above.

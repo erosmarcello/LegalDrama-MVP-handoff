@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils"
 import { LegalButton, LegalCard, Chip, ToastProvider, useToast, LegalInput, LegalTabs } from "@/components/legal-ui"
 import {
-  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, LOCATION_PROFILES, TIMELINE_EVENTS, DRAMA_LEVELS,
+  FULL_DOCKET_ENTRIES, CHAPTER_DATA, CHARACTER_PROFILES, LOCATION_PROFILES, TIMELINE_EVENTS,
   type DocketEntry, type Chapter, type ChapterSection, type DramaLevel, getDatePercent, getLaneColor
 } from "@/lib/case-data"
 
@@ -25,6 +25,7 @@ import { SettingsModal } from "@/components/settings-modal"
 import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
+import { DramaLevelSlider } from "@/components/drama-level-slider"
 
 // Lane definitions for timeline
 const LANES = [
@@ -1703,9 +1704,8 @@ function CaseWorkspaceContent() {
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-5">
-                  {CHARACTER_PROFILES.map((char, i) => {
+                  {CHARACTER_PROFILES.map((char) => {
                     const lvl: DramaLevel = (charLevels[char.id] ?? 0) as DramaLevel
-                    const activeLevel = DRAMA_LEVELS[lvl]
                     const setLvl = (v: DramaLevel) => setCharLevels((p) => ({ ...p, [char.id]: v }))
                     return (
                     <div
@@ -1727,67 +1727,12 @@ function CaseWorkspaceContent() {
                           <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{char.name}</div>
                           <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{char.descs[lvl]}</p>
 
-                          {/* Drama level — 5-stop parametric slider */}
-                          <div className="mb-3">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                                Drama · L{lvl}
-                              </div>
-                              <div
-                                className="font-mono text-[9px] font-bold uppercase tracking-wider"
-                                style={{ color: activeLevel.color }}
-                              >
-                                {activeLevel.label}
-                              </div>
-                            </div>
-                            <div
-                              role="radiogroup"
-                              aria-label={`Drama level for ${char.name}`}
-                              className="flex gap-1"
-                            >
-                              {DRAMA_LEVELS.map((dl) => {
-                                const active = dl.id === lvl
-                                const filled = dl.id <= lvl
-                                return (
-                                  <button
-                                    key={dl.id}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={active}
-                                    aria-label={`${dl.label} (level ${dl.id})`}
-                                    tabIndex={active ? 0 : -1}
-                                    onClick={() => setLvl(dl.id as DramaLevel)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                                        e.preventDefault()
-                                        setLvl(Math.min(4, lvl + 1) as DramaLevel)
-                                      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                                        e.preventDefault()
-                                        setLvl(Math.max(0, lvl - 1) as DramaLevel)
-                                      } else if (e.key === "Home") {
-                                        e.preventDefault()
-                                        setLvl(0)
-                                      } else if (e.key === "End") {
-                                        e.preventDefault()
-                                        setLvl(4)
-                                      }
-                                    }}
-                                    title={dl.label}
-                                    className={cn(
-                                      "flex-1 h-3.5 border-[2px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
-                                      active
-                                        ? "border-[var(--foreground)] shadow-[1px_1px_0_var(--shadow-color)]"
-                                        : "border-[var(--border)] hover:border-[var(--foreground)]/60",
-                                    )}
-                                    style={{
-                                      backgroundColor: filled ? dl.color : "transparent",
-                                      opacity: filled ? 1 : 0.35,
-                                    }}
-                                  />
-                                )
-                              })}
-                            </div>
-                          </div>
+                          <DramaLevelSlider
+                            value={lvl}
+                            onChange={setLvl}
+                            entityName={char.name}
+                            className="mb-3"
+                          />
 
                           <div className="flex items-center gap-2">
                             <button
@@ -1821,7 +1766,6 @@ function CaseWorkspaceContent() {
               <div className="grid md:grid-cols-2 gap-5">
                 {LOCATION_PROFILES.map((loc) => {
                   const lvl: DramaLevel = (locLevels[loc.id] ?? 0) as DramaLevel
-                  const activeLevel = DRAMA_LEVELS[lvl]
                   const setLvl = (v: DramaLevel) => setLocLevels((p) => ({ ...p, [loc.id]: v }))
                   return (
                     <div
@@ -1838,67 +1782,12 @@ function CaseWorkspaceContent() {
                           <div className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">{loc.name}</div>
                           <p className="font-serif text-sm text-[var(--muted-foreground)] mb-3 line-clamp-3">{loc.descs[lvl]}</p>
 
-                          {/* Drama level slider — identical pattern to characters */}
-                          <div className="mb-1">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
-                                Drama · L{lvl}
-                              </div>
-                              <div
-                                className="font-mono text-[9px] font-bold uppercase tracking-wider"
-                                style={{ color: activeLevel.color }}
-                              >
-                                {activeLevel.label}
-                              </div>
-                            </div>
-                            <div
-                              role="radiogroup"
-                              aria-label={`Drama level for ${loc.name}`}
-                              className="flex gap-1"
-                            >
-                              {DRAMA_LEVELS.map((dl) => {
-                                const active = dl.id === lvl
-                                const filled = dl.id <= lvl
-                                return (
-                                  <button
-                                    key={dl.id}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={active}
-                                    aria-label={`${dl.label} (level ${dl.id})`}
-                                    tabIndex={active ? 0 : -1}
-                                    onClick={() => setLvl(dl.id as DramaLevel)}
-                                    onKeyDown={(e) => {
-                                      if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                                        e.preventDefault()
-                                        setLvl(Math.min(4, lvl + 1) as DramaLevel)
-                                      } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                                        e.preventDefault()
-                                        setLvl(Math.max(0, lvl - 1) as DramaLevel)
-                                      } else if (e.key === "Home") {
-                                        e.preventDefault()
-                                        setLvl(0)
-                                      } else if (e.key === "End") {
-                                        e.preventDefault()
-                                        setLvl(4)
-                                      }
-                                    }}
-                                    title={dl.label}
-                                    className={cn(
-                                      "flex-1 h-3.5 border-[2px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
-                                      active
-                                        ? "border-[var(--foreground)] shadow-[1px_1px_0_var(--shadow-color)]"
-                                        : "border-[var(--border)] hover:border-[var(--foreground)]/60",
-                                    )}
-                                    style={{
-                                      backgroundColor: filled ? dl.color : "transparent",
-                                      opacity: filled ? 1 : 0.35,
-                                    }}
-                                  />
-                                )
-                              })}
-                            </div>
-                          </div>
+                          <DramaLevelSlider
+                            value={lvl}
+                            onChange={setLvl}
+                            entityName={loc.name}
+                            className="mb-1"
+                          />
                         </div>
                       </div>
                     </div>
