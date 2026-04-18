@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LegalButton, Chip, ToastProvider, useToast, LegalInput } from "@/components/legal-ui"
+import { SiteFooter } from "@/components/site-footer"
 
 /* ─── Tab definitions ─── */
 const TABS = [
@@ -966,6 +967,8 @@ function SettingsContent() {
           </div>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

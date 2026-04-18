@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { AuthModal } from "@/components/auth-modal"
 import { ToastProvider, useToast } from "@/components/legal-ui"
+import { SiteFooter } from "@/components/site-footer"
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -1055,6 +1056,8 @@ function HomePage() {
         }}
         initialMode={authMode}
       />
+
+      <SiteFooter />
     </div>
   )
 }

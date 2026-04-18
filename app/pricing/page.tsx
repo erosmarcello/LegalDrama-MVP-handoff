@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils"
 import { LegalButton, Chip, ToastProvider, useToast } from "@/components/legal-ui"
 import { SettingsLauncher } from "@/components/settings-launcher"
+import { SiteFooter } from "@/components/site-footer"
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -400,26 +401,7 @@ function PricingContent() {
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer
-        className={cn(
-          "mt-16 border-t-[2.5px] border-border",
-          "px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-4"
-        )}
-      >
-        <span className="font-mono text-[10px] text-muted-foreground">
-          &copy; 2026 LegalDrama.ai &mdash; All rights reserved
-        </span>
-        <div className="flex items-center gap-4">
-          {["Terms", "Privacy", "Support"].map((link) => (
-            <span
-              key={link}
-              className="font-mono text-[10px] text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-            >
-              {link}
-            </span>
-          ))}
-        </div>
-      </footer>
+      <SiteFooter className="mt-16" />
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { Search, Scale, Gavel, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { SettingsLauncher } from "@/components/settings-launcher"
+import { SiteFooter } from "@/components/site-footer"
 
 /* ------------------------------------------------------------------ */
 /*  Featured Cases Data                                                */
@@ -456,6 +457,8 @@ function BrowseContent() {
           </p>
         )}
       </main>
+
+      <SiteFooter />
     </div>
   )
 }

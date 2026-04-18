@@ -11,7 +11,7 @@ import {
   Layers, Grid3X3, List, Search, Filter,
   Flame, Scale, Target, Gavel, Box, ImagePlus,
   Shield, AlertTriangle as AlertTriangleIcon, BarChart3, Timer,
-  BookMarked, FileSearch, TrendingUp, Activity, Hash
+  FileSearch, TrendingUp, Activity, Hash
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
@@ -95,14 +95,6 @@ const LEGAL_INTELLIGENCE = [
   { id: "deadline", label: "Next Deadline", value: "Apr 25", unit: "", color: "var(--red)", trend: "17d", desc: "Mot. in Limine responses due" },
   { id: "judge", label: "Judge Garnett", value: "64%", unit: "gov", color: "var(--cyan)", trend: "±4", desc: "Historical govt win rate" },
   { id: "motions", label: "Suppression Rate", value: "23%", unit: "grant", color: "var(--orange)", trend: "S.D.N.Y.", desc: "District average for this motion type" },
-]
-
-const PRECEDENT_MATCHES = [
-  { case: "USA v. Tsarnaev", relevance: 89, court: "1st Cir.", tag: "DEATH PENALTY → LIFE", color: "var(--red)" },
-  { case: "USA v. Roof", relevance: 84, court: "4th Cir.", tag: "HATE CRIME CAPITAL", color: "var(--orange)" },
-  { case: "USA v. Holmes", relevance: 76, court: "N.D. Cal.", tag: "CEO FRAUD TRIAL", color: "var(--purple)" },
-  { case: "USA v. Rittenhouse", relevance: 71, court: "E.D. Wis.", tag: "SELF-DEFENSE MEDIA", color: "var(--cyan)" },
-  { case: "People v. Weinstein", relevance: 68, court: "S.D.N.Y.", tag: "HIGH-PROFILE SDNY", color: "var(--pink)" },
 ]
 
 const FRCP_QUICK_REF = [
@@ -823,8 +815,8 @@ Based on: ${assetNames}`,
                         : "border-border text-foreground hover:border-purple"
                     )}
                   >
-                    <Sparkles size={14} />
-                    SECONDARY EVIDENCE
+                    <ImagePlus size={14} />
+                    MOOD BOARD
                   </button>
                 </div>
                 
@@ -853,10 +845,14 @@ Based on: ${assetNames}`,
                     </div>
                     <div className="text-left">
                       <p className={cn("font-sans text-sm font-bold", uploadMode === "case" ? "text-red" : "text-purple")}>
-                        Drop files here or click to browse
+                        {uploadMode === "case"
+                          ? "Drop docket filings — authoritative court record"
+                          : "Drop visual refs — mood, tone, scene inspiration"}
                       </p>
                       <p className="font-mono text-[10px] text-muted-foreground">
-                        PDF · DOCX · MP4 · M4A · JPG · PNG · ZIP — up to 100MB
+                        {uploadMode === "case"
+                          ? "PDF · DOCX — pleadings, orders, exhibits, transcripts — up to 100MB"
+                          : "JPG · PNG · MP4 · M4A · ZIP — stills, clips, audio cues — up to 100MB"}
                       </p>
                     </div>
                   </div>
@@ -1002,32 +998,6 @@ Based on: ${assetNames}`,
                         <div className="font-mono text-[7px] text-muted-foreground mt-1">{metric.desc}</div>
                       </div>
                     ))}
-                  </div>
-
-                  {/* Precedent Matches */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <BookMarked size={12} className="text-purple" />
-                      <span className="font-mono text-[9px] font-bold text-purple tracking-wider">PRECEDENT RADAR</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      {PRECEDENT_MATCHES.map((p, i) => (
-                        <div key={i} className="flex items-center gap-3 px-3 py-2 border border-border bg-card hover:bg-surface-alt transition-colors cursor-pointer group">
-                          {/* Relevance bar */}
-                          <div className="w-8 text-right">
-                            <span className="font-mono text-[10px] font-bold" style={{ color: p.color }}>{p.relevance}</span>
-                          </div>
-                          <div className="w-16 h-1.5 bg-border overflow-hidden">
-                            <div className="h-full transition-all" style={{ width: `${p.relevance}%`, backgroundColor: p.color }} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="font-mono text-[10px] font-bold text-foreground group-hover:underline">{p.case}</span>
-                            <span className="font-mono text-[8px] text-muted-foreground ml-2">{p.court}</span>
-                          </div>
-                          <span className="px-1.5 py-0.5 font-mono text-[7px] font-bold shrink-0" style={{ color: p.color, backgroundColor: `color-mix(in srgb, ${p.color} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${p.color} 30%, transparent)` }}>{p.tag}</span>
-                        </div>
-                      ))}
-                    </div>
                   </div>
 
                   {/* FRCP Quick Reference */}

@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { Masthead } from "@/components/masthead"
+import { SiteFooter } from "@/components/site-footer"
 
 /* ------------------------------------------------------------------ */
 /*  DATA                                                               */
@@ -359,16 +360,7 @@ function DashboardContent() {
       </main>
 
       {/* FOOTER */}
-      <footer className="px-5 py-4 border-t-[2.5px] border-[var(--border)] bg-[var(--surface)] mt-auto">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="font-mono text-[8px] text-[var(--muted-foreground)] tracking-wider">
-            LegalDrama.AI MVP Rev V2.0
-          </div>
-          <div className="font-mono text-[8px] text-[var(--muted-foreground)]">
-            Design: Eros M. Iuliano | Product: Trademarkia/PatentVC
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

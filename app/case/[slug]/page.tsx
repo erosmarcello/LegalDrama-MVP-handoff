@@ -26,6 +26,7 @@ import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
 import { DramaLevelSlider } from "@/components/drama-level-slider"
+import { SiteFooter } from "@/components/site-footer"
 
 // Lane definitions for timeline
 const LANES = [
@@ -1799,6 +1800,7 @@ function CaseWorkspaceContent() {
         )}
       </main>
       <SidebarChat />
+      <SiteFooter />
     </div>
   )
 }
