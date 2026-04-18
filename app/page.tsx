@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { AuthModal } from "@/components/auth-modal"
 import { ToastProvider, useToast } from "@/components/legal-ui"
+import { SettingsLauncher } from "@/components/settings-launcher"
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -357,6 +358,7 @@ function HomePage() {
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
+            <SettingsLauncher variant="chip" />
             <button
               onClick={() => {
                 setAuthMode("signup")

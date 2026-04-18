@@ -6,7 +6,7 @@ import {
   FileText, Zap, Flag, Calendar, MessageSquare, Clock,
   Check, Copy, Trash2, Plus, ChevronUp, ChevronDown, 
   Sparkles, Volume2, Image as ImageIcon, Video, Archive,
-  RefreshCw, Edit3, Save, Share2, Settings, Link2, Eye,
+  RefreshCw, Edit3, Save, Share2, Settings, Eye,
   Download, Mic, Film, Wand2, ExternalLink, MoreHorizontal,
   Layers, Grid3X3, List, Search, Filter,
   Flame, Scale, Target, Gavel, Box, ImagePlus,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
+import { DRAMA_LEVELS, type DramaLevel } from "@/lib/case-data"
 
 interface ContentModalProps {
   isOpen: boolean
@@ -157,7 +158,8 @@ const LANES = {
 
 export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSettings }: ContentModalProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "organize" | "screenplay" | "collab">(initialTab)
-  const [dramatization, setDramatization] = useState(75)
+  // Dramatization axis — 5 brutalist stops (Court Record → Mythic), not a 0-100 slider.
+  const [dramaLevel, setDramaLevel] = useState<DramaLevel>(2)
   const [caseEvidence, setCaseEvidence] = useState(CASE_EVIDENCE)
   const [secondaryEvidence, setSecondaryEvidence] = useState(SECONDARY_EVIDENCE)
   const [isDragging, setIsDragging] = useState(false)
@@ -171,7 +173,7 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   const [generatedScript, setGeneratedScript] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editableScript, setEditableScript] = useState("")
-  const [savedScripts, setSavedScripts] = useState<{id: string, name: string, content: string, dramatization: number, createdAt: Date}[]>([])
+  const [savedScripts, setSavedScripts] = useState<{id: string, name: string, content: string, dramaLevel: DramaLevel, createdAt: Date}[]>([])
   const [copySuccess, setCopySuccess] = useState(false)
   
   // Upload tab state
@@ -239,9 +241,26 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
     const enabledAssets = [...caseEvidence, ...secondaryEvidence].filter(a => a.enabled)
     const assetNames = enabledAssets.map(a => a.name).join(", ")
     
-    // Mock script based on dramatization level
-    const scripts = {
-      factual: `FADE IN:
+    // Mock script keyed by DramaLevel (0 = Court Record, 4 = Mythic).
+    const scripts: Record<DramaLevel, string> = {
+      0: `COVER PAGE
+
+UNITED STATES v. LUIGI MANGIONE
+Docket 1:25-cr-00176-MMG
+Southern District of New York
+Before: Hon. Margaret M. Garnett
+
+PROCEDURAL HISTORY
+
+On December 9, 2024, the defendant was arrested in Altoona, Pennsylvania, in connection with the December 4, 2024 shooting of Brian Thompson outside the Hilton Midtown in New York, New York.
+
+The grand jury returned a four-count indictment charging: (i) interstate stalking resulting in death; (ii) murder through the use of a firearm; (iii) discharging a firearm in furtherance of a crime of violence; and (iv) related firearms counts.
+
+The defendant pleaded not guilty. Two counts were subsequently dismissed. The Government withdrew its notice of intent to seek the death penalty on February 27, 2026.
+
+Based on: ${assetNames}`,
+
+      1: `FADE IN:
 
 INT. MANHATTAN FEDERAL COURTHOUSE - DAY
 
@@ -256,14 +275,14 @@ CUT TO:
 
 INT. COURTROOM 110 - DAY
 
-Judge KATHERINE FAILLA presides. The defendant, LUIGI MANGIONE, 26, sits at the defense table.
+Judge MARGARET M. GARNETT presides. The defendant, LUIGI MANGIONE, 26, sits at the defense table.
 
 PROSECUTOR
 Your Honor, the United States charges the defendant with four counts...
 
 Based on: ${assetNames}`,
-      
-      trueStory: `FADE IN:
+
+      2: `FADE IN:
 
 EXT. HILTON MIDTOWN MANHATTAN - DAWN
 
@@ -287,7 +306,31 @@ I wrote it all down. Every reason. Every justification. I knew they wouldn't und
 
 Based on: ${assetNames}`,
       
-      creative: `FADE IN:
+      3: `FADE IN:
+
+TITLE CARD: "A ROOM WHERE A CONSTITUENCY WAS WAITING"
+
+INT. CABLE NEWS GREEN ROOM - NIGHT
+
+Monitors loop the McDonald's arrest footage. A BOOKING AGENT scrolls a feed of letters — some pleading, some adoring, all unruly.
+
+BOOKING AGENT
+Every panel we book makes him bigger. Every panel we don't makes him a martyr.
+
+CUT TO:
+
+INT. COURTROOM 110 - DAY
+
+Jury voir dire. The PROSECUTOR scans a questionnaire longer than the indictment.
+
+PROSECUTOR (V.O.)
+The people's case is not that he is guilty. The people's case is that sympathy is not a defense.
+
+The gallery is full. Some wear black. Some wear green. Nobody wears neutral.
+
+Based on: ${assetNames}`,
+
+      4: `FADE IN:
 
 BLACK SCREEN
 
@@ -313,19 +356,11 @@ EXT. NEW YORK CITY - AERIAL - DAWN
 
 The city that never sleeps is about to wake up screaming.
 
-Based on: ${assetNames}`
+Based on: ${assetNames}`,
     }
-    
-    // Determine which script based on dramatization
-    let script: string
-    if (dramatization < 33) {
-      script = scripts.factual
-    } else if (dramatization < 66) {
-      script = scripts.trueStory
-    } else {
-      script = scripts.creative
-    }
-    
+
+    const script = scripts[dramaLevel]
+
     // Simulate streaming generation
     let currentText = ""
     const words = script.split(" ")
@@ -344,7 +379,7 @@ Based on: ${assetNames}`
       time: "Just now",
       user: "You",
       action: "generated script",
-      target: `${dramLabel} (${dramatization}%)`,
+      target: `${dramLabel} (L${dramaLevel})`,
       color: "var(--pink)"
     }, ...prev])
   }
@@ -363,7 +398,7 @@ Based on: ${assetNames}`
       id: Date.now().toString(),
       name: `${dramLabel} Script - ${new Date().toLocaleDateString()}`,
       content: isEditing ? editableScript : (generatedScript || ""),
-      dramatization,
+      dramaLevel,
       createdAt: new Date()
     }
     
@@ -406,7 +441,7 @@ Based on: ${assetNames}`
     if (!textToShare) return
     
     // For now, copy a shareable summary
-    const shareText = `LegalDrama.ai Script (${dramLabel} - ${dramatization}%)\n\n${textToShare.slice(0, 500)}...`
+    const shareText = `LegalDrama.ai Script (${dramLabel} · L${dramaLevel})\n\n${textToShare.slice(0, 500)}...`
     navigator.clipboard.writeText(shareText)
     setCopySuccess(true)
     setTimeout(() => setCopySuccess(false), 2000)
@@ -618,14 +653,18 @@ Based on: ${assetNames}`
     { id: "collab", label: "COLLAB", icon: Users },
   ] as const
   
-  // Dramatization labels and colors
-  const dramLabel = dramatization < 33 ? "Factual" : dramatization < 66 ? "True Story" : "Creative"
-  const dramColor = dramatization < 33 ? "var(--green)" : dramatization < 66 ? "var(--orange)" : "var(--purple)"
-  const dramText = dramatization < 33 
-    ? "On December 4, 2024, Brian Thompson was shot outside the Hilton Midtown. Luigi Mangione was arrested and charged with four counts."
-    : dramatization < 66 
-    ? "The killing of a healthcare CEO sends shockwaves. Investigators piece together a manifesto and a portrait of calculated rage."
-    : "A young graduate plans an act that will force the nation to confront corporate indifference. A manhunt, a trial, a reckoning."
+  // Dramatization labels, colors, and treatment text — one per drama stop.
+  const DRAMA_TREATMENTS: Record<DramaLevel, string> = {
+    0: "On December 4, 2024, Brian Thompson was shot outside the Hilton Midtown. Luigi Mangione was arrested December 9 in Altoona, PA and charged in a four-count federal indictment. Two counts were later dismissed; the death penalty notice was withdrawn on February 27, 2026.",
+    1: "The killing of a healthcare CEO sends shockwaves through Midtown. Investigators piece together a manifesto, a ghost gun, and a portrait of calculated rage. The docket thickens: Sealed Complaint, redacted indictment, a suppression fight over what deputies found in a backpack.",
+    2: "A five-day manhunt grips the nation. In a Pennsylvania McDonald's, a patron recognizes the face from the wanted poster. The case tightens like a vice — cameras on a sidewalk, a fingerprint on a water bottle, a courtroom waiting in New York.",
+    3: "What if the grievance had a constituency? A young graduate becomes a reluctant folk hero; the prosecution finds itself arguing against sympathy as much as evidence. The jury pool is the nation; voir dire is triage.",
+    4: "A young graduate plans an act that will force the nation to confront corporate indifference. A manhunt, a trial, a reckoning — staged in the grammar of American myth: the shooter, the CEO, the chorus.",
+  }
+  const dramaMeta = DRAMA_LEVELS[dramaLevel]
+  const dramLabel = dramaMeta.label
+  const dramColor = dramaMeta.color
+  const dramText = DRAMA_TREATMENTS[dramaLevel]
   
   return (
     <div className="fixed inset-0 z-[100] animate-fade-in" style={{ animationDuration: '0.2s' }}>
@@ -1211,72 +1250,80 @@ Based on: ${assetNames}`
                   )}
                 </div>
                 
-                {/* Dramatization Slider - Fun and Pop */}
-                <div className="relative">
-                  {/* Gradient track background */}
-                  <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 rounded-full bg-gradient-to-r from-green via-orange to-purple opacity-30" />
-                  
-                  {/* Active track fill */}
-                  <div 
-                    className="absolute left-0 top-1/2 -translate-y-1/2 h-3 rounded-l-full transition-all duration-300"
-                    style={{ 
-                      width: `${dramatization}%`,
-                      background: `linear-gradient(90deg, var(--green) 0%, var(--orange) 50%, var(--purple) 100%)`,
-                      boxShadow: `0 0 20px ${dramColor}40`
-                    }}
-                  />
-                  
-                  {/* Slider input */}
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={dramatization}
-                    onChange={(e) => setDramatization(Number(e.target.value))}
-                    disabled={isGenerating}
-                    className="relative w-full h-3 appearance-none cursor-pointer bg-transparent z-10 
-                      [&::-webkit-slider-thumb]:appearance-none 
-                      [&::-webkit-slider-thumb]:w-6 
-                      [&::-webkit-slider-thumb]:h-6 
-                      [&::-webkit-slider-thumb]:rounded-full 
-                      [&::-webkit-slider-thumb]:bg-white 
-                      [&::-webkit-slider-thumb]:border-4 
-                      [&::-webkit-slider-thumb]:border-pink 
-                      [&::-webkit-slider-thumb]:shadow-lg
-                      [&::-webkit-slider-thumb]:shadow-pink/30
-                      [&::-webkit-slider-thumb]:cursor-grab
-                      [&::-webkit-slider-thumb]:transition-all
-                      [&::-webkit-slider-thumb]:hover:scale-110
-                      [&::-webkit-slider-thumb]:active:cursor-grabbing
-                      [&::-moz-range-thumb]:w-6 
-                      [&::-moz-range-thumb]:h-6 
-                      [&::-moz-range-thumb]:rounded-full 
-                      [&::-moz-range-thumb]:bg-white 
-                      [&::-moz-range-thumb]:border-4 
-                      [&::-moz-range-thumb]:border-pink
-                      [&::-moz-range-thumb]:shadow-lg
-                      disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                  
-                  {/* Labels */}
-                  <div className="flex justify-between mt-3">
-                    <span className="font-mono text-xs font-bold text-green">Factual</span>
-                    <span className="font-mono text-xs font-bold text-orange">Dramatized</span>
-                    <span className="font-mono text-xs font-bold text-purple">Creative</span>
-                  </div>
+                {/* Dramatization Axis — 5 brutalist stops (Court Record → Mythic) */}
+                <div
+                  role="radiogroup"
+                  aria-label="Dramatization level"
+                  className="flex gap-2"
+                >
+                  {DRAMA_LEVELS.map((dl) => {
+                    const active = dl.id === dramaLevel
+                    const filled = dl.id <= dramaLevel
+                    return (
+                      <button
+                        key={dl.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        aria-label={`${dl.label} (level ${dl.id})`}
+                        tabIndex={active ? 0 : -1}
+                        disabled={isGenerating}
+                        onClick={() => setDramaLevel(dl.id)}
+                        onKeyDown={(e) => {
+                          const max = DRAMA_LEVELS.length - 1
+                          if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                            e.preventDefault()
+                            setDramaLevel(Math.min(max, dramaLevel + 1) as DramaLevel)
+                          } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                            e.preventDefault()
+                            setDramaLevel(Math.max(0, dramaLevel - 1) as DramaLevel)
+                          } else if (e.key === "Home") {
+                            e.preventDefault()
+                            setDramaLevel(0)
+                          } else if (e.key === "End") {
+                            e.preventDefault()
+                            setDramaLevel(max as DramaLevel)
+                          }
+                        }}
+                        title={dl.label}
+                        className={cn(
+                          "group flex-1 flex flex-col items-start gap-2 p-3 text-left",
+                          "border-[2.5px] transition-all",
+                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+                          "disabled:opacity-50 disabled:cursor-not-allowed",
+                          active
+                            ? "border-[var(--foreground)] shadow-[3px_3px_0_var(--shadow-color)]"
+                            : "border-[var(--border)] hover:border-[var(--foreground)]/60"
+                        )}
+                        style={{
+                          backgroundColor: filled ? dl.color : "transparent",
+                          color: filled ? "var(--background)" : "var(--muted-foreground)",
+                          opacity: filled ? 1 : 0.55,
+                        }}
+                      >
+                        <span className="font-mono text-[9px] font-bold tracking-widest">
+                          L{dl.id}
+                        </span>
+                        <span className="font-sans text-xs font-black leading-tight">
+                          {dl.label}
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
-                
+
                 {/* Current Level Badge */}
                 <div className="flex items-center gap-4">
-                  <div 
-                    className="px-5 py-2.5 rounded-lg font-mono text-sm font-black transition-all duration-300"
-                    style={{ 
+                  <div
+                    className="px-5 py-2.5 font-mono text-sm font-black transition-all duration-300"
+                    style={{
                       backgroundColor: `color-mix(in srgb, ${dramColor} 20%, transparent)`,
                       color: dramColor,
-                      boxShadow: `0 0 20px ${dramColor}30`
+                      border: `2.5px solid ${dramColor}`,
+                      boxShadow: `3px 3px 0 var(--shadow-color)`,
                     }}
                   >
-                    {dramLabel} - {dramatization}%
+                    {dramLabel} · L{dramaLevel}
                   </div>
                   <div className="flex-1 h-px bg-border" />
                   <span className="font-mono text-xs text-muted-foreground">
@@ -1334,7 +1381,7 @@ Based on: ${assetNames}`
                         {!isGenerating && (
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-[10px] text-muted-foreground">
-                              {dramLabel} - {dramatization}%
+                              {dramLabel} · L{dramaLevel}
                             </span>
                           </div>
                         )}
@@ -1487,15 +1534,21 @@ Based on: ${assetNames}`
                           onClick={() => {
                             setGeneratedScript(script.content)
                             setEditableScript(script.content)
-                            setDramatization(script.dramatization)
+                            setDramaLevel(script.dramaLevel)
                           }}
                         >
                           <div className="flex items-center gap-3">
                             <Film size={14} className="text-muted-foreground" />
                             <span className="font-mono text-sm">{script.name}</span>
                           </div>
-                          <span className="font-mono text-xs text-muted-foreground">
-                            {script.dramatization}%
+                          <span
+                            className="font-mono text-[10px] font-bold px-1.5 py-0.5"
+                            style={{
+                              color: DRAMA_LEVELS[script.dramaLevel].color,
+                              border: `2px solid ${DRAMA_LEVELS[script.dramaLevel].color}`,
+                            }}
+                          >
+                            {DRAMA_LEVELS[script.dramaLevel].short} · L{script.dramaLevel}
                           </span>
                         </div>
                       ))}
@@ -1697,51 +1750,6 @@ Based on: ${assetNames}`
               </div>
             </div>
             
-            {/* Integrations */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Link2 size={14} className="text-purple" />
-                <span className="font-mono text-[10px] font-bold text-purple tracking-wider">INTEGRATIONS</span>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between py-2 px-2 rounded hover:bg-surface-alt transition-colors">
-                  <span className="font-mono text-xs flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-green connected-indicator" />
-                    PACER
-                  </span>
-                  <span className="font-mono text-[10px] text-green font-bold">Connected</span>
-                </div>
-                <div className="flex items-center justify-between py-2 px-2 rounded hover:bg-surface-alt transition-colors cursor-pointer">
-                  <span className="font-mono text-xs flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-                    ECF
-                  </span>
-                  <span className="font-mono text-[10px] text-red">Not linked</span>
-                </div>
-                <div className="flex items-center justify-between py-2 px-2 rounded hover:bg-surface-alt transition-colors cursor-pointer">
-                  <span className="font-mono text-xs flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-muted-foreground opacity-50" />
-                    DocketBird
-                  </span>
-                  <span className="font-mono text-[10px] text-red">Not linked</span>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => { onOpenSettings?.(); }}
-                className={cn(
-                  "w-full mt-4 py-2 flex items-center justify-center gap-2",
-                  "border border-border",
-                  "font-mono text-[10px] text-muted-foreground",
-                  "hover:border-green hover:text-green hover:shadow-[0_0_8px_var(--green)] transition-all cursor-pointer"
-                )}
-              >
-                <Settings size={12} />
-                Manage Integrations
-              </button>
-            </div>
-
             {/* ═══ LEGAL INTEL — RIGHT SIDEBAR ═══ */}
             <div className="mt-6 pt-4 border-t border-border">
               <div className="flex items-center gap-2 mb-3">

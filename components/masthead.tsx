@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { SettingsLauncher } from "@/components/settings-launcher"
 
 interface MastheadProps {
   onSettingsClick?: () => void
@@ -71,6 +72,7 @@ export function Masthead({ onSignIn, user, onSignOut, className }: MastheadProps
 
         {/* Right controls */}
         <div className="flex items-center gap-2">
+          <SettingsLauncher variant="chip" />
           {user ? (
             <div className="flex items-center gap-2">
               <button

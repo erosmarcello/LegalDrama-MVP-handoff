@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LegalButton, Chip, ToastProvider, useToast } from "@/components/legal-ui"
+import { SettingsLauncher } from "@/components/settings-launcher"
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -160,6 +161,7 @@ function PricingContent() {
 
         {/* Right controls */}
         <div className="flex items-center gap-2">
+          <SettingsLauncher variant="chip" />
           <Link href="/">
             <LegalButton small>Sign in</LegalButton>
           </Link>

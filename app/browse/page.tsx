@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Search, Scale, Gavel, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
+import { SettingsLauncher } from "@/components/settings-launcher"
 
 /* ------------------------------------------------------------------ */
 /*  Featured Cases Data                                                */
@@ -261,6 +262,8 @@ function BrowseContent() {
             >
               Pricing
             </span>
+
+            <SettingsLauncher variant="chip" />
 
             {/* Sign In */}
             <Link
