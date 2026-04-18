@@ -8,7 +8,7 @@ import {
   Sparkles, Volume2, Image as ImageIcon, Video, Archive,
   RefreshCw, Edit3, Save, Share2, Settings, Link2, Eye,
   Download, Mic, Film, Wand2, ExternalLink, MoreHorizontal,
-  ChevronRight, ChevronLeft, Layers, Grid3X3, List, Search, Filter,
+  Layers, Grid3X3, List, Search, Filter,
   Flame, Scale, Target, Gavel, Box, ImagePlus,
   Shield, AlertTriangle as AlertTriangleIcon, BarChart3, Timer,
   BookMarked, FileSearch, TrendingUp, Activity, Hash
@@ -165,8 +165,7 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   const [inviteRole, setInviteRole] = useState("Collaborator")
   const [uploadMode, setUploadMode] = useState<"case" | "secondary">("case")
   const [visibleLanes, setVisibleLanes] = useState(new Set(["factual", "procedural", "scheduling"]))
-  const [inferenceOpen, setInferenceOpen] = useState(true)
-  
+
   // Screenplay tab state
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedScript, setGeneratedScript] = useState<string | null>(null)
@@ -743,155 +742,8 @@ Based on: ${assetNames}`
           ))}
         </div>
         
-        {/* Main Content - 3 Column Layout */}
+        {/* Main Content */}
         <div className="flex-1 flex overflow-hidden bg-background">
-          {/* LEFT SIDEBAR - Inference Window (toggleable) */}
-          <div className={cn(
-            "border-r border-border overflow-y-auto bg-card transition-all duration-300",
-            inferenceOpen ? "w-64" : "w-12"
-          )}>
-            {/* Collapse/expand toggle */}
-            <button
-              onClick={() => setInferenceOpen(prev => !prev)}
-              className="w-full flex items-center justify-between px-3 py-2.5 border-b border-border bg-surface-alt hover:bg-surface transition-colors"
-            >
-              {inferenceOpen ? (
-                <>
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={12} className="text-red" />
-                    <span className="font-mono text-[8px] font-bold text-red tracking-wider">INFERENCE</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {/* On/Off toggle switch */}
-                    <div className="relative w-7 h-[14px] border-[2px] border-red bg-red/20">
-                      <div className="absolute top-[1px] left-[11px] w-[8px] h-[8px] bg-red border-[1.5px] border-red transition-all duration-150" />
-                    </div>
-                    <ChevronLeft size={12} className="text-muted-foreground" />
-                  </div>
-                </>
-              ) : (
-                <div className="w-full flex flex-col items-center gap-1">
-                  <Sparkles size={14} className="text-red" />
-                  <div className="relative w-7 h-[14px] border-[2px] border-border bg-surface-alt">
-                    <div className="absolute top-[1px] left-[1px] w-[8px] h-[8px] bg-muted-foreground border-[1.5px] border-border transition-all duration-150" />
-                  </div>
-                  <ChevronRight size={12} className="text-muted-foreground" />
-                </div>
-              )}
-            </button>
-
-            {inferenceOpen && (
-            <div className="p-4">
-              {/* Inference Header */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-red" />
-                  <span className="font-mono text-[10px] font-bold text-red tracking-wider">INFERENCE WINDOW</span>
-                </div>
-                <span className={cn(
-                  "px-1.5 py-0.5 bg-surface-alt",
-                  "font-mono text-[10px]",
-                  "rounded"
-                )}>{enabledCount}</span>
-              </div>
-
-              <p className="font-mono text-[10px] text-muted-foreground leading-relaxed mb-4">
-                Toggle sources on/off to control what the AI sees. Active sources feed timelines, summaries, and screenplay generation.
-              </p>
-              
-              {/* Case Evidence Section */}
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText size={12} className="text-red" />
-                  <span className="font-mono text-[10px] font-bold text-red tracking-wider">CASE EVIDENCE</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">{caseEvidence.filter(e => e.enabled).length}</span>
-                </div>
-                
-                <div className="space-y-2">
-                  {caseEvidence.map((item) => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "relative flex items-start gap-3 p-3",
-                        "border-l-[3px] transition-all cursor-pointer",
-                        "-r-lg",
-                        "hover:bg-surface-alt",
-                        item.enabled ? "bg-surface-alt/50" : "opacity-60"
-                      )}
-                      style={{ 
-                        borderLeftColor: item.enabled ? item.color : 'var(--border)'
-                      }}
-                    >
-                      <item.icon size={14} className="mt-0.5 shrink-0" style={{ color: item.color }} />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-mono text-[11px] font-medium truncate">{item.name}</div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className={cn(
-                            "px-1 py-0.5 text-[8px] font-bold",
-                            "rounded",
-                            item.date.includes("27/26") ? "bg-green/20 text-green" : "bg-surface-alt text-muted-foreground"
-                          )}>{item.date}</span>
-                          <span className="px-1 py-0.5 bg-surface-alt text-[8px] rounded">{item.type}</span>
-                          <span className={cn(
-                            "px-1 py-0.5 text-[8px] font-bold rounded",
-                            item.tier === "T1" ? "bg-red/20 text-red" : "bg-surface-alt text-muted-foreground"
-                          )}>{item.tier}</span>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={item.enabled}
-                        onCheckedChange={() => toggleAsset(item.id, true)}
-                        className="scale-75 shrink-0"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Secondary Evidence Section */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles size={12} className="text-purple" />
-                  <span className="font-mono text-[10px] font-bold text-purple tracking-wider">SECONDARY EVIDENCE</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">{secondaryEvidence.filter(e => e.enabled).length}</span>
-                </div>
-                
-                <div className="space-y-2">
-                  {secondaryEvidence.map((item) => (
-                    <div
-                      key={item.id}
-                      className={cn(
-                        "relative flex items-start gap-3 p-3",
-                        "border-l-[3px] transition-all cursor-pointer",
-                        "-r-lg",
-                        "hover:bg-surface-alt",
-                        item.enabled ? "bg-surface-alt/50" : "opacity-60"
-                      )}
-                      style={{ 
-                        borderLeftColor: item.enabled ? item.color : 'var(--border)'
-                      }}
-                    >
-                      <item.icon size={14} className="mt-0.5 shrink-0" style={{ color: item.color }} />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-mono text-[11px] font-medium truncate">{item.name}</div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="px-1 py-0.5 bg-surface-alt text-[8px] rounded">{item.tag}</span>
-                        </div>
-                        <div className="font-mono text-[9px] text-muted-foreground mt-1">{item.detail}</div>
-                      </div>
-                      <Switch
-                        checked={item.enabled}
-                        onCheckedChange={() => toggleAsset(item.id, false)}
-                        className="scale-75 shrink-0"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            )}
-          </div>
-
           {/* CENTER - Main Content Area */}
           <div className="flex-1 overflow-y-auto p-6 bg-background">
             {/* UPLOAD TAB */}
