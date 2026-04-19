@@ -1,17 +1,24 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, Source_Serif_4, JetBrains_Mono } from 'next/font/google'
+import { Inter, Anton, Source_Serif_4, JetBrains_Mono, EB_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
-const bricolage = Bricolage_Grotesque({ 
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-  variable: '--font-bricolage',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
   display: 'swap',
 })
 
-const sourceSerif = Source_Serif_4({ 
+const anton = Anton({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-anton',
+  display: 'swap',
+})
+
+const sourceSerif = Source_Serif_4({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
   style: ['normal', 'italic'],
@@ -19,10 +26,21 @@ const sourceSerif = Source_Serif_4({
   display: 'swap',
 })
 
-const jetbrainsMono = JetBrains_Mono({ 
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '700', '800'],
   variable: '--font-jetbrains',
+  display: 'swap',
+})
+
+// EB Garamond — the "gold contract" font. Classic legal-document serif
+// used for gold metadata taglines, character names, case numbers, and
+// anywhere we want a dignified courtroom-dossier feel.
+const ebGaramond = EB_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-garamond',
   display: 'swap',
 })
 
@@ -54,10 +72,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FFF9EC' },
-    { media: '(prefers-color-scheme: dark)', color: '#1C1810' },
-  ],
+  themeColor: '#0a0a0a',
 }
 
 export default function RootLayout({
@@ -66,13 +81,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${anton.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} font-sans antialiased`}
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
+          forcedTheme="dark"
           enableSystem={false}
-          disableTransitionOnChange={false}
+          disableTransitionOnChange={true}
         >
           {children}
         </ThemeProvider>

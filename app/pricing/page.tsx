@@ -3,369 +3,345 @@
 import { useState } from "react"
 import Link from "next/link"
 import {
-  CheckCircle, Zap, Users, Crown,
-  ChevronDown, ChevronUp, HelpCircle, ArrowRight,
-  Sparkles
+  CheckCircle,
+  Zap,
+  Users,
+  Crown,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  Sparkles,
+  Film,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LegalButton, Chip, ToastProvider, useToast } from "@/components/legal-ui"
-import { SettingsLauncher } from "@/components/settings-launcher"
+import { ToastProvider, useToast } from "@/components/legal-ui"
 import { SiteFooter } from "@/components/site-footer"
+import { Masthead } from "@/components/masthead"
 
 /* ------------------------------------------------------------------ */
-/*  Data                                                               */
+/*  Plans                                                              */
 /* ------------------------------------------------------------------ */
 
-const PLANS = [
+interface Plan {
+  id: string
+  name: string
+  price: string
+  period: string
+  tagline: string
+  reel: string
+  icon: typeof Sparkles
+  accent: string
+  featured: boolean
+  features: string[]
+  cta: string
+}
+
+const PLANS: Plan[] = [
   {
     id: "starter",
-    name: "STARTER",
+    name: "Matinee",
     price: "$99",
     period: "one-time",
-    description: "For individuals exploring legal storytelling",
+    tagline: "A seat in the last row of the theater",
+    reel: "Reel 01",
     icon: Sparkles,
-    color: "var(--cyan)",
+    accent: "#ffffff",
     featured: false,
     features: [
-      "25 case searches",
+      "25 federal case searches",
       "Basic screenplay generation",
+      "Mood board (read-only)",
       "Email support",
+      "Fair-use citation export",
     ],
-    cta: "Get Started",
+    cta: "Buy Matinee Pass",
   },
   {
     id: "pro",
-    name: "PRO",
+    name: "Prime Time",
     price: "$499",
     period: "one-time",
-    description: "Full power for serious legal dramatists",
+    tagline: "Private screening with the director's notes",
+    reel: "Reel 02",
     icon: Zap,
-    color: "var(--amber)",
+    accent: "var(--gold)",
     featured: true,
     features: [
-      "Unlimited searches",
+      "Unlimited federal case searches",
       "Full dramatization controls",
-      "Priority support",
-      "API access",
-      "Collaboration",
+      "Editable mood board + exhibit pinboards",
+      "API access (PACER + court listener)",
+      "Fountain/Final Draft exports",
+      "Priority support · 24h SLA",
     ],
-    cta: "Go Pro",
+    cta: "Go Prime Time",
   },
   {
     id: "team",
-    name: "TEAM",
+    name: "The Writers' Room",
     price: "$59",
-    period: "/mo per seat",
-    description: "Built for studios and legal teams at scale",
+    period: "per seat · mo",
+    tagline: "Your whole room on one set",
+    reel: "Reel 03",
     icon: Users,
-    color: "var(--purple)",
+    accent: "var(--red)",
     featured: false,
     features: [
-      "Everything in Pro",
-      "Real-time collaboration",
-      "Custom branding",
-      "Admin dashboard",
+      "Everything in Prime Time",
+      "Real-time collaborative scripting",
+      "Custom studio branding",
+      "Admin + billing dashboard",
+      "SAML/SSO · Private cases",
+      "Dedicated CSM",
     ],
-    cta: "Contact Sales",
+    cta: "Book A Screening",
   },
 ]
 
 const FAQ_ITEMS = [
   {
-    q: "What happens after I use all 25 searches on Starter?",
-    a: "Your existing projects remain fully accessible. To run additional searches, upgrade to Pro for unlimited access or purchase another Starter license.",
+    q: "What happens after I use all 25 searches on Matinee?",
+    a: "Your existing projects remain fully accessible. To run additional searches, upgrade to Prime Time for unlimited access or purchase another Matinee pass.",
   },
   {
     q: "Is the one-time price really one-time?",
-    a: "Yes. Starter and Pro are single purchases with no recurring fees. You own the license indefinitely. Future major version upgrades may be offered at a discounted rate.",
+    a: "Yes. Matinee and Prime Time are single purchases with no recurring fees. You own the license indefinitely. Future major version upgrades may be offered at a discounted rate.",
   },
   {
-    q: "Can I switch from Starter to Pro later?",
-    a: "Absolutely. Upgrade at any time and we will credit your original Starter purchase toward the Pro price. No data is lost during the transition.",
+    q: "Can I upgrade from Matinee to Prime Time later?",
+    a: "Absolutely. Upgrade at any time and we credit your original Matinee purchase toward the Prime Time price. No data is lost during the transition.",
   },
   {
-    q: "How does Team billing work?",
-    a: "Team is billed monthly per seat. Add or remove seats at any time and your invoice adjusts automatically at the next billing cycle. Annual billing with a 20% discount is also available.",
+    q: "How does Writers' Room billing work?",
+    a: "Writers' Room is billed monthly per seat. Add or remove seats at any time and your invoice adjusts automatically at the next billing cycle. Annual billing with a 20% discount is available.",
   },
   {
     q: "Do you offer refunds?",
     a: "We offer a 14-day money-back guarantee on all plans. If LegalDrama is not the right fit, contact support for a full refund within the first two weeks.",
   },
+  {
+    q: "Is anything in LegalDrama.ai legal advice?",
+    a: "No. Everything here is public-record dramatization and creative tooling. For legal guidance, consult a licensed attorney in your jurisdiction.",
+  },
 ]
 
 /* ------------------------------------------------------------------ */
-/*  Nav links                                                          */
-/* ------------------------------------------------------------------ */
-
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Browse" },
-  { href: "/pricing", label: "Pricing" },
-]
-
-/* ------------------------------------------------------------------ */
-/*  Main content (wrapped in ToastProvider below)                      */
+/*  Pricing Content                                                    */
 /* ------------------------------------------------------------------ */
 
 function PricingContent() {
   const { toast } = useToast()
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const [user, setUser] = useState<{ email: string; name: string } | null>(null)
 
   const handlePlanClick = (planName: string) => {
-    toast(`${planName} selected -- checkout coming soon`, "var(--green)")
+    toast(`${planName} selected — checkout coming soon`, "var(--gold)")
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* ── Navigation ─────────────────────────────────────────── */}
-      <nav
-        className={cn(
-          "sticky top-0 z-40 px-4 py-2",
-          "flex items-center justify-between gap-3",
-          "border-b-[3px] border-red",
-          "bg-foreground dark:bg-surface"
-        )}
-      >
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-baseline gap-1 cursor-pointer group"
-        >
-          <span className="font-sans text-lg font-black text-background dark:text-foreground transition-colors group-hover:text-red">
-            legal
-          </span>
-          <span className="font-sans text-lg font-black text-red">drama</span>
-          <span className="font-mono text-xs text-pink">.ai</span>
-        </Link>
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+      <Masthead
+        user={user}
+        onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
+        onSignOut={() => setUser(null)}
+        pacerConnected
+      />
 
-        {/* Center links */}
-        <div className="hidden sm:flex items-center gap-1">
-          {NAV_LINKS.map((link) => {
-            const isActive = link.href === "/pricing"
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-3 py-1 font-mono text-[11px] font-bold uppercase transition-colors",
-                  isActive
-                    ? "text-amber border-b-2"
-                    : "text-background dark:text-muted-foreground hover:text-amber"
-                )}
-                style={isActive ? { borderColor: "var(--amber)" } : undefined}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
-        </div>
-
-        {/* Right controls */}
-        <div className="flex items-center gap-2">
-          <SettingsLauncher variant="chip" />
-          <Link href="/">
-            <LegalButton small>Sign in</LegalButton>
-          </Link>
-        </div>
-      </nav>
-
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <main className="max-w-5xl mx-auto px-4 py-12 lg:py-16">
-        <div className="text-center mb-12">
-          <h1 className="font-sans text-4xl font-extrabold text-foreground mb-3">
-            Pricing
+      {/* ─── Hero ─── */}
+      <section className="relative border-b border-[var(--border)] cinema-grain">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 50% at 20% 30%, rgba(179,163,105,0.14), transparent 55%), radial-gradient(ellipse 60% 40% at 80% 70%, rgba(204,24,24,0.12), transparent 55%), linear-gradient(180deg, #0a0a0a 0%, #141414 100%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-20 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="cinema-pulse-gold" aria-hidden />
+            <span className="cinema-contract text-[12px] text-[var(--gold)]">
+              Subscription Tiers · No Hidden Residuals
+            </span>
+          </div>
+          <h1
+            className="cinema-title text-[44px] md:text-[72px] lg:text-[92px] leading-[0.9] text-white"
+            style={{ textShadow: "2px 2px 0 #000" }}
+          >
+            Pick Your{" "}
+            <span style={{ color: "var(--red)" }}>Seat</span>.
+            <br />
+            Walk Into The{" "}
+            <span style={{ color: "var(--gold)" }}>Theater</span>.
           </h1>
-          <p className="font-serif text-lg text-muted-foreground max-w-lg mx-auto">
-            Simple plans for every legal storyteller
+          <p className="mt-5 font-sans text-[15px] leading-relaxed text-[var(--muted-foreground)] max-w-[58ch] mx-auto">
+            Three tickets. One reel of federal court records. Cancel any time —
+            your generated scripts, mood boards, and timelines stay yours.
           </p>
         </div>
+      </section>
 
-        {/* ── Pricing Grid ─────────────────────────────────────── */}
-        <div className="grid gap-6 sm:grid-cols-3 mb-20">
-          {PLANS.map((plan) => {
-            const Icon = plan.icon
-            return (
-              <div
-                key={plan.id}
-                className={cn(
-                  "relative flex flex-col",
-                  "border-[2.5px] border-border bg-card",
-                  "transition-all duration-150",
-                  "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
-                  "rounded-none "
-                )}
-                style={{
-                  borderColor: plan.featured
-                    ? "var(--amber)"
-                    : "var(--border)",
-                  boxShadow: "var(--shadow-color) 4px 4px 0px",
-                }}
-              >
-                {/* Popular chip */}
-                {plan.featured && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <Chip
-                      mono
-                      small
-                      style={{
-                        backgroundColor: "var(--amber)",
-                        color: "var(--background)",
-                        borderColor: "var(--amber)",
-                      }}
-                    >
-                      <Crown size={10} />
-                      POPULAR
-                    </Chip>
-                  </div>
-                )}
-
-                <div className="p-6 flex flex-col flex-1">
-                  {/* Plan header */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div
-                      className={cn(
-                        "w-8 h-8 flex items-center justify-center",
-                        "border-[2.5px] border-border",
-                        "rounded-none "
-                      )}
-                      style={{ borderColor: plan.color }}
-                    >
-                      <Icon size={16} style={{ color: plan.color }} />
+      {/* ─── Plan grid ─── */}
+      <section className="relative bg-[#0a0a0a] cinema-grain">
+        <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-16">
+          <div className="grid gap-5 md:grid-cols-3">
+            {PLANS.map(plan => {
+              const Icon = plan.icon
+              return (
+                <div
+                  key={plan.id}
+                  className={cn(
+                    "relative flex flex-col border bg-[#141414] transition-colors",
+                    plan.featured
+                      ? "border-[var(--gold)]"
+                      : "border-[var(--border)] hover:border-[var(--gold)]"
+                  )}
+                  style={{ borderTop: `2px solid ${plan.accent}` }}
+                >
+                  {plan.featured && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <div className="bg-[var(--gold)] px-3 py-1 cinema-contract text-[10px] text-[#0a0a0a] flex items-center gap-1.5">
+                        <Crown size={10} /> Most Popular
+                      </div>
                     </div>
-                    <span className="font-mono text-xs font-extrabold tracking-widest text-muted-foreground uppercase">
+                  )}
+
+                  <div className="p-6 md:p-7 flex flex-col flex-1">
+                    <div className="flex items-center justify-between">
+                      <div className="cinema-contract text-[10px] text-[var(--gold)]">
+                        {plan.reel}
+                      </div>
+                      <Icon size={16} style={{ color: plan.accent }} />
+                    </div>
+
+                    <h3
+                      className="cinema-title mt-5 text-[34px] md:text-[40px] leading-[0.95] text-white"
+                      style={{ textShadow: "1px 1px 0 #000" }}
+                    >
                       {plan.name}
-                    </span>
-                  </div>
+                    </h3>
+                    <p className="mt-2 cinema-contract-italic text-[13px] text-[var(--gold)]">
+                      {plan.tagline}
+                    </p>
 
-                  {/* Price */}
-                  <div className="mb-1">
-                    <span className="font-sans text-4xl font-black text-foreground">
-                      {plan.price}
-                    </span>
-                  </div>
-                  <span className="font-mono text-[10px] text-muted-foreground uppercase mb-4">
-                    {plan.period}
-                  </span>
-
-                  {/* Description */}
-                  <p className="font-serif text-sm text-muted-foreground mb-6">
-                    {plan.description}
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-2.5 mb-8 flex-1">
-                    {plan.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-start gap-2"
+                    <div className="mt-6 flex items-baseline gap-2 pb-5 border-b border-[var(--border)]">
+                      <span
+                        className="cinema-title text-[44px] leading-none"
+                        style={{ color: plan.accent, textShadow: "1px 1px 0 #000" }}
                       >
-                        <CheckCircle
-                          size={15}
-                          className="shrink-0 mt-0.5"
-                          style={{ color: plan.color }}
-                        />
-                        <span className="font-serif text-sm text-foreground">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                        {plan.price}
+                      </span>
+                      <span className="cinema-contract text-[11px] text-[var(--muted-foreground)]">
+                        {plan.period}
+                      </span>
+                    </div>
 
-                  {/* CTA */}
-                  <button
-                    onClick={() => handlePlanClick(plan.name)}
-                    className={cn(
-                      "w-full py-2.5 flex items-center justify-center gap-2",
-                      "border-[2.5px] font-mono text-xs font-extrabold uppercase",
-                      "transition-all duration-150 cursor-pointer",
-                      "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
-                      "rounded-none "
-                    )}
-                    style={{
-                      backgroundColor: plan.featured
-                        ? "var(--amber)"
-                        : "var(--card)",
-                      color: plan.featured
-                        ? "var(--background)"
-                        : "var(--foreground)",
-                      borderColor: plan.featured
-                        ? "var(--amber)"
-                        : "var(--border)",
-                      boxShadow: "var(--shadow-color) 4px 4px 0px",
-                    }}
-                  >
-                    {plan.cta}
-                    <ArrowRight size={14} />
-                  </button>
+                    <ul className="mt-5 space-y-3 flex-1">
+                      {plan.features.map(feature => (
+                        <li key={feature} className="flex items-start gap-3">
+                          <CheckCircle
+                            size={14}
+                            className="shrink-0 mt-0.5"
+                            style={{ color: plan.accent }}
+                          />
+                          <span className="font-sans text-[13px] leading-snug text-white">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => handlePlanClick(plan.name)}
+                      className={cn(
+                        "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
+                        plan.featured
+                          ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
+                          : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
+                      )}
+                    >
+                      {plan.cta} <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* ── FAQ ───────────────────────────────────────────────── */}
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="font-sans text-2xl font-extrabold text-foreground mb-2">
-              Frequently Asked Questions
-            </h2>
-            <p className="font-serif text-sm text-muted-foreground">
-              Everything you need to know before getting started
-            </p>
+              )
+            })}
           </div>
 
-          <div className="space-y-3">
+          {/* Comparison strip */}
+          <div className="mt-12 border border-[var(--border)] bg-[#141414] p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Film size={14} className="text-[var(--gold)]" />
+              <span className="cinema-contract text-[11px] text-[var(--gold)]">
+                All Tickets Include
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                "Federal public record access",
+                "AI-dramatization labels",
+                "Cited source documents",
+                "14-day refund window",
+              ].map(item => (
+                <div
+                  key={item}
+                  className="flex items-start gap-2"
+                >
+                  <CheckCircle size={13} className="text-[var(--gold)] mt-0.5 shrink-0" />
+                  <span className="font-sans text-[12px] text-[var(--muted-foreground)] leading-snug">
+                    {item}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FAQ ─── */}
+      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+        <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-8 py-14 md:py-20">
+          <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3 text-center">
+            § Director's Commentary
+          </div>
+          <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white text-center">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="mt-10 border border-[var(--border)]">
             {FAQ_ITEMS.map((item, idx) => {
               const isOpen = openFaq === idx
               return (
                 <div
                   key={idx}
                   className={cn(
-                    "border-[2.5px] border-border bg-card",
-                    "transition-all duration-150",
-                    "rounded-none "
+                    "border-b last:border-b-0 border-[var(--border)] bg-[#141414]",
+                    isOpen && "bg-[#1a1a1a]"
                   )}
-                  style={{
-                    boxShadow: isOpen
-                      ? "none"
-                      : "var(--shadow-color) 4px 4px 0px",
-                    transform: isOpen
-                      ? "translate(2px, 2px)"
-                      : "translate(0, 0)",
-                  }}
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className={cn(
-                      "w-full flex items-center justify-between gap-4",
-                      "p-4 text-left cursor-pointer"
-                    )}
+                    className="w-full flex items-center justify-between gap-4 px-5 md:px-6 py-4 text-left group"
                   >
                     <div className="flex items-center gap-3">
-                      <HelpCircle
-                        size={16}
-                        className="shrink-0 text-amber"
-                      />
-                      <span className="font-sans text-sm font-bold text-foreground">
+                      <span
+                        className="cinema-contract text-[10px] w-6 text-[var(--gold)]"
+                      >
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      <span className="font-sans text-[14px] font-medium text-white group-hover:text-[var(--gold)] transition-colors">
                         {item.q}
                       </span>
                     </div>
                     {isOpen ? (
-                      <ChevronUp
-                        size={16}
-                        className="shrink-0 text-muted-foreground"
-                      />
+                      <ChevronUp size={14} className="text-[var(--gold)] shrink-0" />
                     ) : (
-                      <ChevronDown
-                        size={16}
-                        className="shrink-0 text-muted-foreground"
-                      />
+                      <ChevronDown size={14} className="text-[var(--muted-foreground)] shrink-0" />
                     )}
                   </button>
-
                   {isOpen && (
-                    <div className="px-4 pb-4 pl-11">
-                      <p className="font-serif text-sm text-muted-foreground leading-relaxed">
+                    <div className="px-5 md:px-6 pb-5 pl-14">
+                      <p className="font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]">
                         {item.a}
                       </p>
                     </div>
@@ -375,39 +351,49 @@ function PricingContent() {
             })}
           </div>
         </div>
+      </section>
 
-        {/* ── Bottom CTA ───────────────────────────────────────── */}
-        <div className="mt-20 text-center">
-          <div
-            className={cn(
-              "inline-block border-[2.5px] border-border bg-card p-8",
-              "rounded-none "
-            )}
-            style={{ boxShadow: "var(--shadow-color) 4px 4px 0px" }}
+      {/* ─── Closing CTA ─── */}
+      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+        <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-8 py-14 md:py-16 text-center">
+          <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
+            § Still Rolling
+          </div>
+          <h3
+            className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white"
+            style={{ textShadow: "1px 1px 0 #000" }}
           >
-            <h3 className="font-sans text-xl font-extrabold text-foreground mb-2">
-              Still have questions?
-            </h3>
-            <p className="font-serif text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-              Our team is ready to help you find the perfect plan for your legal
-              storytelling needs.
-            </p>
-            <LegalButton color="var(--primary)">
-              Contact Support
-              <ArrowRight size={14} />
-            </LegalButton>
+            Not Sure Which Seat To Book?
+          </h3>
+          <p className="mt-4 font-sans text-[14px] text-[var(--muted-foreground)] max-w-[50ch] mx-auto">
+            Our team walks through the plan with you, shows you a real case
+            workspace, and answers everything — even the legal questions we
+            can't answer.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/legal/contact"
+              className="h-11 px-6 bg-white text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
+            >
+              Contact Support <ArrowRight size={12} />
+            </Link>
+            <Link
+              href="/browse"
+              className="h-11 px-6 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[11px] hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors inline-flex items-center gap-2"
+            >
+              Watch A Demo Case
+            </Link>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* ── Footer ─────────────────────────────────────────────── */}
-      <SiteFooter className="mt-16" />
+      <SiteFooter />
     </div>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  Export with ToastProvider                                           */
+/*  Export with ToastProvider                                          */
 /* ------------------------------------------------------------------ */
 
 export default function PricingPage() {

@@ -6,7 +6,7 @@ import { Scale, AlertTriangle, Shield, Github, Twitter } from "lucide-react"
 
 interface SiteFooterProps {
   className?: string
-  /** When true, renders the slimmer compact variant (dashboard/workspace chrome). */
+  /** When true, renders the slimmer compact variant (workspace chrome). */
   variant?: "default" | "compact"
 }
 
@@ -14,7 +14,7 @@ const YEAR = new Date().getFullYear()
 
 const PRODUCT_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/browse", label: "Browse" },
+  { href: "/browse", label: "Active Trials" },
   { href: "/pricing", label: "Pricing" },
   { href: "/dashboard", label: "Dashboard" },
 ]
@@ -35,46 +35,53 @@ const RESOURCES_LINKS = [
 ]
 
 /**
- * Alpha/omega site footer — appears at the bottom of every page.
+ * Alpha/omega cinema-noir footer — bookends every page.
  *
- * Frames the web app with the generic-yet-required legal scaffolding:
- * terms, privacy, copyright, AI disclosures, dramatization disclaimers.
- * Uses the same brutalist token set as the Masthead so the page feels
- * bookended.
+ * Dark film surface, aged-gold labels, white/red/gold disclaimer cards,
+ * pulsing red copyright stamp.
  */
 export function SiteFooter({ className, variant = "default" }: SiteFooterProps) {
   if (variant === "compact") {
     return (
       <footer
         className={cn(
-          "w-full border-t-[2.5px] border-[var(--border)]",
-          "bg-[var(--card)] dark:bg-[var(--surface)]",
+          "w-full border-t border-[var(--border)]",
+          "bg-[#0a0a0a]",
+          "cinema-grain",
           "px-5 py-3",
           className
         )}
       >
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-          <div className="flex items-baseline gap-0.5">
-            <span className="font-sans text-sm font-extrabold text-[var(--foreground)]">legal</span>
-            <span className="font-sans text-sm font-extrabold text-[var(--red)]">drama</span>
-            <span className="font-mono text-[11px] text-[var(--pink)]">.ai</span>
-            <span className="ml-2 font-mono text-[10px] text-[var(--muted-foreground)]">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+          <div className="flex items-baseline gap-1">
+            <span className="cinema-title text-[14px] text-white leading-none">
+              LEGAL
+            </span>
+            <span
+              className="cinema-title text-[14px] leading-none"
+              style={{ color: "var(--red)" }}
+            >
+              DRAMA
+            </span>
+            <span className="cinema-label text-[8px] text-[var(--gold)] ml-1">
+              .AI
+            </span>
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)] ml-3">
               © {YEAR}
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-[var(--muted-foreground)]">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {LEGAL_LINKS.slice(0, 3).map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-[var(--amber)] transition-colors"
+                className="cinema-label text-[9px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors"
               >
                 {link.label}
               </Link>
             ))}
-            <span className="hidden sm:inline">·</span>
-            <span className="hidden sm:inline text-[var(--muted-foreground)]/70">
-              AI-generated dramatization — not legal advice
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)]/60 hidden sm:inline">
+              · AI dramatization — not legal advice
             </span>
           </div>
         </div>
@@ -85,167 +92,192 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
   return (
     <footer
       className={cn(
-        "w-full border-t-[2.5px] border-[var(--border)]",
-        "bg-[var(--card)] dark:bg-[var(--surface)]",
+        "w-full border-t border-[var(--border)]",
+        "bg-[#0a0a0a]",
+        "cinema-grain",
         "mt-auto",
         className
       )}
     >
       {/* ═══ Disclaimer banner ═══ */}
-      <div className="border-b-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
-        <div className="max-w-7xl mx-auto px-5 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div
-              className="flex items-start gap-2 p-3 border-[2.5px] border-[var(--amber)]/40 bg-[var(--amber)]/5"
-            >
-              <AlertTriangle size={14} className="text-[var(--amber)] shrink-0 mt-0.5" />
-              <div>
-                <div className="font-mono text-[10px] font-bold text-[var(--amber)] tracking-wider mb-1">
-                  DRAMATIZATION — NOT A RECORD
-                </div>
-                <p className="font-sans text-[11px] leading-snug text-[var(--foreground)]">
-                  Scenes, dialogue, and characterizations are AI-generated
-                  dramatizations for entertainment. They are not transcripts
-                  or recreations of actual courtroom events.
-                </p>
-              </div>
-            </div>
-
-            <div
-              className="flex items-start gap-2 p-3 border-[2.5px] border-[var(--red)]/40 bg-[var(--red)]/5"
-            >
-              <Scale size={14} className="text-[var(--red)] shrink-0 mt-0.5" />
-              <div>
-                <div className="font-mono text-[10px] font-bold text-[var(--red)] tracking-wider mb-1">
-                  NOT LEGAL ADVICE
-                </div>
-                <p className="font-sans text-[11px] leading-snug text-[var(--foreground)]">
-                  LegalDrama.ai is a creative storytelling tool. Nothing on
-                  this site constitutes legal advice or an attorney-client
-                  relationship. Consult a licensed attorney for legal matters.
-                </p>
-              </div>
-            </div>
-
-            <div
-              className="flex items-start gap-2 p-3 border-[2.5px] border-[var(--cyan)]/40 bg-[var(--cyan)]/5"
-            >
-              <Shield size={14} className="text-[var(--cyan)] shrink-0 mt-0.5" />
-              <div>
-                <div className="font-mono text-[10px] font-bold text-[var(--cyan)] tracking-wider mb-1">
-                  PUBLIC RECORD + AI
-                </div>
-                <p className="font-sans text-[11px] leading-snug text-[var(--foreground)]">
-                  Case data is sourced from public federal court records
-                  (PACER / CourtListener). AI-generated content is labeled and
-                  may contain errors, omissions, or embellishments.
-                </p>
-              </div>
-            </div>
+      <div className="relative z-10 border-b border-[var(--border)]">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-6">
+          <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
+            The Fine Print
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[var(--border)]">
+            <DisclaimerCard
+              accent="var(--red)"
+              icon={AlertTriangle}
+              label="DRAMATIZATION"
+              body="Scenes, dialogue, and characterizations are AI-generated dramatizations for entertainment. Not transcripts or recreations of actual courtroom events."
+            />
+            <DisclaimerCard
+              accent="var(--gold)"
+              icon={Scale}
+              label="NOT LEGAL ADVICE"
+              body="LegalDrama.ai is a creative storytelling tool. Nothing here constitutes legal advice or forms an attorney-client relationship. Consult a licensed attorney."
+              borderLeft
+            />
+            <DisclaimerCard
+              accent="#ffffff"
+              icon={Shield}
+              label="PUBLIC RECORD + AI"
+              body="Case data sourced from public federal court records (PACER / CourtListener). AI-generated content is labeled and may contain errors or embellishments."
+              borderLeft
+            />
           </div>
         </div>
       </div>
 
       {/* ═══ Columns ═══ */}
-      <div className="max-w-7xl mx-auto px-5 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-8 py-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand column */}
           <div className="col-span-2">
-            <Link href="/" className="flex items-baseline gap-0.5 group">
-              <span className="font-sans text-xl font-extrabold text-[var(--foreground)] transition-colors group-hover:text-[var(--red)]">
-                legal
+            <Link href="/" className="flex items-baseline gap-1 group">
+              <span
+                className="cinema-title text-[28px] text-white leading-none"
+                style={{ textShadow: "1px 1px 0 #000" }}
+              >
+                LEGAL
               </span>
-              <span className="font-sans text-xl font-extrabold text-[var(--red)]">
-                drama
+              <span
+                className="cinema-title text-[28px] leading-none"
+                style={{ color: "var(--red)", textShadow: "1px 1px 0 #000" }}
+              >
+                DRAMA
               </span>
-              <span className="font-mono text-sm text-[var(--pink)]">.ai</span>
+              <span className="cinema-label text-[11px] text-[var(--gold)] ml-1">
+                .AI
+              </span>
             </Link>
-            <p className="mt-3 font-serif text-[13px] leading-relaxed text-[var(--muted-foreground)] max-w-sm">
+            <p className="mt-4 font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)] max-w-sm">
               Federal court cases reimagined as cinematic legal dramas.
-              Public record in, story out.
+              Built for screenwriters, true-crime obsessives, and anyone who
+              thinks the docket is already a script.
             </p>
-            <div className="mt-4 flex items-center gap-2">
-              <a
-                href="https://github.com/"
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="GitHub"
-                className={cn(
-                  "w-8 h-8 flex items-center justify-center",
-                  "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-                  "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]",
-                  "brut-press shadow-[2px_2px_0px_var(--shadow-color)] transition-colors"
-                )}
-              >
-                <Github size={14} />
-              </a>
-              <a
-                href="https://twitter.com/"
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="Twitter / X"
-                className={cn(
-                  "w-8 h-8 flex items-center justify-center",
-                  "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-                  "text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]",
-                  "brut-press shadow-[2px_2px_0px_var(--shadow-color)] transition-colors"
-                )}
-              >
-                <Twitter size={14} />
-              </a>
+            <div className="mt-5 flex items-center gap-2">
+              <SocialChip href="https://github.com/" label="GitHub">
+                <Github size={13} />
+              </SocialChip>
+              <SocialChip href="https://twitter.com/" label="Twitter / X">
+                <Twitter size={13} />
+              </SocialChip>
+            </div>
+            <div className="mt-6 flex items-center gap-2">
+              <span className="cinema-pulse-gold" aria-hidden />
+              <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                Alpha — public record in, story out
+              </span>
             </div>
           </div>
 
-          {/* Product */}
           <FooterColumn title="Product" links={PRODUCT_LINKS} />
-
-          {/* Legal */}
           <FooterColumn title="Legal" links={LEGAL_LINKS} />
-
-          {/* Resources */}
           <FooterColumn title="Resources" links={RESOURCES_LINKS} />
         </div>
       </div>
 
       {/* ═══ Bottom bar ═══ */}
-      <div className="border-t-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
-        <div className="max-w-7xl mx-auto px-5 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="flex items-center gap-3 font-mono text-[10px] text-[var(--muted-foreground)]">
-            <span>© {YEAR} LegalDrama.ai — All rights reserved.</span>
-            <span className="hidden sm:inline">·</span>
-            <span className="hidden sm:inline">
-              Made with public records and a lot of coffee.
+      <div className="relative z-10 border-t border-[var(--border)]">
+        <div className="max-w-7xl mx-auto px-5 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <span className="cinema-pulse-dot" aria-hidden />
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+              © {YEAR} LegalDrama.ai — All rights reserved.
             </span>
           </div>
-          <div className="flex items-center gap-3 font-mono text-[10px]">
+          <div className="flex items-center gap-4">
             <Link
               href="/legal/terms"
-              className="text-[var(--muted-foreground)] hover:text-[var(--amber)] transition-colors"
+              className="cinema-label text-[9px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors"
             >
               Terms
             </Link>
-            <span className="text-[var(--muted-foreground)]/40">·</span>
             <Link
               href="/legal/privacy"
-              className="text-[var(--muted-foreground)] hover:text-[var(--amber)] transition-colors"
+              className="cinema-label text-[9px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors"
             >
               Privacy
             </Link>
-            <span className="text-[var(--muted-foreground)]/40">·</span>
             <Link
               href="/legal/cookies"
-              className="text-[var(--muted-foreground)] hover:text-[var(--amber)] transition-colors"
+              className="cinema-label text-[9px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors"
             >
               Cookies
             </Link>
-            <span className="text-[var(--muted-foreground)]/40">·</span>
-            <span className="text-[var(--muted-foreground)]/70">
-              v0.1 — alpha
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)]/60">
+              v0.1 · Alpha
             </span>
           </div>
         </div>
       </div>
     </footer>
+  )
+}
+
+function DisclaimerCard({
+  accent,
+  icon: Icon,
+  label,
+  body,
+  borderLeft = false,
+}: {
+  accent: string
+  icon: React.ComponentType<{ size?: number; className?: string }>
+  label: string
+  body: string
+  borderLeft?: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        "p-4 flex items-start gap-3 bg-[var(--surface)]/50",
+        borderLeft && "border-l border-[var(--border)]"
+      )}
+      style={{ borderTop: `2px solid ${accent}` }}
+    >
+      <Icon size={14} className="shrink-0 mt-0.5" style={{ color: accent }} />
+      <div>
+        <div
+          className="cinema-label text-[9px] mb-1.5"
+          style={{ color: accent }}
+        >
+          {label}
+        </div>
+        <p className="font-sans text-[11px] leading-snug text-[var(--foreground)]">
+          {body}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function SocialChip({
+  href,
+  label,
+  children,
+}: {
+  href: string
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label={label}
+      className={cn(
+        "w-8 h-8 flex items-center justify-center",
+        "border border-[var(--border)] bg-transparent",
+        "text-[var(--muted-foreground)] hover:text-[var(--gold)] hover:border-[var(--gold)]",
+        "transition-colors"
+      )}
+    >
+      {children}
+    </a>
   )
 }
 
@@ -258,15 +290,15 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h3 className="font-mono text-[10px] font-bold text-[var(--foreground)] tracking-wider uppercase mb-3">
+      <h3 className="cinema-label text-[10px] text-[var(--gold)] mb-4">
         {title}
       </h3>
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {links.map(link => (
           <li key={link.href}>
             <Link
               href={link.href}
-              className="font-sans text-[13px] text-[var(--muted-foreground)] hover:text-[var(--amber)] transition-colors"
+              className="font-sans text-[12px] text-[var(--muted-foreground)] hover:text-white transition-colors"
             >
               {link.label}
             </Link>

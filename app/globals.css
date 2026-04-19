@@ -3,134 +3,104 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Light mode (default) — Editorial Mission Control */
-:root {
-  --background: #FFF9EC;
-  --foreground: #1F1F1F;
-  --surface: #F5F0E0;
-  --surface-alt: #EBE6D6;
-  --card: #FFF9EC;
-  --card-foreground: #1F1F1F;
-  --popover: #FFF9EC;
-  --popover-foreground: #1F1F1F;
-  --primary: #CB3A2A;
-  --primary-foreground: #FFF9EC;
-  --secondary: #F5F0E0;
-  --secondary-foreground: #1F1F1F;
-  --muted: #EBE6D6;
-  --muted-foreground: #6C664B;
-  --accent: #EF9F27;
-  --accent-foreground: #1F1F1F;
-  --destructive: #CB3A2A;
-  --destructive-foreground: #FFF9EC;
-  --border: #1F1F1F;
-  --border-light: #D4CEB8;
-  --input: #FFF9EC;
-  --ring: #EF9F27;
-  --radius: 0px;
-  --border-width: 2.5px;
-  --shadow-color: #1F1F1F;
+/* ═══════════════════════════════════════════════════════════════════
+   CINEMA NOIR — "Law & Order title sequence meets PACER database"
+   Dark-default. Blood-red CTAs. Aged-gold metadata. Film grain.
+   ═══════════════════════════════════════════════════════════════════ */
 
-  /* Semantic colors — SAME in both modes */
-  --red: #CB3A2A;
-  --orange: #A34D14;
-  --yellow: #EF9F27;
-  --green: #14710A;
-  --purple: #644AC9;
-  --cyan: #036A96;
-  --pink: #A3144D;
-  --amber: #EF9F27;
-  --selection: #CFCFDE;
-
-  /* Lane colors */
-  --lane-factual: #CB3A2A;
-  --lane-procedural: #036A96;
-  --lane-scheduling: #A34D14;
-  --lane-narrative: #644AC9;
-  --lane-danger: #A3144D;
-
-  /* Gradient colors */
-  --gradient-start: #CB3A2A;
-  --gradient-mid: #EF9F27;
-  --gradient-end: #644AC9;
-
-  /* Sidebar */
-  --sidebar: #F5F0E0;
-  --sidebar-foreground: #1F1F1F;
-  --sidebar-primary: #CB3A2A;
-  --sidebar-primary-foreground: #FFF9EC;
-  --sidebar-accent: #EBE6D6;
-  --sidebar-accent-foreground: #1F1F1F;
-  --sidebar-border: #1F1F1F;
-  --sidebar-ring: #EF9F27;
-}
-
-/* Dark mode — Editorial Mission Control */
+:root,
 .dark {
-  --background: #1C1810;
-  --foreground: #FFF9EC;
-  --surface: #252118;
-  --surface-alt: #302A1F;
-  --card: #252118;
-  --card-foreground: #FFF9EC;
-  --popover: #252118;
-  --popover-foreground: #FFF9EC;
-  --primary: #CB3A2A;
-  --primary-foreground: #FFF9EC;
-  --secondary: #302A1F;
-  --secondary-foreground: #FFF9EC;
-  --muted: #302A1F;
-  --muted-foreground: #8A8470;
-  --accent: #EF9F27;
-  --accent-foreground: #1C1810;
-  --destructive: #CB3A2A;
-  --destructive-foreground: #FFF9EC;
-  --border: #3A3520;
-  --border-light: #302A1F;
-  --input: #302A1F;
-  --ring: #EF9F27;
+  /* Cinematic void + warm gray-brown surface stack */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --surface: #141414;
+  --surface-alt: #1e1d1b;
+  --card: #141414;
+  --card-foreground: #ffffff;
+  --popover: #141414;
+  --popover-foreground: #ffffff;
+
+  /* Primary — blood red for drama, CTAs, active state */
+  --primary: #cc1818;
+  --primary-foreground: #ffffff;
+
+  /* Secondary — aged gold/amber for metadata, categories, borders */
+  --secondary: #b3a369;
+  --secondary-foreground: #0a0a0a;
+
+  /* Muted — desaturated olive-gray */
+  --muted: #1e1d1b;
+  --muted-foreground: #6b6656;
+
+  /* Accent mirrors secondary (aged gold) */
+  --accent: #b3a369;
+  --accent-foreground: #0a0a0a;
+
+  --destructive: #cc1818;
+  --destructive-foreground: #ffffff;
+
+  /* Warm dark borders, 1px solid look */
+  --border: #2a2822;
+  --border-light: #1e1d1b;
+  --input: #141414;
+  --ring: #b3a369;
+
   --radius: 0px;
-  --border-width: 2.5px;
-  --shadow-color: #0D0B07;
+  --border-width: 1px;
+  --shadow-color: #000000;
 
-  /* Semantic colors — SAME in both modes */
-  --red: #CB3A2A;
-  --orange: #A34D14;
-  --yellow: #EF9F27;
-  --green: #14710A;
-  --purple: #644AC9;
-  --cyan: #036A96;
-  --pink: #A3144D;
-  --amber: #EF9F27;
-  --selection: #CFCFDE;
+  /* Semantic — retuned for noir palette */
+  --red: #cc1818;
+  --orange: #a55f1f;
+  --yellow: #d4a93a;
+  --green: #3d8b3d;
+  --purple: #6a5a9e;
+  --cyan: #4a8cad;
+  --pink: #a34d4d;
+  --amber: #b3a369;
+  --gold: #b3a369;
+  --selection: #2a2822;
 
-  /* Lane colors */
-  --lane-factual: #CB3A2A;
-  --lane-procedural: #036A96;
-  --lane-scheduling: #A34D14;
-  --lane-narrative: #644AC9;
-  --lane-danger: #A3144D;
+  /* Lane colors — cinematic role coding
+     red = govt / prosecution
+     gold = defense
+     white = court / orders
+     cyan = procedural
+     purple = narrative */
+  --lane-factual: #cc1818;
+  --lane-procedural: #4a8cad;
+  --lane-scheduling: #b3a369;
+  --lane-narrative: #6a5a9e;
+  --lane-danger: #a34d4d;
+  --lane-govt: #cc1818;
+  --lane-defense: #b3a369;
+  --lane-court: #ffffff;
 
-  /* Gradient colors */
-  --gradient-start: #CB3A2A;
-  --gradient-mid: #EF9F27;
-  --gradient-end: #644AC9;
+  /* Gradient colors — used sparingly (noir prefers flats) */
+  --gradient-start: #cc1818;
+  --gradient-mid: #b3a369;
+  --gradient-end: #1e1d1b;
 
   /* Sidebar */
-  --sidebar: #252118;
-  --sidebar-foreground: #FFF9EC;
-  --sidebar-primary: #CB3A2A;
-  --sidebar-primary-foreground: #FFF9EC;
-  --sidebar-accent: #302A1F;
-  --sidebar-accent-foreground: #FFF9EC;
-  --sidebar-border: #3A3520;
-  --sidebar-ring: #EF9F27;
+  --sidebar: #141414;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #cc1818;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e1d1b;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #2a2822;
+  --sidebar-ring: #b3a369;
 }
+
+/* Light mode preserved as the same noir tokens — the reference screenshots
+   are uniformly dark; we force cinema-noir regardless of system preference. */
 
 @theme inline {
-  --font-sans: var(--font-bricolage), 'Bricolage Grotesque', system-ui;
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: var(--font-source-serif), 'Source Serif 4', Georgia, serif;
-  --font-mono: var(--font-jetbrains), 'JetBrains Mono', monospace;
+  --font-mono: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: var(--font-anton), 'Anton', 'Oswald', 'Impact', sans-serif;
+  --font-contract: var(--font-garamond), 'EB Garamond', 'Libre Caslon', Georgia, serif;
   
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -163,6 +133,7 @@
   --color-cyan: var(--cyan);
   --color-pink: var(--pink);
   --color-amber: var(--amber);
+  --color-gold: var(--gold);
   --color-selection: var(--selection);
 
   --color-lane-factual: var(--lane-factual);
@@ -238,6 +209,256 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--muted-foreground);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CINEMA NOIR — film grain, title shadows, status pulse
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Film grain overlay — drop onto any container as a sibling, or via ::before */
+.cinema-grain {
+  position: relative;
+}
+.cinema-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-repeat: repeat;
+}
+
+/* Heavier grain for hero surfaces */
+.cinema-grain-heavy::before {
+  opacity: 0.12;
+}
+
+/* Cinematic radial vignette from corners */
+.cinema-vignette {
+  position: relative;
+}
+.cinema-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at top left, rgba(40, 35, 30, 0.6) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(40, 35, 30, 0.5) 0%, transparent 55%);
+}
+
+/* Hard directional shadow for Anton display type */
+.cinema-title {
+  font-family: var(--font-anton), 'Anton', 'Oswald', 'Impact', sans-serif;
+  font-weight: 400; /* Anton only ships 400 */
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+  text-shadow: 2px 2px 0px #000;
+}
+
+.cinema-title-xl {
+  font-size: clamp(3rem, 9vw, 8rem);
+}
+
+/* Smaller caps/labels — cinematic title-card feel */
+.cinema-label {
+  font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+}
+
+.cinema-label-tight {
+  font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+/* ─── "Gold contract" font ────────────────────────────────────────
+   EB Garamond in uppercase with generous tracking — evokes the
+   typewritten caption bar of a legal dossier. Use for gold metadata
+   lines (case numbers, district labels), taglines under titles,
+   and character/cast-style credits.
+   ──────────────────────────────────────────────────────────────── */
+.cinema-contract {
+  font-family: var(--font-contract), 'EB Garamond', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-feature-settings: "smcp" 1, "c2sc" 1, "onum" 0;
+}
+
+.cinema-contract-tight {
+  font-family: var(--font-contract), 'EB Garamond', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cinema-contract-italic {
+  font-family: var(--font-contract), 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* Pulsing red dot — live/synced/active indicator */
+@keyframes cinema-pulse-dot {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 70%, transparent),
+                0 0 8px color-mix(in srgb, var(--red) 60%, transparent);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--red) 0%, transparent),
+                0 0 12px color-mix(in srgb, var(--red) 80%, transparent);
+    opacity: 0.85;
+  }
+}
+.cinema-pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  border-radius: 0;
+  animation: cinema-pulse-dot 1.6s ease-in-out infinite;
+}
+
+/* Gold pulse variant — for aged-gold "in-session" indicators */
+@keyframes cinema-pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 70%, transparent),
+                0 0 8px color-mix(in srgb, var(--gold) 60%, transparent);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 0%, transparent),
+                0 0 12px color-mix(in srgb, var(--gold) 80%, transparent);
+    opacity: 0.85;
+  }
+}
+.cinema-pulse-gold {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 0;
+  animation: cinema-pulse-gold 2s ease-in-out infinite;
+}
+
+/* Sharp 1px horizontal rule — chronological dividers */
+.cinema-rule {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.cinema-rule-gold {
+  border: 0;
+  border-top: 1px solid var(--gold);
+  margin: 0;
+  opacity: 0.35;
+}
+
+/* Cinema card — sharp, bordered, grainy */
+.cinema-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.cinema-card:hover {
+  border-color: var(--gold);
+}
+
+.cinema-card--red-left {
+  border-left: 3px solid var(--red);
+}
+
+.cinema-card--gold-left {
+  border-left: 3px solid var(--gold);
+}
+
+.cinema-card--white-left {
+  border-left: 3px solid #ffffff;
+}
+
+/* Primary cinema button — white fill, black text */
+.cinema-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-jetbrains), 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: #ffffff;
+  color: #0a0a0a;
+  border: 1px solid #ffffff;
+  transition: background 180ms ease, color 180ms ease;
+  cursor: pointer;
+}
+.cinema-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0a0a0a;
+}
+
+.cinema-btn--ghost {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+.cinema-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.cinema-btn--red {
+  background: var(--red);
+  color: #ffffff;
+  border-color: var(--red);
+}
+.cinema-btn--red:hover {
+  background: #ffffff;
+  color: var(--red);
+  border-color: #ffffff;
+}
+
+/* Cinema text selection */
+::selection {
+  background: var(--red);
+  color: #ffffff;
+}
+
+/* Subtle scanline overlay — use on hero surfaces */
+.cinema-scanlines {
+  position: relative;
+}
+.cinema-scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 3px
+  );
+  z-index: 1;
 }
 
 /* ====== ANIMATIONS ====== */
