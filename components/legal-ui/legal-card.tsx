@@ -11,24 +11,33 @@ interface LegalCardProps {
   onClick?: () => void
 }
 
-export function LegalCard({ children, color, animated = false, delay = 0, className, onClick }: LegalCardProps) {
+/**
+ * Cinema-noir card — thin 1px border against the film surface,
+ * optional left-lane color accent, subtle hover that brightens
+ * the border to gold instead of translating the element.
+ */
+export function LegalCard({
+  children,
+  color,
+  animated = false,
+  delay = 0,
+  className,
+  onClick,
+}: LegalCardProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
-        "bg-card border transition-theme",
-        "p-4",
-        // Light mode
-        "shadow-brut",
-        // Dark mode
-        " dark:shadow-brut",
+        "relative border border-[var(--border)] bg-[#141414] p-4",
+        "transition-colors duration-150",
         animated && "animate-card-in",
-        onClick && "cursor-pointer hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none",
+        onClick &&
+          "cursor-pointer hover:border-[var(--gold)]",
         className
       )}
       style={{
         borderLeftColor: color,
-        borderLeftWidth: color ? 3 : undefined,
+        borderLeftWidth: color ? 2 : undefined,
         animationDelay: animated ? `${delay}ms` : undefined,
       }}
     >
@@ -46,19 +55,26 @@ interface LegalSectionProps {
   className?: string
 }
 
-export function LegalSection({ title, icon, count, color, children, className }: LegalSectionProps) {
+export function LegalSection({
+  title,
+  icon,
+  count,
+  color,
+  children,
+  className,
+}: LegalSectionProps) {
   return (
     <div className={cn("mb-4", className)}>
       <div className="flex items-center gap-2 mb-2">
         {icon && <span className="text-sm">{icon}</span>}
-        <span 
-          className="font-mono text-[9px] font-extrabold tracking-widest uppercase"
-          style={{ color: color || "var(--muted-foreground)" }}
+        <span
+          className="cinema-label text-[10px]"
+          style={{ color: color || "var(--gold)" }}
         >
           {title}
         </span>
         {count != null && (
-          <span className="font-mono text-[8px] font-bold text-muted-foreground bg-muted/50 px-1 py-0.5 -sm border border-border/40">
+          <span className="cinema-label text-[8px] text-[var(--muted-foreground)] px-1.5 py-0.5 border border-[var(--border)]">
             {count}
           </span>
         )}
@@ -77,12 +93,7 @@ export function LegalPanel({ children, className }: LegalPanelProps) {
   return (
     <div
       className={cn(
-        "bg-card border border-border",
-        "p-4",
-        // Light mode
-        "shadow-brut-lg",
-        // Dark mode
-        " dark:shadow-brut-lg",
+        "bg-[#141414] border border-[var(--border)] p-4",
         "animate-panel-in",
         className
       )}

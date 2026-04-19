@@ -19,6 +19,10 @@ interface LegalTabsProps {
   size?: "sm" | "md" | "lg"
 }
 
+/**
+ * Cinema-noir horizontal tabs. Active tab is marked with a red underline
+ * rule (like a title-card section break), not a filled background.
+ */
 export function LegalTabs({
   tabs,
   active,
@@ -27,20 +31,21 @@ export function LegalTabs({
   size = "md",
 }: LegalTabsProps) {
   const sizeClasses = {
-    sm: "px-2 py-1 text-[9px]",
-    md: "px-3 py-1.5 text-[10px]",
-    lg: "px-4 py-2 text-xs",
+    sm: "px-2.5 py-1.5 text-[9px]",
+    md: "px-3.5 py-2 text-[10px]",
+    lg: "px-4 py-2.5 text-[11px]",
   }
 
-  const iconSizes = {
-    sm: 10,
-    md: 12,
-    lg: 14,
-  }
+  const iconSizes = { sm: 10, md: 12, lg: 14 }
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
-      {tabs.map((tab) => {
+    <div
+      className={cn(
+        "flex items-center gap-0 border-b border-[var(--border)]",
+        className
+      )}
+    >
+      {tabs.map(tab => {
         const isActive = tab.key === active
         const Icon = tab.icon
 
@@ -49,14 +54,12 @@ export function LegalTabs({
             key={tab.key}
             onClick={() => onChange(tab.key)}
             className={cn(
-              "flex items-center gap-1.5",
+              "relative flex items-center gap-1.5",
               sizeClasses[size],
-              "font-mono font-bold uppercase tracking-wider",
-              "border-2 transition-all duration-150",
-              "",
+              "cinema-label transition-colors duration-150",
               isActive
-                ? "bg-primary/15 border-primary text-primary shadow-brutal-sm dark:shadow-none"
-                : "bg-surface border-border text-muted-foreground hover:text-foreground hover:border-foreground/50"
+                ? "text-white"
+                : "text-[var(--muted-foreground)] hover:text-white"
             )}
           >
             {Icon && <Icon size={iconSizes[size]} />}
@@ -64,13 +67,20 @@ export function LegalTabs({
             {tab.badge !== undefined && (
               <span
                 className={cn(
-                  "px-1.5 py-0.5 text-[8px] font-bold",
-                  "rounded-full",
-                  isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  "px-1.5 py-0.5 text-[8px] cinema-label border",
+                  isActive
+                    ? "border-[var(--gold)] text-[var(--gold)]"
+                    : "border-[var(--border)] text-[var(--muted-foreground)]"
                 )}
               >
                 {tab.badge}
               </span>
+            )}
+            {isActive && (
+              <span
+                className="absolute -bottom-px left-0 right-0 h-[2px]"
+                style={{ background: "var(--red)" }}
+              />
             )}
           </button>
         )
@@ -79,11 +89,13 @@ export function LegalTabs({
   )
 }
 
-// Vertical tabs variant
 interface LegalTabsVerticalProps extends LegalTabsProps {
   fullWidth?: boolean
 }
 
+/**
+ * Cinema-noir vertical tabs — left rule colored gold on active.
+ */
 export function LegalTabsVertical({
   tabs,
   active,
@@ -93,20 +105,16 @@ export function LegalTabsVertical({
   fullWidth = true,
 }: LegalTabsVerticalProps) {
   const sizeClasses = {
-    sm: "px-2 py-1.5 text-[9px]",
-    md: "px-3 py-2 text-[10px]",
-    lg: "px-4 py-2.5 text-xs",
+    sm: "px-3 py-2 text-[9px]",
+    md: "px-3.5 py-2.5 text-[10px]",
+    lg: "px-4 py-3 text-[11px]",
   }
 
-  const iconSizes = {
-    sm: 12,
-    md: 14,
-    lg: 16,
-  }
+  const iconSizes = { sm: 12, md: 14, lg: 16 }
 
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
-      {tabs.map((tab) => {
+    <div className={cn("flex flex-col", className)}>
+      {tabs.map(tab => {
         const isActive = tab.key === active
         const Icon = tab.icon
 
@@ -115,16 +123,14 @@ export function LegalTabsVertical({
             key={tab.key}
             onClick={() => onChange(tab.key)}
             className={cn(
-              "flex items-center gap-2",
+              "flex items-center gap-2 text-left",
               sizeClasses[size],
               fullWidth && "w-full",
-              "font-mono font-bold uppercase tracking-wider",
-              "border-2 border-l-4 transition-all duration-150",
-              "text-left",
-              "",
+              "cinema-label transition-colors duration-150",
+              "border-l-2",
               isActive
-                ? "bg-primary/15 border-border border-l-primary text-primary"
-                : "bg-surface border-border border-l-transparent text-muted-foreground hover:text-foreground hover:border-l-foreground/30"
+                ? "text-white bg-[#141414] border-l-[var(--gold)]"
+                : "text-[var(--muted-foreground)] border-l-transparent hover:text-white hover:bg-[#141414]"
             )}
           >
             {Icon && <Icon size={iconSizes[size]} />}
@@ -132,9 +138,10 @@ export function LegalTabsVertical({
             {tab.badge !== undefined && (
               <span
                 className={cn(
-                  "px-1.5 py-0.5 text-[8px] font-bold",
-                  "rounded-full",
-                  isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  "px-1.5 py-0.5 text-[8px] cinema-label border",
+                  isActive
+                    ? "border-[var(--gold)] text-[var(--gold)]"
+                    : "border-[var(--border)] text-[var(--muted-foreground)]"
                 )}
               >
                 {tab.badge}

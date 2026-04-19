@@ -43,11 +43,11 @@ export function DramaLevelSlider({
   return (
     <div className={className}>
       <div className="flex items-center justify-between mb-1.5">
-        <div className="font-mono text-[9px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
+        <div className="cinema-label text-[9px] text-white/50">
           Drama · L{value}
         </div>
         <div
-          className="font-mono text-[9px] font-bold uppercase tracking-wider"
+          className="cinema-label text-[9px]"
           style={{ color: activeLevel.color }}
         >
           {activeLevel.label}
@@ -56,7 +56,7 @@ export function DramaLevelSlider({
       <div
         role="radiogroup"
         aria-label={`Drama level for ${entityName}`}
-        className="flex gap-1"
+        className="flex gap-[2px]"
       >
         {DRAMA_LEVELS.map((dl) => {
           const active = dl.id === value
@@ -87,10 +87,10 @@ export function DramaLevelSlider({
               }}
               title={dl.label}
               className={cn(
-                "flex-1 h-3.5 border-[2px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
+                "flex-1 h-2 border transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--gold)]",
                 active
-                  ? "border-[var(--foreground)] shadow-[1px_1px_0_var(--shadow-color)]"
-                  : "border-[var(--border)] hover:border-[var(--foreground)]/60",
+                  ? "border-white/80"
+                  : "border-[var(--border)] hover:border-white/40",
               )}
               style={{
                 backgroundColor: filled ? dl.color : "transparent",

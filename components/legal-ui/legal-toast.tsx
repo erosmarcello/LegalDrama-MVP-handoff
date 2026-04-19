@@ -1,6 +1,12 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react"
 import { cn } from "@/lib/utils"
 
 interface Toast {
@@ -20,10 +26,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const addToast = useCallback((message: string, color?: string) => {
     const id = Math.random().toString(36).slice(2, 11)
-    setToasts((prev) => [...prev, { id, message, color }])
-    
+    setToasts(prev => [...prev, { id, message, color }])
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
+      setToasts(prev => prev.filter(t => t.id !== id))
     }, 3000)
   }, [])
 
@@ -43,32 +48,32 @@ export function useToast() {
   return context
 }
 
+/**
+ * Cinema-noir toast — deep black card with a thin accent-color top rule
+ * and a cinema-label message. Reads like a title card insert.
+ */
 function ToastContainer({ toasts }: { toasts: Toast[] }) {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-5 left-1/2 z-[9999] flex flex-col gap-2">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          className={cn(
-            "px-5 py-2.5",
-            "font-mono text-[11px] font-extrabold",
-            "border animate-toast whitespace-nowrap",
-            // Light mode
-            "shadow-brut",
-            // Dark mode
-            " dark:shadow-brut"
-          )}
-          style={{
-            backgroundColor: t.color || "var(--green)",
-            color: "var(--background)",
-            borderColor: t.color || "var(--green)",
-          }}
-        >
-          {t.message}
-        </div>
-      ))}
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 items-center">
+      {toasts.map(t => {
+        const accent = t.color || "var(--gold)"
+        return (
+          <div
+            key={t.id}
+            className={cn(
+              "relative px-5 py-2.5 min-w-[200px] text-center",
+              "cinema-label text-[10px] text-white",
+              "bg-[#0f0f0f] border border-[var(--border)]",
+              "animate-toast whitespace-nowrap shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+            )}
+            style={{ borderTop: `2px solid ${accent}` }}
+          >
+            {t.message}
+          </div>
+        )
+      })}
     </div>
   )
 }

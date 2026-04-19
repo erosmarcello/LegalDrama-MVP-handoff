@@ -660,86 +660,78 @@ Based on: ${assetNames}`,
   
   return (
     <div className="fixed inset-0 z-[100] animate-fade-in" style={{ animationDuration: '0.2s' }}>
-      {/* Full-screen backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/90 backdrop-blur-md"
+      {/* Full-screen backdrop — deep black + cinema grain */}
+      <div
+        className="absolute inset-0 bg-black/95 cinema-grain"
         onClick={onClose}
       />
-      
+
       {/* Full-screen modal container */}
-      <div className="relative h-full flex flex-col animate-enter-up" style={{ animationDuration: '0.35s' }}>
-        {/* Top Nav Bar */}
-        <div className="relative z-10 bg-foreground dark:bg-surface border-b border-border/50">
-          <div className="flex items-center justify-between px-4 py-3">
+      <div className="relative h-full flex flex-col animate-enter-up bg-[#0a0a0a] text-white" style={{ animationDuration: '0.35s' }}>
+        {/* Top Nav Bar — cinema masthead */}
+        <div className="relative z-10 bg-[#0f0f0f] border-b border-[var(--border)]">
+          <div className="flex items-center justify-between px-5 h-14">
             {/* Logo */}
             <div className="flex items-baseline gap-1">
-              <span className="font-sans text-xl font-black text-background dark:text-foreground">legal</span>
-              <span className="font-sans text-xl font-black text-red dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-pink dark:via-purple dark:to-cyan">drama</span>
-              <span className="font-mono text-sm text-pink">.ai</span>
+              <span className="cinema-title text-[22px] text-white">legal</span>
+              <span className="cinema-title text-[22px] text-[var(--red)]">drama</span>
+              <span className="cinema-label text-[10px] text-[var(--gold)] ml-1">.AI</span>
             </div>
 
             {/* Right controls */}
             <div className="flex items-center gap-3">
-              {/* Settings — always accessible */}
               <button
                 onClick={() => { onOpenSettings?.(); }}
                 className={cn(
-                  "px-3 py-1.5 flex items-center gap-2",
-                  "border-2 border-border text-muted-foreground",
-                  "font-mono text-[10px] font-bold",
-                  "hover:border-green hover:text-green hover:shadow-[0_0_8px_var(--green)] transition-all cursor-pointer"
+                  "px-3 h-8 flex items-center gap-2",
+                  "border border-[var(--border)] text-white/60",
+                  "cinema-label text-[10px]",
+                  "hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer",
                 )}
               >
-                <Settings size={12} className="group-hover:rotate-90 transition-transform" />
-                SETTINGS
+                <Settings size={11} />
+                Settings
               </button>
 
-              <div className="w-px h-6 bg-border/50" />
+              <div className="w-px h-6 bg-[var(--border)]" />
 
               <button className={cn(
-                "px-3 py-1.5 flex items-center gap-2",
-                "border-2 border-cyan text-cyan",
-                "font-mono text-[10px] font-bold",
-                "bg-cyan/10"
+                "px-3 h-8 flex items-center gap-2",
+                "border border-[var(--gold)] text-[var(--gold)]",
+                "cinema-label text-[10px] bg-transparent",
               )}>
-                <Layers size={12} />
-                MISSION-CONTROL
+                <Layers size={11} />
+                Mission Control
               </button>
             </div>
           </div>
         </div>
-        
-        {/* Case Header Bar */}
-        <div className="relative z-10 bg-card border-b border-border">
-          <div className="flex items-center justify-between px-4 py-3">
+
+        {/* Case Header Bar — cinema marquee */}
+        <div className="relative z-10 bg-[#0a0a0a] border-b border-[var(--border)]">
+          <div className="flex items-center justify-between px-5 h-12">
             <div className="flex items-center gap-4">
-              <h1 className="font-sans text-xl font-black">USA v. MANGIONE</h1>
+              <h1 className="cinema-title text-[20px] text-white tracking-wider">
+                USA <span className="text-[var(--red)]">v.</span> MANGIONE
+              </h1>
               <div className="flex items-center gap-2">
-                <span className={cn(
-                  "px-2 py-0.5 border border-border",
-                  "font-mono text-[10px]",
-                  ""
-                )}>1:25-cr-00176-MMG</span>
-                <span className={cn(
-                  "px-2 py-0.5 border-2 border-cyan text-cyan",
-                  "font-mono text-[10px] font-bold",
-                  ""
-                )}>S.D.N.Y.</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-orange animate-pulse" />
-                <span className="font-mono text-xs text-muted-foreground">
-                  Motion to Continue pending · Trial: <span className="text-red font-bold">Oct 13 &apos;26</span>
+                <span className="px-2 py-0.5 border border-[var(--border)] cinema-label text-[9px] text-white/70">
+                  1:25-cr-00176-MMG
+                </span>
+                <span className="px-2 py-0.5 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[9px]">
+                  S.D.N.Y.
                 </span>
               </div>
-              <div className={cn(
-                "px-3 py-1 border-2 border-border",
-                "font-mono text-xs",
-                ""
-              )}>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="cinema-pulse-dot" style={{ backgroundColor: "var(--gold)" }} />
+                <span className="cinema-contract text-[10px] text-white/60">
+                  Motion to Continue pending · Trial <span className="text-[var(--red)]">Oct 13 &apos;26</span>
+                </span>
+              </div>
+              <div className="px-3 py-1 border border-[var(--border)] cinema-label text-[9px] text-white/70">
                 {enabledCount}/{totalCount} sources active
               </div>
             </div>
@@ -1258,7 +1250,7 @@ Based on: ${assetNames}`,
                         title={dl.label}
                         className={cn(
                           "group flex-1 flex flex-col items-start gap-2 p-3 text-left",
-                          "border-[2.5px] transition-all",
+                          "border transition-all",
                           "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
                           "disabled:opacity-50 disabled:cursor-not-allowed",
                           active

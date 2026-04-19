@@ -38,7 +38,8 @@ export function Masthead({
   onSignIn,
   user,
   onSignOut,
-  pacerConnected = true,
+  pacerConnected = false,
+  showSettings = false,
   className,
   showSearch = false,
   searchPlaceholder = "Enter case # or name",
@@ -140,7 +141,7 @@ export function Masthead({
             </div>
           )}
 
-          <SettingsLauncher variant="chip" />
+          {showSettings && <SettingsLauncher variant="chip" />}
 
           {user ? (
             <button

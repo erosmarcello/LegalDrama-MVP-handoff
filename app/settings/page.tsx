@@ -3,19 +3,45 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import {
-  Moon, Sun, ArrowLeft, User, Shield, CreditCard,
-  Palette, Key, Link2, Trash2, Check,
-  Sparkles, RefreshCw, ChevronDown,
-  Copy, Plus, Clock, CheckCircle2,
-  HelpCircle, Download, Activity,
-  Gavel, BookOpen, Cloud, Folder, Bell, Calendar, Zap,
-  Mail, Monitor
+  Moon,
+  Sun,
+  User,
+  Shield,
+  CreditCard,
+  Palette,
+  Key,
+  Link2,
+  Trash2,
+  Sparkles,
+  RefreshCw,
+  ChevronDown,
+  Copy,
+  Plus,
+  Clock,
+  CheckCircle2,
+  HelpCircle,
+  Download,
+  Gavel,
+  BookOpen,
+  Cloud,
+  Folder,
+  Bell,
+  Calendar,
+  Zap,
+  Mail,
+  Monitor,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LegalButton, Chip, ToastProvider, useToast, LegalInput } from "@/components/legal-ui"
+import {
+  LegalButton,
+  Chip,
+  ToastProvider,
+  useToast,
+  LegalInput,
+} from "@/components/legal-ui"
 import { SiteFooter } from "@/components/site-footer"
+import { Masthead } from "@/components/masthead"
 
 /* ─── Tab definitions ─── */
 const TABS = [
@@ -283,6 +309,29 @@ const INTEGRATION_CATEGORIES = [
   },
 ]
 
+/* ─── Reusable noir section card ─── */
+function NoirCard({
+  children,
+  className,
+  accent,
+}: {
+  children: React.ReactNode
+  className?: string
+  accent?: string
+}) {
+  return (
+    <div
+      className={cn(
+        "relative border border-[var(--border)] bg-[#141414] p-6",
+        className
+      )}
+      style={accent ? { borderTop: `2px solid ${accent}` } : undefined}
+    >
+      {children}
+    </div>
+  )
+}
+
 /* ─── Main component ─── */
 function SettingsContent() {
   const { resolvedTheme, setTheme } = useTheme()
@@ -290,12 +339,18 @@ function SettingsContent() {
   const router = useRouter()
   const { toast } = useToast()
 
-  useEffect(() => { setMounted(true) }, [])
-  const isDark = mounted ? resolvedTheme === "dark" : false
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  const isDark = mounted ? resolvedTheme === "dark" : true
 
   const [activeTab, setActiveTab] = useState("profile")
-  const [expandedCategory, setExpandedCategory] = useState<string | null>("court-systems")
-  const [syncingIntegration, setSyncingIntegration] = useState<string | null>(null)
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(
+    "court-systems"
+  )
+  const [syncingIntegration, setSyncingIntegration] = useState<string | null>(
+    null
+  )
 
   const [profile, setProfile] = useState({
     name: "John Doe",
@@ -304,84 +359,72 @@ function SettingsContent() {
     role: "Senior Partner",
   })
 
-  const handleSave = () => toast("Settings saved!", "var(--green)")
+  const handleSave = () => toast("Settings saved", "var(--gold)")
 
   const handleSync = async (integrationId: string) => {
     setSyncingIntegration(integrationId)
-    await new Promise(r => setTimeout(r, 2000))
+    await new Promise(r => setTimeout(r, 1600))
     setSyncingIntegration(null)
-    toast("Sync complete!", "var(--green)")
+    toast("Sync complete", "var(--gold)")
   }
 
   const handleConnect = (_id: string, name: string) =>
-    toast(`Opening ${name} authentication...`, "var(--cyan)")
+    toast(`Opening ${name} authentication…`, "var(--gold)")
 
   const handleDisconnect = (_id: string, name: string) =>
-    toast(`Disconnected from ${name}`, "var(--orange)")
+    toast(`Disconnected from ${name}`, "var(--red)")
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    toast("Copied to clipboard!", "var(--green)")
+    toast("Copied to clipboard", "var(--gold)")
   }
 
   const connectedCount = INTEGRATION_CATEGORIES.reduce(
-    (a, c) => a + c.integrations.filter(i => i.connected).length, 0
+    (a, c) => a + c.integrations.filter(i => i.connected).length,
+    0
   )
   const totalCount = INTEGRATION_CATEGORIES.reduce(
-    (a, c) => a + c.integrations.length, 0
+    (a, c) => a + c.integrations.length,
+    0
   )
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* ── Masthead ── */}
-      <nav className="sticky top-0 z-50 border-b-[2.5px] border-[var(--border)] bg-[var(--card)] dark:bg-[var(--surface)]">
-        <div className="px-5 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className={cn(
-                "w-9 h-9 flex items-center justify-center",
-                "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-                "text-[var(--foreground)] hover:border-[var(--amber)]",
-                "transition-all shadow-[2px_2px_0px_var(--shadow-color)]",
-                "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-              )}
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <Link href="/" className="flex items-baseline gap-0.5 cursor-pointer group">
-              <span className="font-sans text-xl font-extrabold text-[var(--foreground)] transition-colors group-hover:text-[var(--red)]">
-                legal
-              </span>
-              <span className="font-sans text-xl font-extrabold text-[var(--red)]">
-                drama
-              </span>
-              <span className="font-mono text-sm text-[var(--pink)]">.ai</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+      <Masthead
+        onSignIn={() => router.push("/")}
+        showSettings
+        pacerConnected
+      />
 
       {/* ── Main content ── */}
-      <main className="max-w-5xl mx-auto px-4 py-8 lg:px-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-5 md:px-8 py-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-sans text-3xl font-black text-foreground">Settings</h1>
-            <p className="font-mono text-xs text-muted-foreground mt-1">
-              Manage your account, integrations, and preferences
+            <div className="cinema-contract text-[11px] text-[var(--gold)] mb-2">
+              § Production Office
+            </div>
+            <h1 className="cinema-title text-[48px] text-white leading-none">
+              Settings
+            </h1>
+            <p className="cinema-contract-italic text-[12px] text-[var(--muted-foreground)] mt-3">
+              Account · Integrations · Preferences
             </p>
           </div>
           {activeTab === "integrations" && (
-            <div className="flex items-center gap-2">
-              <Chip mono bold color="var(--green)">{connectedCount} Connected</Chip>
-              <Chip mono bold>{totalCount - connectedCount} Available</Chip>
+            <div className="flex flex-col items-end gap-1">
+              <span className="cinema-contract text-[10px] text-[var(--gold)]">
+                {connectedCount} Connected
+              </span>
+              <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                of {totalCount} available
+              </span>
             </div>
           )}
         </div>
 
         {/* ── Horizontal Tab Bar ── */}
-        <div className="flex items-center gap-1.5 mb-8 overflow-x-auto pb-1">
+        <div className="flex items-center gap-0 mb-8 overflow-x-auto border-b border-[var(--border)]">
           {TABS.map(tab => {
             const isActive = activeTab === tab.key
             const Icon = tab.icon
@@ -390,40 +433,49 @@ function SettingsContent() {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 whitespace-nowrap",
-                  "font-mono text-xs font-bold",
-                  "border-[2.5px] transition-all",
-                  "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+                  "relative flex items-center gap-2 px-4 py-3 whitespace-nowrap",
+                  "cinema-label text-[10px] transition-colors",
                   isActive
-                    ? "border-[var(--red)] text-[var(--red)] bg-[var(--red)]/5 shadow-[3px_3px_0px_var(--shadow-color)]"
-                    : "border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--card)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]/40 shadow-[3px_3px_0px_var(--shadow-color)]"
+                    ? "text-white"
+                    : "text-[var(--muted-foreground)] hover:text-white"
                 )}
               >
-                <Icon size={14} />
+                <Icon size={12} />
                 <span>{tab.label}</span>
                 {tab.badge !== undefined && (
-                  <span className={cn(
-                    "px-1.5 py-0.5 text-[9px] font-bold border",
-                    isActive
-                      ? "bg-[var(--red)]/15 text-[var(--red)] border-[var(--red)]/30"
-                      : "bg-[var(--green)]/15 text-[var(--green)] border-[var(--green)]/30"
-                  )}>
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.5 text-[8px] cinema-label border",
+                      isActive
+                        ? "border-[var(--gold)] text-[var(--gold)]"
+                        : "border-[var(--border)] text-[var(--muted-foreground)]"
+                    )}
+                  >
                     {tab.badge}
                   </span>
+                )}
+                {isActive && (
+                  <span
+                    className="absolute -bottom-px left-0 right-0 h-[2px]"
+                    style={{ background: "var(--red)" }}
+                  />
                 )}
               </button>
             )
           })}
         </div>
 
-        {/* ── Tab Content ── */}
-
         {/* ═══ PROFILE ═══ */}
         {activeTab === "profile" && (
-          <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-            <h2 className="font-sans text-lg font-bold text-foreground mb-6">Profile Information</h2>
+          <NoirCard accent="var(--gold)">
+            <h2 className="cinema-title text-[24px] text-white mb-1">
+              Profile
+            </h2>
+            <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
+              Your credits on the call sheet
+            </p>
 
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <LegalInput
                 label="Full Name"
                 value={profile.name}
@@ -433,10 +485,12 @@ function SettingsContent() {
                 label="Email"
                 type="email"
                 value={profile.email}
-                onChange={e => setProfile({ ...profile, email: e.target.value })}
+                onChange={e =>
+                  setProfile({ ...profile, email: e.target.value })
+                }
               />
               <LegalInput
-                label="Firm/Organization"
+                label="Firm / Organization"
                 value={profile.firm}
                 onChange={e => setProfile({ ...profile, firm: e.target.value })}
               />
@@ -448,170 +502,147 @@ function SettingsContent() {
             </div>
 
             <div className="flex justify-end mt-6">
-              <LegalButton onClick={handleSave} className="shadow-[3px_3px_0px_var(--shadow-color)]">
+              <LegalButton active color="var(--gold)" onClick={handleSave}>
                 Save Changes
               </LegalButton>
             </div>
-          </div>
+          </NoirCard>
         )}
 
         {/* ═══ ACCOUNT ═══ */}
         {activeTab === "account" && (
-          <div className="space-y-6">
-            {/* Security */}
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-              <h2 className="font-sans text-lg font-bold text-foreground mb-5">Security</h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 border-[2.5px] border-[var(--border)] bg-[var(--background)] hover:border-[var(--foreground)]/40 transition-all">
-                  <div>
-                    <div className="font-mono text-sm font-bold text-foreground">Password</div>
-                    <div className="font-mono text-[11px] text-muted-foreground">Last changed 30 days ago</div>
-                  </div>
-                  <LegalButton small className="shadow-[3px_3px_0px_var(--shadow-color)]">Change</LegalButton>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border-[2.5px] border-[var(--border)] bg-[var(--background)] hover:border-[var(--foreground)]/40 transition-all">
-                  <div>
-                    <div className="font-mono text-sm font-bold text-foreground">Two-Factor Auth</div>
-                    <div className="font-mono text-[11px] text-muted-foreground">Add extra security to your account</div>
-                  </div>
-                  <Chip mono bold color="var(--red)">Not Enabled</Chip>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border-[2.5px] border-[var(--border)] bg-[var(--background)] hover:border-[var(--foreground)]/40 transition-all">
-                  <div>
-                    <div className="font-mono text-sm font-bold text-foreground">Active Sessions</div>
-                    <div className="font-mono text-[11px] text-muted-foreground">2 devices currently logged in</div>
-                  </div>
-                  <LegalButton small className="shadow-[3px_3px_0px_var(--shadow-color)]">Manage</LegalButton>
-                </div>
-              </div>
-            </div>
-
-            {/* Danger Zone */}
-            <div className="border-[2.5px] border-[var(--red)]/50 bg-[var(--red)]/5 p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-              <h2 className="font-sans text-lg font-bold text-[var(--red)] mb-2">Danger Zone</h2>
-              <p className="font-serif text-sm text-muted-foreground mb-4">
-                Permanently delete your account and all associated data. This action cannot be undone.
+          <div className="space-y-4">
+            <NoirCard accent="var(--gold)">
+              <h2 className="cinema-title text-[24px] text-white mb-1">
+                Security
+              </h2>
+              <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-5">
+                Locks & seals
               </p>
-              <LegalButton small color="var(--red)" className="shadow-[3px_3px_0px_var(--shadow-color)]">
+              <div className="divide-y divide-[var(--border)]">
+                <SecurityRow
+                  title="Password"
+                  subtitle="Last changed 30 days ago"
+                  action={<LegalButton small>Change</LegalButton>}
+                />
+                <SecurityRow
+                  title="Two-Factor Auth"
+                  subtitle="Add extra security to your account"
+                  action={<Chip color="var(--red)">Not Enabled</Chip>}
+                />
+                <SecurityRow
+                  title="Active Sessions"
+                  subtitle="2 devices currently logged in"
+                  action={<LegalButton small>Manage</LegalButton>}
+                />
+              </div>
+            </NoirCard>
+
+            <NoirCard accent="var(--red)">
+              <h2 className="cinema-title text-[24px] mb-1" style={{ color: "var(--red)" }}>
+                Danger Zone
+              </h2>
+              <p className="font-sans text-[13px] text-[var(--muted-foreground)] mb-4 leading-relaxed">
+                Permanently delete your account and all associated data. This
+                action cannot be undone.
+              </p>
+              <LegalButton active color="var(--red)" small>
                 <Trash2 size={12} />
                 Delete Account
               </LegalButton>
-            </div>
+            </NoirCard>
           </div>
         )}
 
         {/* ═══ APPEARANCE ═══ */}
         {activeTab === "appearance" && (
-          <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-            <h2 className="font-sans text-lg font-bold text-foreground mb-6">Theme</h2>
+          <NoirCard accent="var(--gold)">
+            <h2 className="cinema-title text-[24px] text-white mb-1">
+              Theme
+            </h2>
+            <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
+              House lights
+            </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Light Mode */}
-              <button
-                onClick={() => setTheme("light")}
-                className={cn(
-                  "p-5 border-[2.5px] transition-all text-left",
-                  "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-                  !isDark
-                    ? "border-[var(--red)] shadow-[4px_4px_0px_var(--red)]"
-                    : "border-[var(--border)] shadow-[4px_4px_0px_var(--shadow-color)] hover:border-[var(--foreground)]/40"
-                )}
-              >
-                {/* Preview */}
-                <div className="w-full h-32 bg-[#FFF9EC] border-[2.5px] border-[var(--border)] mb-4 overflow-hidden">
-                  <div className="h-6 bg-[#F5F0E0] border-b-2 border-[var(--border)]" />
-                  <div className="h-[2px] bg-[var(--red)] w-full" />
-                  <div className="p-3 space-y-2">
-                    <div className="h-2 bg-[#EBE6D6] w-3/4" />
-                    <div className="h-1.5 bg-[#EBE6D6] w-1/2" />
-                    <div className="h-1.5 bg-[#EBE6D6] w-2/3" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ThemeCard
+                selected={!isDark}
+                onSelect={() => setTheme("light")}
+                title="Open Court"
+                subtitle="Public session — bright, on the record"
+                Icon={Sun}
+                preview={
+                  <div className="w-full h-32 bg-[#FFF9EC] border border-[var(--border)] overflow-hidden">
+                    <div className="h-6 bg-[#F5F0E0] border-b border-[var(--border)]" />
+                    <div className="h-[2px] bg-[var(--red)] w-full" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-2 bg-[#EBE6D6] w-3/4" />
+                      <div className="h-1.5 bg-[#EBE6D6] w-1/2" />
+                      <div className="h-1.5 bg-[#EBE6D6] w-2/3" />
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Sun size={16} className="text-[var(--amber)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">Open Court</span>
-                </div>
-                <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Public session — bright, on the record
-                </p>
-              </button>
-
-              {/* Dark Mode */}
-              <button
-                onClick={() => setTheme("dark")}
-                className={cn(
-                  "p-5 border-[2.5px] transition-all text-left",
-                  "active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-                  isDark
-                    ? "border-[var(--red)] shadow-[4px_4px_0px_var(--red)]"
-                    : "border-[var(--border)] shadow-[4px_4px_0px_var(--shadow-color)] hover:border-[var(--foreground)]/40"
-                )}
-              >
-                {/* Preview */}
-                <div className="w-full h-32 bg-[#1C1810] border-[2.5px] border-[#3A3520] mb-4 overflow-hidden">
-                  <div className="h-6 bg-[#252118] border-b-2 border-[#3A3520]" />
-                  <div className="h-[2px] bg-[var(--purple)] w-full" />
-                  <div className="p-3 space-y-2">
-                    <div className="h-2 bg-[#302A1F] w-3/4" />
-                    <div className="h-1.5 bg-[#302A1F] w-1/2" />
-                    <div className="h-1.5 bg-[#302A1F] w-2/3" />
+                }
+              />
+              <ThemeCard
+                selected={isDark}
+                onSelect={() => setTheme("dark")}
+                title="In Camera"
+                subtitle="Chambers session — sealed, off the record"
+                Icon={Moon}
+                preview={
+                  <div className="w-full h-32 bg-[#0a0a0a] border border-[var(--border)] overflow-hidden cinema-grain">
+                    <div className="h-6 bg-[#141414] border-b border-[var(--border)]" />
+                    <div className="h-[2px] bg-[var(--gold)] w-full" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-2 bg-[#262626] w-3/4" />
+                      <div className="h-1.5 bg-[#262626] w-1/2" />
+                      <div className="h-1.5 bg-[#262626] w-2/3" />
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Moon size={16} className="text-[var(--purple)]" />
-                  <span className="font-mono text-sm font-bold text-foreground">In Camera</span>
-                </div>
-                <p className="font-mono text-[11px] text-muted-foreground mt-1 text-center">
-                  Chambers session — sealed, off the record
-                </p>
-              </button>
+                }
+              />
             </div>
-          </div>
+          </NoirCard>
         )}
 
         {/* ═══ AI USAGE REPORT ═══ */}
         {activeTab === "ai-usage" && (
-          <div className="space-y-6">
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-              <h2 className="font-sans text-lg font-bold text-foreground mb-1">AI Usage Report</h2>
-              <p className="font-serif text-sm text-muted-foreground mb-6">
-                Track every AI-assisted output for WGA and compliance transparency.
+          <div className="space-y-4">
+            <NoirCard accent="var(--gold)">
+              <h2 className="cinema-title text-[24px] text-white mb-1">
+                AI Usage Report
+              </h2>
+              <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
+                Every AI-assisted output logged — WGA & compliance transparency
               </p>
 
-              {/* Stat cards */}
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-3xl font-black text-[var(--cyan)]">142</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-1">AI Prompts Sent</div>
-                </div>
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-3xl font-black text-[var(--foreground)]">87</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-1">Outputs Generated</div>
-                </div>
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-3xl font-black text-[var(--amber)]">34%</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-1">AI Contribution</div>
-                </div>
+              <div className="grid grid-cols-3 gap-0 border border-[var(--border)] mb-8">
+                <StatTile value="142" label="AI Prompts Sent" accent="var(--gold)" />
+                <StatTile value="87" label="Outputs Generated" accent="#ffffff" borderLeft />
+                <StatTile value="34%" label="AI Contribution" accent="var(--red)" borderLeft />
               </div>
 
-              {/* AI Contribution by Section */}
-              <div className="mb-2">
+              <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles size={14} className="text-[var(--amber)]" />
-                  <span className="font-sans text-sm font-bold text-foreground">AI Contribution by Section</span>
+                  <Sparkles size={12} className="text-[var(--gold)]" />
+                  <span className="cinema-label text-[10px] text-[var(--gold)]">
+                    Contribution by Section
+                  </span>
                 </div>
                 <div className="space-y-4">
                   {AI_CONTRIBUTIONS.map(item => (
                     <div key={item.label}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-mono text-xs text-foreground">{item.label}</span>
-                        <span className="font-mono text-xs font-bold text-[var(--amber)]">{item.pct}%</span>
+                        <span className="font-sans text-[13px] text-white">
+                          {item.label}
+                        </span>
+                        <span className="cinema-label text-[10px] text-[var(--gold)]">
+                          {item.pct}%
+                        </span>
                       </div>
-                      <div className="w-full h-[3px] bg-[var(--surface-alt)]">
+                      <div className="w-full h-[2px] bg-[var(--border)]">
                         <div
-                          className="h-full bg-[var(--amber)] transition-all duration-500"
+                          className="h-full bg-[var(--gold)] transition-all duration-500"
                           style={{ width: `${item.pct}%` }}
                         />
                       </div>
@@ -619,241 +650,265 @@ function SettingsContent() {
                   ))}
                 </div>
               </div>
-            </div>
+            </NoirCard>
 
-            {/* Recent AI Activity */}
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
+            <NoirCard>
               <div className="flex items-center gap-2 mb-5">
-                <Clock size={14} className="text-muted-foreground" />
-                <span className="font-sans text-sm font-bold text-foreground">Recent AI Activity</span>
+                <Clock size={12} className="text-[var(--muted-foreground)]" />
+                <span className="cinema-label text-[10px] text-[var(--gold)]">
+                  Recent Activity
+                </span>
               </div>
-
-              <div className="space-y-0">
+              <div className="divide-y divide-[var(--border)]">
                 {AI_ACTIVITY.map((item, i) => (
                   <div
                     key={i}
-                    className={cn(
-                      "flex items-center gap-4 py-4 px-2",
-                      i < AI_ACTIVITY.length - 1 && "border-b border-[var(--border)]/30"
-                    )}
+                    className="flex items-center gap-4 py-3"
                   >
-                    <span className="font-mono text-[11px] text-muted-foreground w-20 shrink-0">
+                    <span className="cinema-label text-[9px] text-[var(--muted-foreground)] w-20 shrink-0">
                       {item.time}
                     </span>
-                    <span className="font-sans text-sm font-semibold text-foreground flex-1">
+                    <span className="font-sans text-[13px] text-white flex-1">
                       {item.action}
                     </span>
-                    <Chip mono bold color="var(--amber)" className="shrink-0">
+                    <Chip color="var(--gold)" mono>
                       {item.category}
                     </Chip>
-                    <span className="font-mono text-[11px] text-muted-foreground shrink-0">
+                    <span className="cinema-label text-[9px] text-[var(--muted-foreground)] shrink-0">
                       {item.model}
                     </span>
                   </div>
                 ))}
               </div>
-            </div>
+            </NoirCard>
 
-            {/* WGA Compliance Notice */}
-            <div className="border-[2.5px] border-dashed border-[var(--cyan)]/50 bg-[var(--cyan)]/5 p-6">
-              <div className="text-center">
-                <div className="font-mono text-xs font-bold text-[var(--amber)] tracking-widest uppercase mb-3">
+            <NoirCard accent="var(--gold)">
+              <div className="text-center py-2">
+                <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
                   WGA Compliance Notice
                 </div>
-                <p className="font-serif text-sm text-muted-foreground mb-4 max-w-2xl mx-auto">
-                  All AI-generated outputs are logged and percentage contributions tracked per project.
-                  Export this report for guild or production compliance at any time.
+                <p className="font-sans text-[13px] text-[var(--muted-foreground)] mb-4 max-w-2xl mx-auto leading-relaxed">
+                  All AI-generated outputs are logged and percentage
+                  contributions tracked per project. Export this report for
+                  guild or production compliance at any time.
                 </p>
-                <LegalButton color="var(--amber)" className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <Download size={14} />
+                <LegalButton active color="var(--gold)">
+                  <Download size={12} />
                   Export Report
                 </LegalButton>
               </div>
-            </div>
+            </NoirCard>
           </div>
         )}
 
         {/* ═══ BILLING ═══ */}
         {activeTab === "billing" && (
-          <div className="space-y-6">
-            {/* Current Plan */}
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
+          <div className="space-y-4">
+            <NoirCard accent="var(--gold)">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-sans text-lg font-bold text-foreground">Current Plan</h2>
-                <Chip mono bold color="var(--purple)">PRO</Chip>
+                <div>
+                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                    Current Plan
+                  </h2>
+                  <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)]">
+                    Prime Time
+                  </p>
+                </div>
+                <Chip color="var(--gold)" mono>
+                  PRO
+                </Chip>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-5">
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-2xl font-black text-foreground">100</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider uppercase mt-1">Searches/mo</div>
-                </div>
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-2xl font-black text-foreground">500</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider uppercase mt-1">AI Gens/mo</div>
-                </div>
-                <div className="text-center p-5 border-[2.5px] border-[var(--border)] bg-[var(--background)] shadow-[3px_3px_0px_var(--shadow-color)]">
-                  <div className="font-mono text-2xl font-black text-foreground">10GB</div>
-                  <div className="font-mono text-[10px] font-bold text-muted-foreground tracking-wider uppercase mt-1">Storage</div>
-                </div>
+              <div className="grid grid-cols-3 gap-0 border border-[var(--border)] mb-5">
+                <StatTile value="100" label="Searches / mo" accent="var(--gold)" />
+                <StatTile value="500" label="AI Gens / mo" accent="#ffffff" borderLeft />
+                <StatTile value="10 GB" label="Storage" accent="var(--red)" borderLeft />
               </div>
 
               <div className="flex gap-2">
-                <LegalButton color="var(--red)" className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                  Upgrade to Enterprise
+                <LegalButton active color="var(--red)">
+                  Upgrade to Writers' Room
                 </LegalButton>
-                <LegalButton className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                  View Invoices
-                </LegalButton>
+                <LegalButton>View Invoices</LegalButton>
               </div>
-            </div>
+            </NoirCard>
 
-            {/* Payment Method */}
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-              <h2 className="font-sans text-lg font-bold text-foreground mb-4">Payment Method</h2>
-              <div className="flex items-center justify-between p-4 border-[2.5px] border-[var(--border)] bg-[var(--background)]">
+            <NoirCard>
+              <h2 className="cinema-title text-[20px] text-white mb-4">
+                Payment Method
+              </h2>
+              <div className="flex items-center justify-between p-4 border border-[var(--border)]">
                 <div className="flex items-center gap-3">
-                  <CreditCard size={20} className="text-muted-foreground" />
+                  <CreditCard size={18} className="text-[var(--muted-foreground)]" />
                   <div>
-                    <div className="font-mono text-sm font-bold text-foreground">Visa ending in 4242</div>
-                    <div className="font-mono text-[11px] text-muted-foreground">Expires 12/26</div>
+                    <div className="font-sans text-[13px] text-white font-semibold">
+                      Visa ending in 4242
+                    </div>
+                    <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-0.5">
+                      Expires 12 / 26
+                    </div>
                   </div>
                 </div>
-                <LegalButton small className="shadow-[3px_3px_0px_var(--shadow-color)]">Update</LegalButton>
+                <LegalButton small>Update</LegalButton>
               </div>
-            </div>
+            </NoirCard>
           </div>
         )}
 
         {/* ═══ INTEGRATIONS ═══ */}
         {activeTab === "integrations" && (
           <div className="space-y-4">
-            {/* Overview card */}
-            <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-5 shadow-[4px_4px_0px_var(--shadow-color)]">
+            <NoirCard accent="var(--gold)">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 flex items-center justify-center shrink-0 bg-[var(--red)]/10 border-[2.5px] border-[var(--red)]/30">
-                  <Link2 size={24} className="text-[var(--red)]" />
+                <div className="w-12 h-12 flex items-center justify-center shrink-0 border border-[var(--gold)]">
+                  <Link2 size={20} className="text-[var(--gold)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-sans text-lg font-bold text-foreground">Connected Services</h2>
-                  <p className="font-mono text-xs text-muted-foreground mt-1">
-                    Connect your legal research tools, court systems, and cloud storage to enhance your workflow.
-                    LegalDrama.ai integrates with industry-standard platforms.
+                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                    Connected Services
+                  </h2>
+                  <p className="font-sans text-[13px] text-[var(--muted-foreground)] leading-relaxed">
+                    Connect legal research tools, court systems, and cloud
+                    storage. PACER, CourtListener, Clio, Westlaw and more all
+                    plug into the workspace here.
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  <div className="font-mono text-3xl font-black text-[var(--red)]">{connectedCount}</div>
-                  <div className="font-mono text-[10px] text-muted-foreground">of {totalCount} connected</div>
+                  <div className="cinema-title text-[32px] text-[var(--gold)] leading-none">
+                    {connectedCount}
+                  </div>
+                  <div className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                    of {totalCount} connected
+                  </div>
                 </div>
               </div>
-            </div>
+            </NoirCard>
 
             {/* Category accordions */}
             {INTEGRATION_CATEGORIES.map(category => {
-              const activeCount = category.integrations.filter(i => i.connected).length
+              const activeCount = category.integrations.filter(
+                i => i.connected
+              ).length
               const isExpanded = expandedCategory === category.id
 
               return (
                 <div
                   key={category.id}
-                  className="border-[2.5px] border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-[4px_4px_0px_var(--shadow-color)]"
+                  className="border border-[var(--border)] bg-[#141414] overflow-hidden"
                 >
-                  {/* Category header */}
                   <button
-                    onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
-                    className={cn(
-                      "w-full flex items-center justify-between p-4",
-                      "hover:bg-[var(--surface-alt)] transition-colors"
-                    )}
+                    onClick={() =>
+                      setExpandedCategory(isExpanded ? null : category.id)
+                    }
+                    className="w-full flex items-center justify-between p-4 hover:bg-[#1a1a1a] transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 flex items-center justify-center bg-[var(--red)]/10 border border-[var(--red)]/30">
-                        <category.icon size={20} className="text-[var(--red)]" />
+                      <div className="w-10 h-10 flex items-center justify-center border border-[var(--border)]">
+                        <category.icon size={18} className="text-[var(--gold)]" />
                       </div>
                       <div className="text-left">
-                        <div className="font-mono text-sm font-bold text-foreground">{category.name}</div>
-                        <div className="font-mono text-[10px] text-muted-foreground">{category.description}</div>
+                        <div className="cinema-contract text-[12px] text-white">
+                          {category.name}
+                        </div>
+                        <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-1">
+                          {category.description}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Chip mono bold color="var(--green)">{activeCount} active</Chip>
+                      <span className="cinema-label text-[9px] text-[var(--gold)]">
+                        {activeCount} active
+                      </span>
                       <ChevronDown
-                        size={16}
+                        size={14}
                         className={cn(
-                          "text-muted-foreground transition-transform",
+                          "text-[var(--muted-foreground)] transition-transform",
                           isExpanded && "rotate-180"
                         )}
                       />
                     </div>
                   </button>
 
-                  {/* Expanded integrations */}
                   {isExpanded && (
-                    <div className="border-t-[2.5px] border-[var(--border)] p-4 space-y-3 bg-[var(--background)]/50">
+                    <div className="border-t border-[var(--border)] p-4 space-y-3 bg-[#0f0f0f]">
                       {category.integrations.map(integration => (
                         <div
                           key={integration.id}
                           className={cn(
-                            "border-[2.5px] p-4",
+                            "border p-4 transition-colors",
                             integration.connected
-                              ? "border-[var(--green)]/30 bg-[var(--green)]/5"
-                              : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--foreground)]/30"
+                              ? "border-[var(--gold)]/40 bg-[color:color-mix(in_srgb,var(--gold)_5%,transparent)]"
+                              : "border-[var(--border)] bg-[#141414] hover:border-[var(--muted-foreground)]"
                           )}
                         >
-                          <div className="flex items-start justify-between">
+                          <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-mono text-sm font-bold text-foreground">
+                                <span className="cinema-contract text-[12px] text-white">
                                   {integration.name}
                                 </span>
                                 {integration.connected ? (
-                                  <Chip mono bold color="var(--green)">
-                                    <CheckCircle2 size={10} />
+                                  <Chip color="var(--gold)" mono>
+                                    <CheckCircle2 size={9} />
                                     Connected
                                   </Chip>
                                 ) : (
-                                  <Chip mono bold>Available</Chip>
+                                  <Chip mono>Available</Chip>
                                 )}
                               </div>
-                              <div className="font-mono text-[10px] text-muted-foreground mb-1">
+                              <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mb-2">
                                 {integration.fullName}
                               </div>
-                              <p className="font-serif text-xs text-muted-foreground">
+                              <p className="font-sans text-[12px] text-[var(--muted-foreground)] leading-relaxed">
                                 {integration.description}
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0 ml-4">
-                              {integration.connected && integration.lastSync && (
-                                <div className="text-right mr-2">
-                                  <div className="font-mono text-[9px] text-muted-foreground">Last sync</div>
-                                  <div className="font-mono text-[10px] text-[var(--green)]">{integration.lastSync}</div>
-                                </div>
-                              )}
+                            <div className="flex items-center gap-2 shrink-0">
+                              {integration.connected &&
+                                integration.lastSync && (
+                                  <div className="text-right mr-2">
+                                    <div className="cinema-label text-[8px] text-[var(--muted-foreground)]">
+                                      Last sync
+                                    </div>
+                                    <div className="cinema-label text-[9px] text-[var(--gold)] mt-0.5">
+                                      {integration.lastSync}
+                                    </div>
+                                  </div>
+                                )}
                               {integration.connected ? (
                                 <>
                                   <button
                                     onClick={() => handleSync(integration.id)}
-                                    disabled={syncingIntegration === integration.id}
+                                    disabled={
+                                      syncingIntegration === integration.id
+                                    }
                                     className={cn(
-                                      "p-2 border-[2.5px] border-[var(--border)] bg-[var(--background)]",
-                                      "hover:border-[var(--foreground)]/40 transition-all",
+                                      "w-8 h-8 flex items-center justify-center",
+                                      "border border-[var(--border)] bg-transparent",
+                                      "text-[var(--muted-foreground)]",
+                                      "hover:border-[var(--gold)] hover:text-[var(--gold)]",
+                                      "transition-colors",
                                       "disabled:opacity-50"
                                     )}
                                   >
                                     <RefreshCw
-                                      size={14}
+                                      size={12}
                                       className={cn(
-                                        "text-muted-foreground",
-                                        syncingIntegration === integration.id && "animate-spin"
+                                        syncingIntegration === integration.id &&
+                                          "animate-spin"
                                       )}
                                     />
                                   </button>
                                   <LegalButton
                                     small
                                     color="var(--red)"
-                                    onClick={() => handleDisconnect(integration.id, integration.name)}
-                                    className="shadow-[3px_3px_0px_var(--shadow-color)]"
+                                    onClick={() =>
+                                      handleDisconnect(
+                                        integration.id,
+                                        integration.name
+                                      )
+                                    }
                                   >
                                     Disconnect
                                   </LegalButton>
@@ -861,8 +916,14 @@ function SettingsContent() {
                               ) : (
                                 <LegalButton
                                   small
-                                  onClick={() => handleConnect(integration.id, integration.name)}
-                                  className="shadow-[3px_3px_0px_var(--shadow-color)]"
+                                  active
+                                  color="var(--gold)"
+                                  onClick={() =>
+                                    handleConnect(
+                                      integration.id,
+                                      integration.name
+                                    )
+                                  }
                                 >
                                   Connect
                                 </LegalButton>
@@ -870,12 +931,11 @@ function SettingsContent() {
                             </div>
                           </div>
 
-                          {/* Feature tags */}
                           <div className="flex flex-wrap gap-1.5 mt-3">
                             {integration.features.map((feature, i) => (
                               <span
                                 key={i}
-                                className="px-2 py-0.5 font-mono text-[9px] border border-[var(--border)] bg-[var(--surface-alt)]"
+                                className="px-2 py-0.5 cinema-label text-[8px] border border-[var(--border)] text-[var(--muted-foreground)]"
                               >
                                 {feature}
                               </span>
@@ -889,67 +949,84 @@ function SettingsContent() {
               )
             })}
 
-            {/* Help footer */}
-            <div className="border-[2.5px] border-[var(--cyan)]/30 bg-[var(--cyan)]/5 p-5 shadow-[4px_4px_0px_var(--shadow-color)]">
+            <NoirCard accent="var(--gold)">
               <div className="flex items-start gap-3">
-                <HelpCircle size={20} className="text-[var(--cyan)] shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-mono text-sm font-bold text-foreground mb-1">Need help connecting?</div>
-                  <p className="font-serif text-xs text-muted-foreground mb-4">
-                    Visit our integration guides for step-by-step setup instructions, or contact support
-                    for assistance with enterprise integrations and custom configurations.
+                <HelpCircle
+                  size={18}
+                  className="text-[var(--gold)] shrink-0 mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="cinema-contract text-[12px] text-white mb-1">
+                    Need help connecting?
+                  </div>
+                  <p className="font-sans text-[12px] text-[var(--muted-foreground)] mb-4 leading-relaxed">
+                    Visit our integration guides for step-by-step setup
+                    instructions, or contact support for assistance with
+                    enterprise integrations and custom configurations.
                   </p>
                   <div className="flex gap-2">
-                    <LegalButton small className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                      <BookOpen size={12} />
+                    <LegalButton small>
+                      <BookOpen size={11} />
                       Integration Guides
                     </LegalButton>
-                    <LegalButton small className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                      <Mail size={12} />
+                    <LegalButton small>
+                      <Mail size={11} />
                       Contact Support
                     </LegalButton>
                   </div>
                 </div>
               </div>
-            </div>
+            </NoirCard>
           </div>
         )}
 
         {/* ═══ API KEYS ═══ */}
         {activeTab === "api" && (
-          <div className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-6 shadow-[4px_4px_0px_var(--shadow-color)]">
-            <h2 className="font-sans text-lg font-bold text-foreground mb-1">API Keys</h2>
-            <p className="font-serif text-sm text-muted-foreground mb-6">
-              Use API keys to integrate LegalDrama.ai with your own applications and workflows.
+          <NoirCard accent="var(--gold)">
+            <h2 className="cinema-title text-[24px] text-white mb-1">
+              API Keys
+            </h2>
+            <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
+              Script access — treat like a production key
             </p>
 
             <div className="space-y-3">
               {API_KEYS.map(apiKey => (
                 <div
                   key={apiKey.id}
-                  className="p-4 border-[2.5px] border-[var(--green)]/30 bg-[var(--green)]/5"
+                  className="p-4 border border-[var(--gold)]/40 bg-[color:color-mix(in_srgb,var(--gold)_5%,transparent)]"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="font-mono text-sm font-bold text-foreground mb-1">{apiKey.name}</div>
-                      <div className="font-mono text-xs text-muted-foreground mb-2">{apiKey.key}</div>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="cinema-contract text-[12px] text-white mb-1">
+                        {apiKey.name}
+                      </div>
+                      <div className="cinema-label text-[10px] text-[var(--gold)] mb-2 truncate">
+                        {apiKey.key}
+                      </div>
                       <div className="flex items-center gap-4">
-                        <span className="font-mono text-[10px] text-muted-foreground">
-                          Created: {apiKey.created}
+                        <span className="cinema-label text-[8px] text-[var(--muted-foreground)]">
+                          Created · {apiKey.created}
                         </span>
-                        <span className="font-mono text-[10px] text-[var(--green)]">
-                          Last used: {apiKey.lastUsed}
+                        <span className="cinema-label text-[8px] text-[var(--gold)]">
+                          Last used · {apiKey.lastUsed}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => copyToClipboard(apiKey.key)}
-                        className="p-2 border-[2.5px] border-[var(--border)] bg-[var(--background)] hover:border-[var(--foreground)]/40 transition-all"
+                        className={cn(
+                          "w-8 h-8 flex items-center justify-center",
+                          "border border-[var(--border)] bg-transparent",
+                          "text-[var(--muted-foreground)]",
+                          "hover:border-[var(--gold)] hover:text-[var(--gold)]",
+                          "transition-colors"
+                        )}
                       >
-                        <Copy size={14} className="text-muted-foreground" />
+                        <Copy size={12} />
                       </button>
-                      <LegalButton small color="var(--red)" className="shadow-[3px_3px_0px_var(--shadow-color)]">
+                      <LegalButton small color="var(--red)">
                         Revoke
                       </LegalButton>
                     </div>
@@ -959,17 +1036,119 @@ function SettingsContent() {
             </div>
 
             <div className="mt-5">
-              <LegalButton className="shadow-[3px_3px_0px_var(--shadow-color)]">
-                <Plus size={14} />
+              <LegalButton active color="var(--gold)">
+                <Plus size={12} />
                 Generate New Key
               </LegalButton>
             </div>
-          </div>
+          </NoirCard>
         )}
       </main>
 
       <SiteFooter />
     </div>
+  )
+}
+
+/* ─── Helpers ─── */
+function SecurityRow({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string
+  subtitle: string
+  action: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center justify-between py-4">
+      <div>
+        <div className="cinema-contract text-[12px] text-white">{title}</div>
+        <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-0.5">
+          {subtitle}
+        </div>
+      </div>
+      {action}
+    </div>
+  )
+}
+
+function StatTile({
+  value,
+  label,
+  accent,
+  borderLeft = false,
+}: {
+  value: string
+  label: string
+  accent: string
+  borderLeft?: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        "text-center p-5",
+        borderLeft && "border-l border-[var(--border)]"
+      )}
+      style={{ borderTop: `2px solid ${accent}` }}
+    >
+      <div
+        className="cinema-title text-[32px] leading-none"
+        style={{ color: accent }}
+      >
+        {value}
+      </div>
+      <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-2">
+        {label}
+      </div>
+    </div>
+  )
+}
+
+function ThemeCard({
+  selected,
+  onSelect,
+  title,
+  subtitle,
+  Icon,
+  preview,
+}: {
+  selected: boolean
+  onSelect: () => void
+  title: string
+  subtitle: string
+  Icon: React.ComponentType<{ size?: number; className?: string }>
+  preview: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onSelect}
+      className={cn(
+        "p-4 border transition-colors text-left",
+        selected
+          ? "border-[var(--gold)] bg-[color:color-mix(in_srgb,var(--gold)_6%,transparent)]"
+          : "border-[var(--border)] bg-transparent hover:border-[var(--muted-foreground)]"
+      )}
+    >
+      {preview}
+      <div className="flex items-center justify-center gap-2 mt-4">
+        <Icon
+          size={14}
+          className={selected ? "text-[var(--gold)]" : "text-[var(--muted-foreground)]"}
+        />
+        <span
+          className={cn(
+            "cinema-contract text-[12px]",
+            selected ? "text-[var(--gold)]" : "text-white"
+          )}
+        >
+          {title}
+        </span>
+      </div>
+      <p className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-1 text-center">
+        {subtitle}
+      </p>
+    </button>
   )
 }
 

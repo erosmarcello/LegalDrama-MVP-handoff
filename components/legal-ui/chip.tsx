@@ -10,25 +10,34 @@ interface ChipProps {
   className?: string
 }
 
-export function Chip({ children, color, mono = false, bold = false, className }: ChipProps) {
+/**
+ * Cinema-noir chip — thin border, tiny contract-font label,
+ * subtle tinted background when an accent color is provided.
+ */
+export function Chip({
+  children,
+  color,
+  mono = false,
+  bold = false,
+  className,
+}: ChipProps) {
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1 px-2 py-0.5",
-        "text-[10px] whitespace-nowrap",
-        "border transition-theme",
-        mono ? "font-mono" : "font-sans",
-        bold ? "font-extrabold" : "font-semibold",
-        // Light mode
-        "border-border shadow-[2px_2px_0_var(--shadow-color)]",
-        // Dark mode
-        "-sm dark:shadow-none",
+        "text-[9px] whitespace-nowrap border transition-colors",
+        mono ? "cinema-label" : "cinema-contract-tight",
+        bold ? "font-bold" : "font-semibold",
         className
       )}
       style={{
-        backgroundColor: color ? `color-mix(in srgb, ${color} 15%, transparent)` : undefined,
-        color: color || undefined,
-        borderColor: color ? `color-mix(in srgb, ${color} 50%, var(--border))` : undefined,
+        backgroundColor: color
+          ? `color-mix(in srgb, ${color} 10%, transparent)`
+          : "transparent",
+        color: color || "var(--muted-foreground)",
+        borderColor: color
+          ? `color-mix(in srgb, ${color} 45%, var(--border))`
+          : "var(--border)",
       }}
     >
       {children}
@@ -43,22 +52,20 @@ interface TierBadgeProps {
 
 export function TierBadge({ tier, className }: TierBadgeProps) {
   const isT1 = tier === 1
-  
   return (
     <span
       className={cn(
-        "inline-block px-1.5 py-0.5",
-        "text-[9px] font-mono font-extrabold",
-        "border transition-theme",
-        // Light mode
-        "rounded-none",
-        // Dark mode
-        "-sm",
-        isT1 
-          ? "bg-yellow text-background border-yellow/80 dark:bg-yellow dark:text-background dark:border-yellow/50" 
-          : "bg-surface-alt text-foreground border-border dark:bg-surface-alt dark:text-foreground dark:border-border/50",
+        "inline-block px-1.5 py-0.5 text-[9px] cinema-label",
+        "border transition-colors",
         className
       )}
+      style={{
+        backgroundColor: isT1
+          ? "color-mix(in srgb, var(--gold) 15%, transparent)"
+          : "transparent",
+        color: isT1 ? "var(--gold)" : "var(--muted-foreground)",
+        borderColor: isT1 ? "var(--gold)" : "var(--border)",
+      }}
     >
       {isT1 ? "T1" : "T2"}
     </span>
@@ -76,9 +83,7 @@ export function LaneBadge({ lane, className }: LaneBadgeProps) {
     procedural: { label: "PROCEDURAL", colorVar: "var(--lane-procedural)" },
     scheduling: { label: "SCHEDULING", colorVar: "var(--lane-scheduling)" },
   }
-  
   const { label, colorVar } = config[lane]
-  
   return (
     <Chip color={colorVar} mono bold className={className}>
       {label}

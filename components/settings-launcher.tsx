@@ -52,7 +52,7 @@ export function SettingsLauncher({ className, variant = "chip" }: SettingsLaunch
         title="Settings"
         onClick={() => setOpen(true)}
         className={cn(
-          "brut-press group inline-flex items-center gap-1.5 px-3 py-1.5",
+          "group inline-flex items-center gap-1.5 px-3 py-1.5",
           "font-mono text-[11px] font-bold",
           "transition-all duration-200",
           className

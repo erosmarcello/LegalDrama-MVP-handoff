@@ -16,20 +16,27 @@ interface LegalModalProps {
   maxWidth?: string
 }
 
-export function LegalModal({ 
-  open, 
-  onClose, 
-  title, 
-  subtitle, 
-  children, 
-  footer, 
+/**
+ * Cinema-noir modal. Pure black surface, thin border, soft ambient shadow.
+ * Header uses cinema-title; subtitle uses contract-font italic.
+ */
+export function LegalModal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
   shake = false,
   className,
-  maxWidth = "580px"
+  maxWidth = "580px",
 }: LegalModalProps) {
-  const handleEscape = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") onClose()
-  }, [onClose])
+  const handleEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    },
+    [onClose]
+  )
 
   useEffect(() => {
     if (open) {
@@ -45,36 +52,39 @@ export function LegalModal({
   if (!open) return null
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[2000] flex items-center justify-center animate-fade-in"
       onClick={onClose}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 dark:bg-black/70" />
-      
+      {/* Backdrop — deep theatre black w/ grain */}
+      <div className="absolute inset-0 bg-black/85 cinema-grain" />
+
       {/* Modal */}
       <div
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         className={cn(
-          "relative w-full mx-4 bg-card border border-border",
-          "max-h-[80vh] overflow-hidden flex flex-col",
-          // Light mode
-          "shadow-[8px_8px_0_var(--shadow-color)]",
-          // Dark mode
-          " dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]",
+          "relative w-full mx-4 bg-[#0f0f0f] border border-[var(--border)]",
+          "max-h-[85vh] overflow-hidden flex flex-col",
+          "shadow-[0_40px_120px_rgba(0,0,0,0.75)]",
           shake ? "animate-shake" : "animate-modal-in",
           className
         )}
         style={{ maxWidth }}
       >
+        {/* Gold rule across the top */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] pointer-events-none"
+          style={{ background: "var(--gold)" }}
+        />
+
         {/* Header */}
-        <div className="px-5 py-4 border-b border-border bg-surface flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-[var(--border)] bg-[#141414] flex items-center justify-between">
           <div>
-            <h2 className="font-sans text-base font-black text-foreground">
+            <h2 className="cinema-title text-[20px] text-white leading-none">
               {title}
             </h2>
             {subtitle && (
-              <p className="font-serif text-sm text-muted-foreground mt-0.5">
+              <p className="cinema-contract-italic text-[11px] text-[var(--gold)] mt-1.5">
                 {subtitle}
               </p>
             )}
@@ -82,28 +92,24 @@ export function LegalModal({
           <button
             onClick={onClose}
             className={cn(
-              "w-7 h-7 flex items-center justify-center",
-              "bg-surface-alt border border-border",
-              "font-mono text-sm font-black text-foreground",
-              "transition-all duration-150 cursor-pointer",
-              // Light mode
-              "hover:bg-destructive hover:text-white",
-              // Dark mode
-              " hover:dark:bg-destructive hover:dark:text-white"
+              "w-7 h-7 flex items-center justify-center shrink-0",
+              "border border-[var(--border)] bg-transparent",
+              "text-[var(--muted-foreground)]",
+              "transition-colors duration-150 cursor-pointer",
+              "hover:border-[var(--red)] hover:text-[var(--red)]"
             )}
+            aria-label="Close"
           >
             <X size={14} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-5">
-          {children}
-        </div>
-        
+        <div className="flex-1 overflow-y-auto p-5">{children}</div>
+
         {/* Footer */}
         {footer && (
-          <div className="px-5 py-3 border-t border-border/30 bg-surface">
+          <div className="px-5 py-3 border-t border-[var(--border)] bg-[#141414]">
             {footer}
           </div>
         )}

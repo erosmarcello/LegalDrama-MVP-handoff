@@ -149,87 +149,88 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
   
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+      {/* Backdrop — deep black with cinema grain */}
+      <div
+        className="absolute inset-0 bg-black/85 cinema-grain animate-fade-in"
         onClick={onClose}
       />
-      
-      {/* Modal */}
-      <div className={cn(
-        "relative w-full max-w-xl mx-4",
-        "bg-surface border-2 border-border",
-        "shadow-brutal-lg",
-        "animate-scale-in",
-        ""
-      )}>
+
+      {/* Modal — noir card with gold top-rule */}
+      <div
+        className={cn(
+          "relative w-full max-w-xl mx-4",
+          "bg-[#0f0f0f] border border-[var(--border)]",
+          "animate-scale-in",
+          "shadow-[0_40px_100px_rgba(0,0,0,0.7)]",
+          "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
+        )}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-border">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--border)]">
           <div>
-            <h2 className="font-sans text-xl font-bold text-foreground flex items-center gap-2">
-              <Share2 size={20} className="text-purple" />
-              Share Case
-            </h2>
-            <p className="text-xs font-mono text-muted-foreground mt-1">
-              {caseTitle} &middot; {caseNumber}
+            <div className="cinema-label text-[9px] text-[var(--gold)] mb-1 flex items-center gap-2">
+              <Share2 size={10} /> Co-counsel Access
+            </div>
+            <h2 className="cinema-title text-[22px] text-white">Distribute Docket</h2>
+            <p className="cinema-contract text-[10px] text-white/50 mt-1">
+              {caseTitle} · {caseNumber}
             </p>
           </div>
           <button
             onClick={onClose}
             className={cn(
-              "w-10 h-10 flex items-center justify-center",
-              "border-2 border-border bg-surface-alt",
-              "text-muted-foreground hover:text-foreground hover:bg-muted/20",
-              "transition-all duration-150 click-scale",
-              ""
+              "w-9 h-9 flex items-center justify-center",
+              "border border-[var(--border)] bg-transparent",
+              "text-white/60 hover:text-[var(--red)] hover:border-[var(--red)]",
+              "transition-colors duration-150",
             )}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
-        
+
         {/* Tab Navigation */}
-        <div className="flex border-b border-border">
+        <div className="flex border-b border-[var(--border)]">
           <button
             onClick={() => setActiveTab("share")}
             className={cn(
-              "flex-1 px-4 py-3 font-mono text-sm font-medium",
-              "border-b-2 transition-all duration-150",
+              "flex-1 px-4 py-3 cinema-label text-[10px]",
+              "border-b-2 transition-colors duration-150",
               "flex items-center justify-center gap-2",
               activeTab === "share"
-                ? "text-purple border-purple bg-purple/5"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-[var(--red)] border-[var(--red)]"
+                : "text-white/50 border-transparent hover:text-white",
             )}
           >
-            <Users size={14} />
+            <Users size={12} />
             Share
           </button>
           <button
             onClick={() => setActiveTab("export")}
             className={cn(
-              "flex-1 px-4 py-3 font-mono text-sm font-medium",
-              "border-b-2 transition-all duration-150",
+              "flex-1 px-4 py-3 cinema-label text-[10px]",
+              "border-b-2 transition-colors duration-150",
               "flex items-center justify-center gap-2",
               activeTab === "export"
-                ? "text-purple border-purple bg-purple/5"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-[var(--red)] border-[var(--red)]"
+                : "text-white/50 border-transparent hover:text-white",
             )}
           >
-            <Download size={14} />
+            <Download size={12} />
             Export
           </button>
           <button
             onClick={() => setActiveTab("activity")}
             className={cn(
-              "flex-1 px-4 py-3 font-mono text-sm font-medium",
-              "border-b-2 transition-all duration-150",
+              "flex-1 px-4 py-3 cinema-label text-[10px]",
+              "border-b-2 transition-colors duration-150",
               "flex items-center justify-center gap-2",
               activeTab === "activity"
-                ? "text-purple border-purple bg-purple/5"
-                : "text-muted-foreground border-transparent hover:text-foreground"
+                ? "text-[var(--red)] border-[var(--red)]"
+                : "text-white/50 border-transparent hover:text-white",
             )}
           >
-            <Clock size={14} />
+            <Clock size={12} />
             Activity
           </button>
         </div>

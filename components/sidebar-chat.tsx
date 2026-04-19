@@ -479,16 +479,12 @@ export function SidebarChat() {
           title="Sidebar — AI counsel (⌘K)"
           className={cn(
             "fixed bottom-6 right-6 z-[60]",
-            "flex items-center gap-2 px-4 h-12",
-            "border-[2.5px] border-[var(--border)]",
-            "bg-[var(--purple)] text-white",
-            "font-mono text-xs font-bold uppercase tracking-widest",
-            "shadow-[4px_4px_0px_var(--shadow-color)]",
-            "hover:translate-x-[-1px] hover:translate-y-[-1px]",
-            "hover:shadow-[5px_5px_0px_var(--shadow-color)]",
-            "active:translate-x-[1px] active:translate-y-[1px]",
-            "active:shadow-[2px_2px_0px_var(--shadow-color)]",
-            "transition-all",
+            "flex items-center gap-2 px-4 h-10",
+            "border border-[var(--gold)]",
+            "bg-[#0f0f0f] text-[var(--gold)]",
+            "cinema-label text-[10px]",
+            "hover:bg-[var(--gold)] hover:text-black",
+            "transition-colors duration-200",
           )}
         >
           <Gavel size={16} />
@@ -504,39 +500,40 @@ export function SidebarChat() {
             "fixed bottom-6 right-6 z-[60]",
             "w-[min(92vw,420px)] h-[min(80vh,600px)]",
             "flex flex-col",
-            "border-[2.5px] border-[var(--border)]",
-            "bg-[var(--card)]",
-            "shadow-[6px_6px_0px_var(--shadow-color)]",
+            "border border-[var(--border)]",
+            "bg-[#0f0f0f] text-white cinema-grain",
+            "shadow-[0_30px_80px_rgba(0,0,0,0.7)]",
+            "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
+            "relative",
           )}
           role="dialog"
           aria-modal="true"
           aria-label="Sidebar — AI counsel"
         >
-          {/* Header */}
+          {/* Header — cinema-noir bar */}
           <div
             className={cn(
               "flex items-center justify-between px-4 py-3",
-              "border-b-[2.5px] border-[var(--border)]",
-              "bg-[var(--surface)]",
+              "border-b border-[var(--border)]",
+              "bg-black/40",
             )}
           >
             <div className="flex items-center gap-2.5">
               <div
                 className={cn(
-                  "w-9 h-9 flex items-center justify-center",
-                  "border-[2.5px] border-[var(--border)]",
-                  "bg-[var(--purple)] text-white",
-                  "shadow-[2px_2px_0px_var(--shadow-color)]",
+                  "w-8 h-8 flex items-center justify-center",
+                  "border border-[var(--gold)]",
+                  "bg-transparent text-[var(--gold)]",
                 )}
               >
-                <Gavel size={16} />
+                <Gavel size={14} />
               </div>
               <div className="leading-tight">
-                <div className="font-sans text-sm font-black text-[var(--foreground)]">
-                  Sidebar
+                <div className="cinema-label text-[9px] text-[var(--gold)]">
+                  Chambers · AI Counsel
                 </div>
-                <div className="font-mono text-[10px] text-[var(--muted-foreground)] uppercase tracking-widest">
-                  AI counsel · approach the bench
+                <div className="cinema-contract-italic text-[10px] text-white/60">
+                  Approach the bench
                 </div>
               </div>
             </div>
@@ -546,20 +543,20 @@ export function SidebarChat() {
               title="Close (Esc)"
               className={cn(
                 "w-8 h-8 flex items-center justify-center",
-                "border-[2.5px] border-[var(--border)]",
-                "bg-[var(--background)] text-[var(--foreground)]",
-                "hover:border-[var(--purple)] hover:text-[var(--purple)]",
+                "border border-[var(--border)]",
+                "bg-transparent text-white/60",
+                "hover:border-[var(--red)] hover:text-[var(--red)]",
                 "transition-colors",
               )}
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           </div>
 
           {/* Messages */}
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[var(--background)]"
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]"
           >
             {messages.map((m, i) => (
               <MessageBubble
@@ -578,7 +575,7 @@ export function SidebarChat() {
           {/* Quick replies — grouped by intent */}
           <div
             className={cn(
-              "px-3 pt-2 pb-2.5 border-t-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]",
+              "px-3 pt-2 pb-2.5 border-t border-[var(--border)] bg-black/40",
               "space-y-1.5",
             )}
           >
@@ -586,8 +583,8 @@ export function SidebarChat() {
               <div key={group.heading}>
                 <div
                   className={cn(
-                    "font-mono text-[9px] font-bold uppercase tracking-[0.18em]",
-                    "text-[var(--muted-foreground)]",
+                    "cinema-label text-[9px]",
+                    "text-[var(--gold)]",
                     "pl-0.5 mb-1",
                   )}
                 >
@@ -602,7 +599,7 @@ export function SidebarChat() {
                       className={cn(
                         "inline-flex items-center gap-1 px-2 py-1",
                         "font-mono text-[11px] font-bold uppercase tracking-wider",
-                        "border-[2.5px] border-[var(--border)]",
+                        "border border-[var(--border)]",
                         q.href
                           ? "bg-[var(--surface)]"
                           : "bg-[var(--card)]",
@@ -640,7 +637,7 @@ export function SidebarChat() {
               className={cn(
                 "flex-1 resize-none px-3 py-2",
                 "font-serif text-sm leading-snug",
-                "border-[2.5px] border-[var(--border)] bg-[var(--background)]",
+                "border border-[var(--border)] bg-[var(--background)]",
                 "text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]",
                 "focus:outline-none focus:border-[var(--purple)]",
                 "disabled:opacity-60",
@@ -652,11 +649,11 @@ export function SidebarChat() {
               aria-label="Send"
               className={cn(
                 "h-10 w-10 flex items-center justify-center shrink-0",
-                "border-[2.5px] border-[var(--border)]",
+                "border border-[var(--border)]",
                 "bg-[var(--purple)] text-white",
-                "shadow-[2px_2px_0px_var(--shadow-color)]",
+                "",
                 "hover:translate-x-[-1px] hover:translate-y-[-1px]",
-                "hover:shadow-[3px_3px_0px_var(--shadow-color)]",
+                "hover:",
                 "active:translate-x-[1px] active:translate-y-[1px]",
                 "active:shadow-none",
                 "disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0",
@@ -690,8 +687,8 @@ function MessageBubble({
       <div
         className={cn(
           "max-w-[85%] px-3 py-2",
-          "border-[2.5px] border-[var(--border)]",
-          "shadow-[2px_2px_0px_var(--shadow-color)]",
+          "border border-[var(--border)]",
+          "",
           isUser
             ? // Amber is a saturated light fill in both themes, so text must stay
               // near-black for AA contrast (≈9.2:1 on #EF9F27).

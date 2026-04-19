@@ -272,7 +272,7 @@ function HomePage() {
       return
     }
     if (searchMode === "case" && !caseNumber.trim()) {
-      setSearchError("Enter a PACER case number.")
+      setSearchError("Enter a federal case number.")
       return
     }
 
@@ -332,7 +332,6 @@ function HomePage() {
           setUser(null)
           toast("Signed out", "var(--muted-foreground)")
         }}
-        pacerConnected
       />
 
       {/* ============================================================ */}
@@ -354,7 +353,7 @@ function HomePage() {
           <div className="flex items-center gap-3 mb-6">
             <span className="cinema-pulse-dot" aria-hidden />
             <span className="cinema-contract text-[12px] text-[var(--gold)]">
-              Now Streaming · Federal Court Records · Live from PACER
+              Now Streaming · Federal Court Records Reimagined
             </span>
           </div>
 
@@ -432,8 +431,8 @@ function HomePage() {
             </h2>
             <p className="mt-4 font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]">
               Enter a federal case number, defendant name, or search by district
-              court. We lift the docket off PACER and stage it for you — ready
-              to be adapted, dramatized, or studied.
+              court. We lift the docket off the public record and stage it for
+              you — ready to be adapted, dramatized, or studied.
             </p>
           </div>
 
@@ -570,7 +569,7 @@ function HomePage() {
                 ) : (
                   <Search size={14} />
                 )}
-                {searchLoading ? "Scanning PACER…" : "Search Federal Courts"}
+                {searchLoading ? "Scanning the archive…" : "Search Federal Courts"}
               </button>
 
               {/* Messages */}
@@ -697,7 +696,7 @@ function HomePage() {
                     </span>
                   </div>
                   <span className="cinema-label text-[9px] text-[var(--gold)]">
-                    Rated PACER-17
+                    Rated NR · Unredacted
                   </span>
                 </div>
 
@@ -990,9 +989,9 @@ function HomePage() {
               accent="var(--red)"
               label="For True-Crime Obsessives"
               title="Beyond The Podcast Episode. Into The Record."
-              body="Follow active federal trials as they unfold. Mood boards pull in news photos, filings, and AI-generated dramatizations — all clearly labeled, all cited, all grounded in PACER source documents."
+              body="Follow active federal trials as they unfold. Mood boards pull in news photos, filings, and AI-generated dramatizations — all clearly labeled, all cited, all grounded in the public record."
               bullets={[
-                "Live PACER syncs",
+                "Live docket syncs",
                 "Case-study mood boards",
                 "Story-so-far timelines",
               ]}

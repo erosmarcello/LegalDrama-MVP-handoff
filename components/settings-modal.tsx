@@ -119,36 +119,42 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in"
+      {/* Backdrop — deep black with cinema grain */}
+      <div
+        className="absolute inset-0 bg-black/85 cinema-grain animate-fade-in"
         onClick={onClose}
       />
-      
-      {/* Modal */}
-      <div className={cn(
-        "relative w-full max-w-2xl mx-4",
-        "bg-surface border-2 border-border",
-        "shadow-brutal-lg",
-        "animate-scale-in",
-        ""
-      )}>
+
+      {/* Modal — noir card with gold top-rule */}
+      <div
+        className={cn(
+          "relative w-full max-w-2xl mx-4",
+          "bg-[#0f0f0f] border border-[var(--border)]",
+          "animate-scale-in",
+          "shadow-[0_40px_100px_rgba(0,0,0,0.7)]",
+          "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
+        )}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-border">
-          <h2 className="font-sans text-xl font-bold text-foreground">
-            Settings - Integrations
-          </h2>
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--border)]">
+          <div>
+            <div className="cinema-label text-[9px] text-[var(--gold)] mb-1">
+              Chambers · Integrations
+            </div>
+            <h2 className="cinema-title text-[22px] text-white">
+              Court Connections
+            </h2>
+          </div>
           <button
             onClick={onClose}
             className={cn(
-              "w-10 h-10 flex items-center justify-center",
-              "border-2 border-border bg-surface-alt",
-              "text-muted-foreground hover:text-foreground hover:bg-muted/20",
-              "transition-all duration-150 click-scale",
-              ""
+              "w-9 h-9 flex items-center justify-center",
+              "border border-[var(--border)] bg-transparent",
+              "text-white/60 hover:text-[var(--red)] hover:border-[var(--red)]",
+              "transition-colors duration-150",
             )}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
         

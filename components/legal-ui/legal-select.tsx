@@ -13,11 +13,14 @@ interface LegalSelectProps {
   disabled?: boolean
 }
 
+/**
+ * Cinema-noir select. Thin border, gold on hover/open, contract-font items.
+ */
 export function LegalSelect({
   value,
   onChange,
   options,
-  placeholder = "Select...",
+  placeholder = "Select…",
   className,
   disabled = false,
 }: LegalSelectProps) {
@@ -26,7 +29,10 @@ export function LegalSelect({
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -34,7 +40,7 @@ export function LegalSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const selectedOption = options.find((o) => o.value === value)
+  const selectedOption = options.find(o => o.value === value)
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>
@@ -44,36 +50,40 @@ export function LegalSelect({
         disabled={disabled}
         className={cn(
           "w-full px-3 py-2 flex items-center justify-between gap-2",
-          "border-2 border-border bg-surface text-foreground",
-          "font-mono text-xs",
-          "transition-all duration-150",
-          "hover:border-primary focus:border-primary focus:outline-none",
+          "border border-[var(--border)] bg-transparent",
+          "cinema-label text-[11px] text-white",
+          "transition-colors duration-150",
+          "hover:border-[var(--gold)] focus:border-[var(--gold)] focus:outline-none",
           "disabled:opacity-50 disabled:cursor-not-allowed",
-          "",
-          isOpen && "border-primary"
+          isOpen && "border-[var(--gold)]"
         )}
       >
-        <span className={cn(!selectedOption && "text-muted-foreground")}>
+        <span
+          className={cn(
+            !selectedOption && "text-[var(--muted-foreground)]"
+          )}
+        >
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown
-          size={14}
-          className={cn("transition-transform duration-200", isOpen && "rotate-180")}
+          size={12}
+          className={cn(
+            "transition-transform duration-200 text-[var(--muted-foreground)]",
+            isOpen && "rotate-180 text-[var(--gold)]"
+          )}
         />
       </button>
 
       {isOpen && (
         <div
           className={cn(
-            "absolute top-full left-0 right-0 z-50 mt-1",
-            "border-2 border-border bg-surface",
-            "shadow-brutal dark:shadow-none",
+            "absolute top-full left-0 right-0 z-50 mt-0.5",
+            "border border-[var(--border)] bg-[#141414]",
             "max-h-60 overflow-auto",
-            "",
             "animate-in fade-in-0 zoom-in-95 duration-150"
           )}
         >
-          {options.map((option) => (
+          {options.map((option, i) => (
             <button
               key={option.value}
               type="button"
@@ -83,11 +93,12 @@ export function LegalSelect({
               }}
               className={cn(
                 "w-full px-3 py-2 text-left",
-                "font-mono text-xs",
+                "cinema-label text-[10px]",
                 "transition-colors duration-100",
                 option.value === value
-                  ? "bg-primary/15 text-primary"
-                  : "text-foreground hover:bg-surface-alt"
+                  ? "bg-[color:color-mix(in_srgb,var(--gold)_14%,transparent)] text-[var(--gold)]"
+                  : "text-white hover:bg-[#1a1a1a]",
+                i < options.length - 1 && "border-b border-[var(--border)]"
               )}
             >
               {option.label}

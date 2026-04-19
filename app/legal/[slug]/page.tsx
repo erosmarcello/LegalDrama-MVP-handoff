@@ -372,7 +372,7 @@ export default async function LegalPage({
       <main className="flex-1 max-w-3xl w-full mx-auto px-5 py-10">
         {/* Title card */}
         <div
-          className="border-[2.5px] p-5 mb-8"
+          className="border p-5 mb-8"
           style={{
             borderColor: doc.accent,
             background: `color-mix(in srgb, ${doc.accent} 6%, transparent)`,
@@ -380,7 +380,7 @@ export default async function LegalPage({
         >
           <div className="flex items-start gap-3">
             <div
-              className="w-10 h-10 flex items-center justify-center border-[2.5px]"
+              className="w-10 h-10 flex items-center justify-center border"
               style={{
                 borderColor: doc.accent,
                 background: `color-mix(in srgb, ${doc.accent} 15%, transparent)`,
@@ -411,7 +411,7 @@ export default async function LegalPage({
           {doc.sections.map((section, i) => (
             <section
               key={i}
-              className="border-[2.5px] border-[var(--border)] bg-[var(--card)] p-5"
+              className="border border-[var(--border)] bg-[var(--card)] p-5"
             >
               <h2 className="font-sans text-lg font-bold text-[var(--foreground)] mb-3">
                 {section.heading}
@@ -431,7 +431,7 @@ export default async function LegalPage({
         </article>
 
         {/* Alpha notice */}
-        <div className="mt-8 border-[2.5px] border-dashed border-[var(--amber)]/50 bg-[var(--amber)]/5 p-4">
+        <div className="mt-8 border border-dashed border-[var(--amber)]/50 bg-[var(--amber)]/5 p-4">
           <p className="font-mono text-[11px] text-[var(--foreground)]">
             <span className="font-bold text-[var(--amber)]">ALPHA NOTICE —</span>{" "}
             This document is a placeholder for the LegalDrama.ai public alpha and

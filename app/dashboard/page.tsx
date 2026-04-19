@@ -243,6 +243,7 @@ function DashboardContent() {
         user={user}
         onSignOut={() => router.push("/")}
         pacerConnected
+        showSettings
       />
 
       {/* ─── Archive hero ─── */}

@@ -10,46 +10,52 @@ interface LegalButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "ghost" | "outline"
 }
 
+/**
+ * Cinema-noir button.
+ *
+ * Thin 1px borders, no offset shadow. Active state fills with the accent
+ * color (red/gold/white) against pure black. Hover transitions border color
+ * only — no translate, no shadow.
+ */
 export const LegalButton = forwardRef<HTMLButtonElement, LegalButtonProps>(
-  ({ children, color, active = false, small = false, variant = "default", className, disabled, ...props }, ref) => {
+  (
+    {
+      children,
+      color,
+      active = false,
+      small = false,
+      variant = "default",
+      className,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <button
         ref={ref}
         disabled={disabled}
         className={cn(
           "inline-flex items-center justify-center gap-1.5",
-          "font-mono font-extrabold transition-all duration-150",
-          "border cursor-pointer",
-          // Sizing
-          small ? "px-2.5 py-1 text-[10px]" : "px-3.5 py-1.5 text-[11px]",
-          // Light mode
-          "border-border",
-          // Dark mode
-          "",
-          // States
-          active
-            ? "translate-x-0.5 translate-y-0.5"
-            : "hover:translate-x-0 hover:translate-y-0 active:translate-x-0.5 active:translate-y-0.5",
-          // Disabled
+          "cinema-label transition-colors duration-150",
+          "border cursor-pointer select-none",
+          small ? "px-3 py-1 text-[10px]" : "px-4 py-1.5 text-[11px]",
           disabled && "opacity-50 cursor-not-allowed",
-          // Variant styles are applied via inline style for color flexibility
           className
         )}
         style={{
-          backgroundColor: active 
-            ? (color || "var(--primary)") 
-            : variant === "ghost" 
-              ? "transparent" 
-              : "var(--card)",
-          color: active 
-            ? "var(--primary-foreground)" 
-            : (color || "var(--foreground)"),
-          borderColor: active || variant === "outline"
-            ? (color || "var(--primary)")
-            : "var(--border)",
-          boxShadow: active 
-            ? "none" 
-            : "var(--shadow-color) 3px 3px 0px",
+          backgroundColor: active
+            ? color || "var(--gold)"
+            : variant === "ghost"
+              ? "transparent"
+              : "transparent",
+          color: active
+            ? "#0a0a0a"
+            : color || "var(--foreground)",
+          borderColor:
+            active || variant === "outline"
+              ? color || "var(--gold)"
+              : "var(--border)",
         }}
         {...props}
       >
@@ -61,7 +67,6 @@ export const LegalButton = forwardRef<HTMLButtonElement, LegalButtonProps>(
 
 LegalButton.displayName = "LegalButton"
 
-// Button group for joined buttons
 interface ButtonGroupProps {
   children: React.ReactNode
   className?: string
@@ -69,12 +74,10 @@ interface ButtonGroupProps {
 
 export function ButtonGroup({ children, className }: ButtonGroupProps) {
   return (
-    <div 
+    <div
       className={cn(
         "inline-flex",
-        "[&>button]:[&>button]:border-r-0 [&>button:last-child]:border-r",
-        "[&>button:first-child]:rounded-l [&>button:last-child]:rounded-r",
-        "dark:[&>button:first-child]:rounded-l dark:[&>button:last-child]:rounded-r",
+        "[&>button]:border-r-0 [&>button:last-child]:border-r",
         className
       )}
     >

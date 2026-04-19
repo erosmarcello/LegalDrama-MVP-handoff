@@ -10,39 +10,39 @@ interface LegalToggleProps {
   className?: string
 }
 
-export function LegalToggle({ active, onToggle, color, disabled = false, className }: LegalToggleProps) {
-  const activeColor = color || "var(--green)"
-  
+/**
+ * Cinema-noir toggle. Thin 1px rule, gold fill when active, no glow.
+ */
+export function LegalToggle({
+  active,
+  onToggle,
+  color,
+  disabled = false,
+  className,
+}: LegalToggleProps) {
+  const activeColor = color || "var(--gold)"
+
   return (
     <div
       onClick={disabled ? undefined : onToggle}
+      role="switch"
+      aria-checked={active}
       className={cn(
         "relative w-[34px] h-[18px] flex-shrink-0",
-        "border transition-all duration-200 cursor-pointer",
-        // Light mode
-        "rounded-none",
-        // Dark mode
-        "-full",
+        "border transition-colors duration-200 cursor-pointer",
         disabled && "opacity-50 cursor-not-allowed",
         className
       )}
       style={{
-        backgroundColor: active ? activeColor : "var(--surface-alt)",
+        backgroundColor: active ? activeColor : "transparent",
         borderColor: active ? activeColor : "var(--border)",
-        boxShadow: active ? `0 0 8px ${activeColor}40` : "none",
       }}
     >
       <div
-        className={cn(
-          "absolute top-0.5 w-3 h-3 transition-all duration-200",
-          // Light mode
-          "rounded-none",
-          // Dark mode
-          "-full"
-        )}
+        className="absolute top-[2px] w-3 h-3 transition-all duration-200"
         style={{
           left: active ? 18 : 2,
-          backgroundColor: active ? "#FFF" : "var(--muted-foreground)",
+          backgroundColor: active ? "#0a0a0a" : "var(--muted-foreground)",
         }}
       />
     </div>
@@ -57,30 +57,41 @@ interface LegalCheckboxProps {
   className?: string
 }
 
-export function LegalCheckbox({ checked, onCheck, color, disabled = false, className }: LegalCheckboxProps) {
-  const activeColor = color || "var(--primary)"
-  
+/**
+ * Cinema-noir checkbox — square thin-border box, gold fill with black
+ * checkmark when active.
+ */
+export function LegalCheckbox({
+  checked,
+  onCheck,
+  color,
+  disabled = false,
+  className,
+}: LegalCheckboxProps) {
+  const activeColor = color || "var(--gold)"
+
   return (
     <div
       onClick={disabled ? undefined : onCheck}
+      role="checkbox"
+      aria-checked={checked}
       className={cn(
-        "w-3.5 h-3.5 flex items-center justify-center",
-        "border-2 transition-all duration-150 cursor-pointer",
-        // Light mode
-        "rounded-none",
-        // Dark mode
-        "-sm",
+        "w-4 h-4 flex items-center justify-center",
+        "border transition-colors duration-150 cursor-pointer",
         disabled && "opacity-50 cursor-not-allowed",
         className
       )}
       style={{
-        borderColor: checked ? activeColor : "var(--muted-foreground)",
+        borderColor: checked ? activeColor : "var(--border)",
         backgroundColor: checked ? activeColor : "transparent",
       }}
     >
       {checked && (
-        <span className="text-[9px] font-black text-white">
-          &#10003;
+        <span
+          className="text-[10px] leading-none"
+          style={{ color: "#0a0a0a", fontWeight: 700 }}
+        >
+          ✓
         </span>
       )}
     </div>

@@ -27,6 +27,7 @@ import { ContentModal } from "@/components/content-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
 import { DramaLevelSlider } from "@/components/drama-level-slider"
 import { SiteFooter } from "@/components/site-footer"
+import { Masthead } from "@/components/masthead"
 
 // Lane definitions for timeline
 const LANES = [
@@ -328,7 +329,7 @@ function CaseWorkspaceContent() {
   }), [docketEntries, chapters])
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col pb-12">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col pb-12 cinema-grain">
       {/* Settings Modal */}
       <SettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
       
@@ -348,194 +349,104 @@ function CaseWorkspaceContent() {
         onOpenSettings={() => { setContentModalOpen(false); setTimeout(() => setSettingsModalOpen(true), 200) }}
       />
 
-      {/* ANIMATED NAV */}
-      <nav className="sticky top-0 left-0 right-0 w-full z-50 nav-shimmer">
-        {/* Gradient animated border - top */}
-        <div className="h-1 gradient-nav animate-gradient-x" />
-        
-        <div className={cn(
-          "relative px-4 py-3 md:px-6",
-          "flex items-center justify-between gap-4",
-          "bg-foreground dark:bg-surface",
-          "transition-all duration-300"
-        )}>
-          {/* Shimmer overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer pointer-events-none" />
-          
-          <div className="relative z-10 flex items-center gap-4">
+      {/* ═══ CINEMA-NOIR CHROME ═══ */}
+      <Masthead showSettings pacerConnected />
+
+      {/* Case marquee — slim strip with case #, live dot, action buttons */}
+      <div className="sticky top-14 z-40 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm cinema-grain">
+        <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-8 h-11 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => router.push("/")}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                "border-2 transition-all duration-200 click-scale",
-                "bg-background text-foreground",
-                "dark:bg-surface-alt dark:text-foreground",
-                "border-border hover:border-primary hover:bg-primary/10",
-                "rounded-none",
-                "group"
-              )}
+              onClick={() => router.push("/browse")}
+              className="w-7 h-7 flex items-center justify-center border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
+              aria-label="Back to browse"
             >
-              <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-0.5" />
+              <ArrowLeft size={12} />
             </button>
-
-            <Link href="/" className="flex items-baseline gap-1 cursor-pointer group">
-              <span className="font-sans text-xl font-black text-background dark:text-foreground transition-colors group-hover:text-primary">
-                legal
-              </span>
-              <span className="font-sans text-xl font-black text-red dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-pink dark:via-purple dark:to-cyan">
-                drama
-              </span>
-              <span className="font-mono text-sm text-pink">.ai</span>
-            </Link>
-          </div>
-
-          {/* Case info - center */}
-          <div className="relative z-10 flex-1 max-w-lg mx-4 hidden md:block">
-            <div className="text-center px-4 py-2 rounded-lg rounded-none-xl bg-background/10 dark:bg-surface-alt/50 backdrop-blur-sm border border-white/10">
-              <div className="font-sans text-sm font-bold text-background dark:text-foreground truncate">
+            <div className="flex items-baseline gap-3 min-w-0">
+              <span className="cinema-contract text-[11px] text-[var(--gold)] truncate">
                 USA v. MANGIONE
-              </div>
-              <div className="font-mono text-[10px] text-background/60 dark:text-muted-foreground flex items-center justify-center gap-2">
-                <span>1:25-cr-00176-MMG</span>
-                <span className="w-1 h-1 rounded-full bg-green animate-pulse" />
-                <span>S.D.N.Y.</span>
-              </div>
+              </span>
+              <span className="cinema-label text-[9px] text-[var(--muted-foreground)] hidden md:inline">
+                1:25-cr-00176-MMG · S.D.N.Y.
+              </span>
+              <span className="items-center gap-1.5 hidden lg:flex">
+                <span className="cinema-pulse-dot" aria-hidden />
+                <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                  Active
+                </span>
+              </span>
             </div>
           </div>
-
-          {/* Action buttons - all same size */}
-          <div className="relative z-10 flex items-center gap-2">
-            {/* Upload/Content button */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => {
                 setContentModalTab("upload")
                 setContentModalOpen(true)
               }}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                "border-2 border-border transition-all duration-200 click-scale",
-                "bg-background dark:bg-surface-alt text-foreground",
-                "hover:border-purple hover:text-purple hover:shadow-[0_0_15px_var(--purple)]",
-                "rounded-none"
-              )}
+              className="h-7 px-2.5 flex items-center gap-1.5 border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cinema-label text-[9px]"
             >
-              <Plus size={18} />
+              <Plus size={11} />
+              <span className="hidden md:inline">Assets</span>
             </button>
-
-            {/* Share button */}
             <button
               onClick={() => setShareModalOpen(true)}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                "border-2 border-border transition-all duration-200 click-scale",
-                "bg-background dark:bg-surface-alt text-foreground",
-                "hover:border-cyan hover:text-cyan hover:shadow-[0_0_15px_var(--cyan)]",
-                "rounded-none"
-              )}
+              className="h-7 px-2.5 flex items-center gap-1.5 border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cinema-label text-[9px]"
             >
-              <Share size={18} />
+              <Share size={11} />
+              <span className="hidden md:inline">Share</span>
             </button>
-
-            {/* Settings button */}
             <button
               onClick={() => setSettingsModalOpen(true)}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center",
-                "border-2 border-border transition-all duration-200 click-scale",
-                "bg-background dark:bg-surface-alt text-muted-foreground",
-                "hover:text-foreground hover:border-green hover:shadow-[0_0_15px_var(--green)]",
-                "rounded-none",
-                "group"
-              )}
+              className="w-7 h-7 flex items-center justify-center border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
+              aria-label="Case settings"
             >
-              <Settings size={18} className="transition-transform group-hover:rotate-90" />
+              <Settings size={12} />
             </button>
           </div>
         </div>
-        
-        {/* Gradient animated border - bottom */}
-        <div className="h-0.5 gradient-nav animate-gradient-x opacity-50" />
-      </nav>
+      </div>
 
-      {/* TAB BAR — sticky, sits below the nav */}
-      <div className="sticky top-[53px] left-0 right-0 w-full border-b-2 border-border bg-surface z-40 shadow-sm">
-        <div className="flex items-center gap-3 overflow-x-auto py-3.5 hide-scrollbar px-4 md:px-6">
-          {/* Tabs */}
-          <div className="flex items-center gap-1 p-1.5 bg-surface-alt/50 rounded-lg rounded-none-xl">
-            {[
-              { key: "all", label: "ALL", icon: LayoutGrid, color: "var(--primary)" },
-              { key: "screenplay", label: "Story", icon: FileText, color: "var(--purple)" },
-              { key: "docket", label: "Docket", icon: Database, color: "var(--cyan)" },
-              { key: "timeline", label: "Timeline", icon: Clock, color: "var(--orange)" },
-              { key: "characters", label: "Characters", icon: Users, color: "var(--pink)" },
-            ].map((tab) => (
+      {/* View tab rail — quiet underline indicator */}
+      <div className="sticky top-[96px] z-30 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm">
+        <div className="max-w-[1600px] mx-auto px-5 md:px-8 flex items-center overflow-x-auto">
+          {[
+            { key: "all", label: "Overview", icon: LayoutGrid },
+            { key: "screenplay", label: "Story", icon: FileText },
+            { key: "docket", label: "Docket", icon: Database },
+            { key: "timeline", label: "Timeline", icon: Clock },
+            { key: "characters", label: "Characters", icon: Users },
+          ].map(tab => {
+            const isActive = activeTab === tab.key
+            const Icon = tab.icon
+            return (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as ViewTab)}
                 className={cn(
-                  "px-3 md:px-4 py-2.5 flex items-center gap-2",
-                  "font-mono text-xs font-bold",
-                  "rounded-md rounded-none",
-                  "focus-premium press-scale",
-                  "transition-all duration-300",
-                  activeTab === tab.key
-                    ? "bg-card text-foreground shadow-brut-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-card/50"
+                  "relative flex items-center gap-2 px-4 py-3 cinema-label text-[10px] transition-colors whitespace-nowrap",
+                  isActive
+                    ? "text-white"
+                    : "text-[var(--muted-foreground)] hover:text-white"
                 )}
-                style={{ 
-                  borderBottom: activeTab === tab.key ? `3px solid ${tab.color}` : '3px solid transparent',
-                  transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
-                }}
               >
-                <tab.icon 
-                  size={14} 
-                  style={{ 
-                    color: activeTab === tab.key ? tab.color : undefined,
-                    transition: 'color 0.2s ease'
-                  }} 
-                  className={activeTab === tab.key ? 'animate-enter-scale' : ''}
-                />
-                <span className="hidden md:inline">{tab.label}</span>
+                <Icon size={12} />
+                <span>{tab.label}</span>
+                {isActive && (
+                  <span
+                    className="absolute -bottom-px left-0 right-0 h-[2px]"
+                    style={{ background: "var(--red)" }}
+                  />
+                )}
               </button>
-            ))}
-          </div>
-
+            )
+          })}
           <div className="flex-1" />
-
-          {/* Quick stats - hide on smaller screens */}
-          <div className="hidden xl:flex items-center gap-3 text-muted-foreground">
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-lane-factual/20 rounded">
-              <Flame size={12} className="text-lane-factual" />
-              <span className="font-mono text-[10px]">{stats.factualEvents}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-lane-procedural/20 rounded">
-              <Scale size={12} className="text-lane-procedural" />
-              <span className="font-mono text-[10px]">{stats.proceduralEvents}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-lane-scheduling/20 rounded">
-              <Calendar size={12} className="text-lane-scheduling" />
-              <span className="font-mono text-[10px]">{stats.schedulingEvents}</span>
-            </div>
+          <div className="hidden xl:flex items-center gap-4 pr-2">
+            <LaneStat color="var(--lane-factual)" label="Factual" count={stats.factualEvents} Icon={Flame} />
+            <LaneStat color="var(--lane-procedural)" label="Procedural" count={stats.proceduralEvents} Icon={Scale} />
+            <LaneStat color="var(--lane-scheduling)" label="Scheduling" count={stats.schedulingEvents} Icon={Calendar} />
           </div>
-
-          {/* Mission Control button - main content management */}
-          <button
-            onClick={() => {
-              setContentModalTab("upload")
-              setContentModalOpen(true)
-            }}
-            className={cn(
-              "hidden lg:flex px-4 py-2.5 items-center gap-2",
-              "border-2 border-cyan bg-cyan/10 text-cyan",
-              "font-mono text-[10px] font-bold",
-              "rounded-none rounded-none",
-              "hover:bg-cyan/20 transition-colors click-scale"
-            )}
-          >
-            <Layers size={14} />
-            <span className="hidden xl:inline">Mission-Control</span>
-          </button>
-
         </div>
       </div>
 
@@ -982,11 +893,11 @@ function CaseWorkspaceContent() {
                   {CHARACTER_PROFILES.slice(0, 4).map((char, i) => (
                     <div
                       key={char.id}
-                      className="p-4 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
+                      className="p-4 border border-[var(--border)] bg-[var(--card)] "
                       style={{ animationDelay: `${i * 0.1}s` }}
                     >
                       <div
-                        className="w-12 h-12 bg-[var(--surface-alt)] flex items-center justify-center mb-3 mx-auto border-[2.5px] border-[var(--border)]"
+                        className="w-12 h-12 bg-[var(--surface-alt)] flex items-center justify-center mb-3 mx-auto border border-[var(--border)]"
                       >
                         <Users size={20} className="text-[var(--muted-foreground)]" />
                       </div>
@@ -1008,25 +919,25 @@ function CaseWorkspaceContent() {
 
                 {/* Upload options */}
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <label className="flex flex-col items-center gap-2 p-6 border-[2.5px] border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--green)] hover:bg-[var(--green)]/5 transition-colors cursor-pointer brut-lift">
-                    <div className="w-12 h-12 flex items-center justify-center border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
+                  <label className="flex flex-col items-center gap-2 p-6 border border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--green)] hover:bg-[var(--green)]/5 transition-colors cursor-pointer">
+                    <div className="w-12 h-12 flex items-center justify-center border border-[var(--border)] bg-[var(--surface-alt)]">
                       <Folder size={24} className="text-[var(--green)]" />
                     </div>
                     <span className="font-sans text-sm font-bold text-[var(--foreground)]">Link Google Drive Folder</span>
                     <span className="font-serif text-xs text-[var(--muted-foreground)]">Sync a folder from your Google Drive.</span>
-                    <span className="mt-1 px-3 py-1.5 border-[2.5px] border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)]">
+                    <span className="mt-1 px-3 py-1.5 border border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold ">
                       Connect to Google Drive Folder
                     </span>
                     <input type="file" className="hidden" onChange={() => toast("Linked Google Drive", "var(--green)")} />
                   </label>
 
-                  <label className="flex flex-col items-center gap-2 p-6 border-[2.5px] border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--cyan)] hover:bg-[var(--cyan)]/5 transition-colors cursor-pointer brut-lift">
-                    <div className="w-12 h-12 flex items-center justify-center border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
+                  <label className="flex flex-col items-center gap-2 p-6 border border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--cyan)] hover:bg-[var(--cyan)]/5 transition-colors cursor-pointer">
+                    <div className="w-12 h-12 flex items-center justify-center border border-[var(--border)] bg-[var(--surface-alt)]">
                       <Upload size={24} className="text-[var(--cyan)]" />
                     </div>
                     <span className="font-sans text-sm font-bold text-[var(--foreground)]">Upload Files Directly</span>
                     <span className="font-serif text-xs text-[var(--muted-foreground)]">Upload documents, videos, and other files.</span>
-                    <span className="mt-1 px-3 py-1.5 border-[2.5px] border-[var(--cyan)] bg-[var(--cyan)] text-white font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)]">
+                    <span className="mt-1 px-3 py-1.5 border border-[var(--cyan)] bg-[var(--cyan)] text-white font-mono text-[10px] font-bold ">
                       Upload Evidence Files
                     </span>
                     <input type="file" multiple className="hidden" onChange={() => toast("Files uploaded!", "var(--green)")} />
@@ -1039,7 +950,7 @@ function CaseWorkspaceContent() {
                     <div className="font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">
                       Uploaded Evidence Dataset <span className="text-[var(--green)] normal-case">— Private evidence uploads</span>
                     </div>
-                    <div className="border-[2.5px] border-[var(--border)] bg-[var(--surface)]">
+                    <div className="border border-[var(--border)] bg-[var(--surface)]">
                       {/* Header */}
                       <div className="flex items-center px-4 py-2 border-b-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
                         <span className="flex-1 font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase">File Name</span>
@@ -1073,13 +984,13 @@ function CaseWorkspaceContent() {
                     <div className="flex items-center justify-between mt-3">
                       <button
                         onClick={() => toast("Upload coming soon...", "var(--cyan)")}
-                        className="flex items-center gap-1.5 px-3 py-1.5 border-[2.5px] border-[var(--border)] font-mono text-[10px] font-bold text-[var(--foreground)] brut-press shadow-[2px_2px_0px_var(--shadow-color)] hover:border-[var(--cyan)]"
+                        className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] font-mono text-[10px] font-bold text-[var(--foreground)]  hover:border-[var(--cyan)]"
                       >
                         <Plus size={12} /> Add More Evidence
                       </button>
                       <button
                         onClick={() => toast("Analyzing evidence...", "var(--green)")}
-                        className="flex items-center gap-1.5 px-4 py-1.5 border-[2.5px] border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)]"
+                        className="flex items-center gap-1.5 px-4 py-1.5 border border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold "
                       >
                         <Sparkles size={12} /> Analyze Evidence
                       </button>
@@ -1087,7 +998,7 @@ function CaseWorkspaceContent() {
                   </div>
 
                   {/* Tips sidebar */}
-                  <div className="hidden lg:block w-48 p-3 border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
+                  <div className="hidden lg:block w-48 p-3 border border-[var(--border)] bg-[var(--surface-alt)]">
                     <div className="font-mono text-[9px] font-bold text-[var(--foreground)] uppercase mb-2">Tips</div>
                     <ul className="space-y-1.5 font-serif text-[11px] text-[var(--muted-foreground)] list-disc pl-3">
                       <li>Ensure files are relevant to the case.</li>
@@ -1132,7 +1043,7 @@ function CaseWorkspaceContent() {
                       "border-b-2 lg:border-b lg:border-l-4 border-transparent",
                       "transition-all duration-200 click-scale",
                       currentChapterIndex === i
-                        ? "bg-card border-l-primary text-foreground shadow-brut-sm lg:shadow-none"
+                        ? "bg-card border-l-primary text-foreground lg:shadow-none"
                         : "hover:bg-surface text-muted-foreground hover:text-foreground",
                       "rounded lg:rounded-none"
                     )}
@@ -1698,7 +1609,7 @@ function CaseWorkspaceContent() {
               </h2>
 
               {CHARACTER_PROFILES.length === 0 ? (
-                <div className="p-8 text-center border-[2.5px] border-[var(--border)] bg-[var(--card)]">
+                <div className="p-8 text-center border border-[var(--border)] bg-[var(--card)]">
                   <Users size={32} className="text-[var(--muted-foreground)] mx-auto mb-3" />
                   <p className="font-sans text-lg font-bold text-[var(--foreground)] mb-1">No characters identified yet.</p>
                   <p className="font-serif text-sm text-[var(--muted-foreground)]">Characters will be populated from the case docket.</p>
@@ -1711,12 +1622,12 @@ function CaseWorkspaceContent() {
                     return (
                     <div
                       key={char.id}
-                      className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
+                      className="p-5 border border-[var(--border)] bg-[var(--card)] "
                       style={{ borderLeftColor: char.roleColor, borderLeftWidth: "5px" }}
                     >
                       <div className="flex items-start gap-4">
                         {/* Thumbnail - clickable for upload */}
-                        <label className="relative w-16 h-16 flex-shrink-0 cursor-pointer group border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center shadow-[2px_2px_0px_var(--shadow-color)] overflow-hidden">
+                        <label className="relative w-16 h-16 flex-shrink-0 cursor-pointer group border border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center  overflow-hidden">
                           <Users size={24} className="text-[var(--muted-foreground)] group-hover:opacity-50 transition-opacity" />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <Pencil size={14} className="text-white" />
@@ -1737,7 +1648,7 @@ function CaseWorkspaceContent() {
 
                           <div className="flex items-center gap-2">
                             <button
-                              className="flex items-center gap-1.5 px-3 py-1.5 border-[2.5px] border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold brut-press shadow-[2px_2px_0px_var(--shadow-color)] hover:bg-[var(--cyan)] hover:text-white transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold  hover:bg-[var(--cyan)] hover:text-white transition-colors"
                               onClick={() => toast("Upload evidence for " + char.name, "var(--cyan)")}
                             >
                               <Upload size={12} />
@@ -1771,11 +1682,11 @@ function CaseWorkspaceContent() {
                   return (
                     <div
                       key={loc.id}
-                      className="p-5 border-[2.5px] border-[var(--border)] bg-[var(--card)] shadow-[4px_4px_0px_var(--shadow-color)] brut-lift"
+                      className="p-5 border border-[var(--border)] bg-[var(--card)] "
                       style={{ borderLeftColor: loc.roleColor, borderLeftWidth: "5px" }}
                     >
                       <div className="flex items-start gap-4">
-                        <div className="relative w-16 h-16 flex-shrink-0 border-[2.5px] border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center shadow-[2px_2px_0px_var(--shadow-color)]">
+                        <div className="relative w-16 h-16 flex-shrink-0 border border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center ">
                           <MapPin size={24} style={{ color: loc.roleColor }} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1972,40 +1883,57 @@ function DocketEntryCard({
         </div>
       )}
       
-      {/* Floating Status Footer */}
-      <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-40",
-        "bg-foreground/98 dark:bg-surface/98 backdrop-blur-md",
-        "border-t border-border/50",
-        "animate-enter-up"
-      )}
-      style={{ animationDelay: '0.5s', animationDuration: '0.3s' }}
-      >
-        <div className="flex items-center justify-between px-5 py-2.5">
-          <div className="flex items-center gap-5">
-            <span className="font-mono text-[10px] text-background dark:text-muted-foreground tracking-wider">
-              LEGALDRAMA.AI MVP Rev V2.0
+      {/* Floating Status Footer — noir strip */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm cinema-grain">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between px-5 md:px-8 py-2">
+          <div className="flex items-center gap-4">
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+              LegalDrama.ai v0.2 · Alpha
             </span>
-            <div className="hidden md:flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-green connected-indicator" style={{ boxShadow: '0 0 6px var(--green)' }} />
-              <span className="font-mono text-[10px] text-background/60 dark:text-muted-foreground">
-                11/14 sources active
+            <div className="hidden md:flex items-center gap-1.5">
+              <span className="cinema-pulse-gold" aria-hidden />
+              <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                11 / 14 sources active
               </span>
             </div>
           </div>
-          
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2">
-              <span className="font-mono text-[10px] text-background/60 dark:text-muted-foreground">
-                Trial: <span className="text-red font-bold animate-pulse-soft">Oct 13, 2026</span>
+              <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                Trial Date ·{" "}
+                <span className="text-[var(--red)]">Oct 13, 2026</span>
               </span>
             </div>
-            <span className="font-mono text-[9px] text-background/40 dark:text-muted-foreground/60 tracking-widest">
-              DESIGN: EROS MARCELLO IULIANO
+            <span className="cinema-label text-[9px] text-[var(--muted-foreground)]/50 hidden lg:inline">
+              Design · Eros Marcello Iuliano
             </span>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function LaneStat({
+  color,
+  label,
+  count,
+  Icon,
+}: {
+  color: string
+  label: string
+  count: number
+  Icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Icon size={11} style={{ color }} />
+      <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+        {label}
+      </span>
+      <span className="cinema-label text-[9px]" style={{ color }}>
+        {count}
+      </span>
     </div>
   )
 }

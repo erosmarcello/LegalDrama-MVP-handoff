@@ -144,7 +144,7 @@ function PricingContent() {
         user={user}
         onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
         onSignOut={() => setUser(null)}
-        pacerConnected
+        showSettings
       />
 
       {/* ─── Hero ─── */}
