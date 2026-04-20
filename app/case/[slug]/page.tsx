@@ -333,7 +333,10 @@ function CaseWorkspaceContent() {
   }), [docketEntries, chapters])
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col pb-12 cinema-grain">
+    /* Wrapper — var-driven so Alucard (light) and Dracula (dark) both flow
+       through this demo. Hardcoded #0a0a0a was locking out the Alucard
+       cream-paper palette. */
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col pb-12 cinema-grain">
       {/* Settings Modal */}
       <SettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
       
@@ -374,8 +377,9 @@ function CaseWorkspaceContent() {
         }}
       />
 
-      {/* Case marquee — slim strip with case #, live dot, action buttons */}
-      <div className="sticky top-14 z-40 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm cinema-grain">
+      {/* Case marquee — slim strip with case #, live dot, action buttons.
+          bg uses --background so the marquee flips with the theme. */}
+      <div className="sticky top-14 z-40 w-full border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_95%,transparent)] backdrop-blur-sm cinema-grain">
         <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-8 h-11 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -430,8 +434,9 @@ function CaseWorkspaceContent() {
       </div>
 
       {/* View tab rail — quiet underline indicator.
-          Pinned flush below the marquee (56px masthead + 44px marquee = 100px). */}
-      <div className="sticky top-[100px] z-30 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm">
+          Pinned flush below the marquee (56px masthead + 44px marquee = 100px).
+          bg uses --background so the rail flips with the theme. */}
+      <div className="sticky top-[100px] z-30 w-full border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_95%,transparent)] backdrop-blur-sm">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 flex items-center overflow-x-auto">
           {[
             { key: "all", label: "Overview", icon: LayoutGrid },
@@ -448,9 +453,11 @@ function CaseWorkspaceContent() {
                 onClick={() => setActiveTab(tab.key as ViewTab)}
                 className={cn(
                   "relative flex items-center gap-2 px-4 py-3 cinema-label text-[10px] transition-colors whitespace-nowrap",
+                  // Active tab label uses --foreground so Alucard renders
+                  // dark-ink on cream and Dracula renders white on black.
                   isActive
-                    ? "text-white"
-                    : "text-[var(--muted-foreground)] hover:text-white"
+                    ? "text-[var(--foreground)]"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 )}
               >
                 <Icon size={12} />
@@ -1992,7 +1999,9 @@ function DocketEntryCard({
       )}
       
       {/* Floating Status Footer — noir strip */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm cinema-grain">
+      {/* Drama scrubber dock — always pinned at viewport bottom. bg uses
+          --background so the dock also flips with the theme. */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_95%,transparent)] backdrop-blur-sm cinema-grain">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between px-5 md:px-8 py-2">
           <div className="flex items-center gap-4">
             <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">

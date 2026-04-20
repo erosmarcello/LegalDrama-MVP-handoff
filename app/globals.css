@@ -4,11 +4,127 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════════════════
-   CINEMA NOIR — "Law & Order title sequence meets PACER database"
-   Dark-default. Blood-red CTAs. Aged-gold metadata. Film grain.
+   TWO THEMES — Dracula (noir dark, default) + Alucard (editorial light).
+   Alucard flips the ink: cream paper, warm brass, ox-blood red, garamond
+   gravity. Both palettes share the same semantic var NAMES so every
+   component built against --background, --foreground, --border, etc.
+   re-skins automatically when next-themes flips the .dark class.
    ═══════════════════════════════════════════════════════════════════ */
 
-:root,
+/* ──────────────────────────────────────────────────────────────────
+   ALUCARD (light) — "Open Court"
+   Cream paper, ox-blood red, aged brass. The dossier-in-your-hands
+   look. Activated when <html> has no .dark class (next-themes "light").
+   ──────────────────────────────────────────────────────────────── */
+:root {
+  --background: #FFF9EC;
+  --foreground: #1F1F1F;
+  --surface: #F5F0E0;
+  --surface-alt: #EBE6D6;
+  --card: #FFF9EC;
+  --card-foreground: #1F1F1F;
+  --popover: #FFF9EC;
+  --popover-foreground: #1F1F1F;
+
+  --primary: #CB3A2A;
+  --primary-foreground: #FFF9EC;
+  --secondary: #B39249;
+  --secondary-foreground: #1F1F1F;
+
+  --muted: #EBE6D6;
+  --muted-foreground: #6C664B;
+  --accent: #B39249;
+  --accent-foreground: #1F1F1F;
+
+  --destructive: #CB3A2A;
+  --destructive-foreground: #FFF9EC;
+
+  --border: #1F1F1F;
+  --border-light: #D4CEB8;
+  --input: #FFF9EC;
+  --ring: #B39249;
+
+  --radius: 0px;
+  --border-width: 1px;
+  --shadow-color: rgba(31, 31, 31, 0.18);
+
+  /* Semantic — retuned for paper palette, still noir-leaning */
+  --red: #CB3A2A;
+  --orange: #A34D14;
+  --yellow: #B37D1F;
+  --green: #2E6B2E;
+  --purple: #4F3F8C;
+  --cyan: #2E5E8A;
+  --pink: #A3144D;
+  --amber: #B39249;
+  --gold: #B39249;
+  --selection: #F0E7C8;
+
+  /* Lane colors — ink version of the dark-mode scheme */
+  --lane-factual: #CB3A2A;
+  --lane-procedural: #2E5E8A;
+  --lane-scheduling: #B39249;
+  --lane-narrative: #4F3F8C;
+  --lane-danger: #A3144D;
+  --lane-govt: #CB3A2A;
+  --lane-defense: #B39249;
+  --lane-court: #1F1F1F;
+
+  /* Extended lane accents (deep/muted/soft) — paper-friendly */
+  --lane-factual-deep:   #962410;
+  --lane-factual-muted:  #7A200F;
+  --lane-factual-soft:   rgba(203, 58, 42, 0.14);
+
+  --lane-procedural-deep:  #1F4A73;
+  --lane-procedural-muted: #16395A;
+  --lane-procedural-soft:  rgba(46, 94, 138, 0.14);
+
+  --lane-scheduling-deep:  #8C6F34;
+  --lane-scheduling-muted: #6E5626;
+  --lane-scheduling-soft:  rgba(179, 146, 73, 0.16);
+
+  --lane-narrative-deep:  #362A6B;
+  --lane-narrative-muted: #27204F;
+  --lane-narrative-soft:  rgba(79, 63, 140, 0.14);
+
+  /* Event tier accents */
+  --tier-1: #B37D1F;
+  --tier-2: #2E5E8A;
+  --tier-3: #BCB39C;
+
+  /* Drama/axis accents */
+  --drama-record:    #2E6B2E;
+  --drama-docudrama: #2E5E8A;
+  --drama-thriller:  #B37D1F;
+  --drama-alt:       #4F3F8C;
+  --drama-mythic:    #962410;
+
+  /* Surfaces — paper stack, lightest at top */
+  --surface-1: #FFFDF4;   /* masthead, topmost */
+  --surface-2: #FFF9EC;   /* primary page surface */
+  --surface-3: #F5F0E0;   /* cards, tooltips */
+  --surface-4: #EBE6D6;   /* hover rows, popovers */
+  --surface-5: #DFD9C4;   /* selected rows, elevated tiles */
+
+  --gradient-start: #CB3A2A;
+  --gradient-mid: #B39249;
+  --gradient-end: #EBE6D6;
+
+  --sidebar: #F5F0E0;
+  --sidebar-foreground: #1F1F1F;
+  --sidebar-primary: #CB3A2A;
+  --sidebar-primary-foreground: #FFF9EC;
+  --sidebar-accent: #EBE6D6;
+  --sidebar-accent-foreground: #1F1F1F;
+  --sidebar-border: #1F1F1F;
+  --sidebar-ring: #B39249;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   DRACULA (dark, default) — "In Camera"
+   Cinematic void, blood red, aged gold, film grain. Activated by
+   next-themes adding .dark to <html>.
+   ──────────────────────────────────────────────────────────────── */
 .dark {
   /* Cinematic void + warm gray-brown surface stack */
   --background: #0a0a0a;
@@ -149,8 +265,9 @@
   --sidebar-ring: #b3a369;
 }
 
-/* Light mode preserved as the same noir tokens — the reference screenshots
-   are uniformly dark; we force cinema-noir regardless of system preference. */
+/* Both themes share the same Tailwind theme token aliases below so every
+   component that uses bg-background / text-foreground / border-border /
+   bg-card / etc. re-skins automatically when .dark is toggled. */
 
 @theme inline {
   --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;

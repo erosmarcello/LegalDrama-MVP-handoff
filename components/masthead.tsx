@@ -73,7 +73,9 @@ export function Masthead({
       className={cn(
         "sticky top-0 z-50 w-full",
         "border-b border-[var(--border)]",
-        "bg-[#0a0a0a]/95 backdrop-blur-sm",
+        // bg uses --background via color-mix so the masthead skin flips
+        // between Alucard (cream) and Dracula (noir) with the theme.
+        "bg-[color-mix(in_srgb,var(--background)_95%,transparent)] backdrop-blur-sm",
         "cinema-grain",
         className
       )}
@@ -85,15 +87,19 @@ export function Masthead({
             href="/"
             className="flex items-baseline gap-1 select-none group shrink-0"
           >
+            {/* Wordmark — "LEGAL" follows --foreground so it flips to ink
+                on cream in Alucard / stays white on black in Dracula. The
+                drop-shadow is also theme-aware so we don't stamp black
+                shadows on a cream wordmark. */}
             <span
-              className="cinema-title text-[22px] md:text-[26px] text-white leading-none"
-              style={{ textShadow: "1px 1px 0 #000" }}
+              className="cinema-title text-[22px] md:text-[26px] text-[var(--foreground)] leading-none"
+              style={{ textShadow: "1px 1px 0 var(--shadow-color)" }}
             >
               LEGAL
             </span>
             <span
               className="cinema-title text-[22px] md:text-[26px] leading-none"
-              style={{ color: "var(--red)", textShadow: "1px 1px 0 #000" }}
+              style={{ color: "var(--red)", textShadow: "1px 1px 0 var(--shadow-color)" }}
             >
               DRAMA
             </span>
@@ -115,8 +121,8 @@ export function Masthead({
                     "cinema-label text-[11px] transition-colors relative",
                     "py-1",
                     isActive
-                      ? "text-white"
-                      : "text-[var(--muted-foreground)] hover:text-white"
+                      ? "text-[var(--foreground)]"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                   )}
                 >
                   {link.label}
@@ -144,7 +150,7 @@ export function Masthead({
                 placeholder={searchPlaceholder}
                 className={cn(
                   "flex-1 bg-transparent outline-none",
-                  "cinema-label text-[11px] text-white",
+                  "cinema-label text-[11px] text-[var(--foreground)]",
                   "placeholder:text-[var(--muted-foreground)] placeholder:tracking-[0.12em]"
                 )}
               />
@@ -171,7 +177,10 @@ export function Masthead({
               onClick={onSignIn}
               className={cn(
                 "h-8 px-4 flex items-center justify-center",
-                "border border-white bg-white text-[#0a0a0a]",
+                // Sign-in pill — high-contrast inverse: fg-on-bg. Alucard
+                // renders dark-ink button on cream; Dracula renders the
+                // original white-on-black.
+                "border border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]",
                 "cinema-label text-[10px]",
                 "hover:bg-[var(--gold)] hover:border-[var(--gold)] transition-colors"
               )}
@@ -230,7 +239,9 @@ function UserAvatarMenu({
         className={cn(
           "relative w-9 h-9 rounded-full overflow-hidden",
           "border border-[var(--gold)]",
-          "bg-[#0a0a0a] text-[var(--gold)]",
+          // Avatar plate uses --background so Alucard shows a cream plate
+          // with gold ring; Dracula stays black plate + gold ring.
+          "bg-[var(--background)] text-[var(--gold)]",
           "cinema-label text-[12px]",
           "transition-transform hover:scale-105",
           "flex items-center justify-center"
@@ -259,7 +270,9 @@ function UserAvatarMenu({
           className={cn(
             "absolute top-[calc(100%+8px)] right-0 z-[60]",
             "min-w-[220px]",
-            "border border-[var(--border)] bg-[#0f0f0f]",
+            // Dropdown surface — --surface pulls the right "slightly
+            // elevated card" shade in each theme.
+            "border border-[var(--border)] bg-[var(--surface)]",
             "cinema-grain",
             "shadow-[0_30px_80px_rgba(0,0,0,0.7)]",
             "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]"
@@ -267,7 +280,7 @@ function UserAvatarMenu({
         >
           <div className="px-4 pt-4 pb-3 border-b border-[var(--border)]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full overflow-hidden border border-[var(--gold)] bg-[#0a0a0a] flex items-center justify-center text-[var(--gold)] cinema-label text-[13px]">
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-[var(--gold)] bg-[var(--background)] flex items-center justify-center text-[var(--gold)] cinema-label text-[13px]">
                 {user.avatar ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
@@ -283,7 +296,7 @@ function UserAvatarMenu({
                 <div className="cinema-label text-[10px] text-[var(--gold)] truncate">
                   {displayName}
                 </div>
-                <div className="cinema-contract text-[10px] text-white/60 truncate">
+                <div className="cinema-contract text-[10px] text-[var(--muted-foreground)] truncate">
                   {user.email}
                 </div>
               </div>
@@ -295,7 +308,7 @@ function UserAvatarMenu({
               onClick={() => setOpen(false)}
               className={cn(
                 "flex items-center gap-2 px-4 py-2",
-                "cinema-label text-[10px] text-white/70",
+                "cinema-label text-[10px] text-[var(--foreground)]/70",
                 "hover:text-[var(--gold)] hover:bg-white/5 transition-colors"
               )}
             >
@@ -309,7 +322,7 @@ function UserAvatarMenu({
               }}
               className={cn(
                 "w-full flex items-center gap-2 px-4 py-2",
-                "cinema-label text-[10px] text-white/70",
+                "cinema-label text-[10px] text-[var(--foreground)]/70",
                 "hover:text-[var(--red)] hover:bg-white/5 transition-colors"
               )}
             >

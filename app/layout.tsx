@@ -82,14 +82,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    /* NOTE: suppressHydrationWarning is required by next-themes because it
+       injects the resolved theme class on <html> before React hydrates. */
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${anton.variable} ${sourceSerif.variable} ${jetbrainsMono.variable} ${ebGaramond.variable} font-sans antialiased`}
       >
+        {/* Dracula stays the default (cinema-noir is the brand), but the
+            theme is no longer forced — Settings › Appearance can now flip
+            into Alucard (light). `enableSystem` is off so we don't surprise
+            users who walk the demo with OS-light preferences. */}
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          forcedTheme="dark"
           enableSystem={false}
           disableTransitionOnChange={true}
         >

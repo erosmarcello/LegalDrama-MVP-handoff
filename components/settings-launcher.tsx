@@ -41,7 +41,7 @@ export function SettingsLauncher({
         "group inline-flex items-center justify-center",
         "border transition-colors duration-150",
         variant === "square" ? "w-9 h-9" : "w-8 h-8",
-        "border-[var(--border)] bg-transparent text-white/60",
+        "border-[var(--border)] bg-transparent text-[var(--foreground)]/60",
         "hover:border-[var(--gold)] hover:text-[var(--gold)]",
         className
       )}

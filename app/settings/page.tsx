@@ -830,16 +830,19 @@ function SettingsContent() {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Alucard — light theme (Dracula spelled backwards). Cream
+                  paper, ox-blood red, aged brass. "Open Court" subtitle keeps
+                  the courtroom poetry. */}
               <ThemeCard
                 selected={!isDark}
                 onSelect={() => setTheme("light")}
-                title="Open Court"
-                subtitle="Public session — bright, on the record"
+                title="Alucard"
+                subtitle="Open Court — bright, on the record"
                 Icon={Sun}
                 preview={
-                  <div className="w-full h-32 bg-[#FFF9EC] border border-[var(--border)] overflow-hidden">
-                    <div className="h-6 bg-[#F5F0E0] border-b border-[var(--border)]" />
-                    <div className="h-[2px] bg-[var(--red)] w-full" />
+                  <div className="w-full h-32 bg-[#FFF9EC] border border-[#1F1F1F] overflow-hidden">
+                    <div className="h-6 bg-[#F5F0E0] border-b border-[#1F1F1F]" />
+                    <div className="h-[2px] bg-[#CB3A2A] w-full" />
                     <div className="p-3 space-y-2">
                       <div className="h-2 bg-[#EBE6D6] w-3/4" />
                       <div className="h-1.5 bg-[#EBE6D6] w-1/2" />
@@ -848,16 +851,18 @@ function SettingsContent() {
                   </div>
                 }
               />
+              {/* Dracula — dark theme (cinema-noir default). "In Camera"
+                  subtitle keeps the chambers/sealed framing. */}
               <ThemeCard
                 selected={isDark}
                 onSelect={() => setTheme("dark")}
-                title="In Camera"
-                subtitle="Chambers session — sealed, off the record"
+                title="Dracula"
+                subtitle="In Camera — sealed, off the record"
                 Icon={Moon}
                 preview={
-                  <div className="w-full h-32 bg-[#0a0a0a] border border-[var(--border)] overflow-hidden cinema-grain">
-                    <div className="h-6 bg-[#141414] border-b border-[var(--border)]" />
-                    <div className="h-[2px] bg-[var(--gold)] w-full" />
+                  <div className="w-full h-32 bg-[#0a0a0a] border border-[#2a2822] overflow-hidden cinema-grain">
+                    <div className="h-6 bg-[#141414] border-b border-[#2a2822]" />
+                    <div className="h-[2px] bg-[#b3a369] w-full" />
                     <div className="p-3 space-y-2">
                       <div className="h-2 bg-[#262626] w-3/4" />
                       <div className="h-1.5 bg-[#262626] w-1/2" />
