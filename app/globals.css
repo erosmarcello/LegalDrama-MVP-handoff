@@ -775,108 +775,42 @@
 .animate-dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
 
 /* ═════════════════════════════════════════════════════════════════
-   TIMELINE BREATHING — constant ambient motion for the main timeline
+   TIMELINE MOTION — restrained, purposeful
    ─────────────────────────────────────────────────────────────────
-   Added per product direction: the timeline should feel alive at rest,
-   not freeze between user interactions. Each utility below layers one
-   subtle loop; together they give the card a "breathing" quality.
+   Two animations only. Both are slow and muted; they communicate
+   "this is live, time is passing" without competing with the data.
+     • timeline-scan: a single thin hairline drifts left→right once
+       every 24s, like a radar sweep. Low alpha, no bloom.
+     • timeline-now-pulse: the NOW orb breathes in place, 1 cycle /2s,
+       reads as a heartbeat.
    ══════════════════════════════════════════════════════════════ */
 
-/* Gentle vertical bob for event dots — per-dot phase offsets stagger
-   the motion so dots don't all bob in lockstep. */
-@keyframes timeline-dot-drift {
-  0%, 100% { transform: translateY(-50%) translateZ(0); }
-  50%      { transform: translateY(calc(-50% - 2px)) translateZ(0); }
+@keyframes timeline-scan {
+  /* Off-screen → sweep across → off-screen. Linear for a clean,
+     mechanical radar feel rather than easing (which would clump
+     the motion in the middle). */
+  0%   { transform: translateX(-8%); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(108%); opacity: 0; }
 }
-.animate-timeline-dot-drift {
-  animation: timeline-dot-drift 4s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Horizontal gradient sweep along a lane track — like a pulse traveling
-   down a wire. Uses background-size 200% so the gradient can translate
-   cleanly without stuttering. */
-@keyframes timeline-track-flow {
-  0%   { background-position: -50% 50%; }
-  100% { background-position: 150% 50%; }
-}
-.animate-timeline-track-flow {
-  animation: timeline-track-flow 8s linear infinite;
-  background-size: 200% 100%;
-  will-change: background-position;
-}
-
-/* Softly oscillating aura behind the card — rotates a gradient slowly
-   so the card surface catches different highlights. */
-@keyframes timeline-aura {
-  0%   { transform: rotate(0deg) scale(1); opacity: 0.22; }
-  50%  { transform: rotate(180deg) scale(1.08); opacity: 0.32; }
-  100% { transform: rotate(360deg) scale(1); opacity: 0.22; }
-}
-.animate-timeline-aura {
-  animation: timeline-aura 24s linear infinite;
+.animate-timeline-scan {
+  animation: timeline-scan 24s linear infinite;
   will-change: transform, opacity;
 }
 
-/* "Now" marker on the timeline — a vertical hairline with a gold orb
-   that hovers mid-track. Slides microscopically left/right and pulses
-   so it reads as a live cursor, not a static rule. */
-@keyframes timeline-now-bob {
-  0%, 100% { transform: translate(-50%, 0); }
-  50%      { transform: translate(calc(-50% + 1px), -1px); }
+@keyframes timeline-now-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.95; }
+  50%      { transform: scale(1.35); opacity: 0.70; }
 }
-.animate-timeline-now-bob {
-  animation: timeline-now-bob 3.5s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Radiating ring around a dot — periodic expanding halo that fades out.
-   Different delays make the dots pulse at different times so the whole
-   thing feels organic, not robotic. */
-@keyframes timeline-halo {
-  0%   { transform: translate(-50%, -50%) scale(0.6); opacity: 0.65; }
-  100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
-}
-.animate-timeline-halo {
-  animation: timeline-halo 2.8s ease-out infinite;
+.animate-timeline-now-pulse {
+  animation: timeline-now-pulse 2.2s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
-/* Slow cinematic breathing of the card border — edges shift between
-   dim and bright noir tone so the frame itself feels responsive. */
-@keyframes timeline-frame-breathe {
-  0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0.00); border-color: var(--border); }
-  50%      { box-shadow: inset 0 0 24px 0 rgba(255,215,0,0.06); border-color: color-mix(in srgb, var(--gold) 25%, var(--border)); }
-}
-.animate-timeline-frame-breathe {
-  animation: timeline-frame-breathe 7s ease-in-out infinite;
-  will-change: box-shadow, border-color;
-}
-
-/* Soft gold spotlight that drifts across the top of the card. Gives a
-   subtle "reel projector" feeling — light moving across the frame. */
-@keyframes timeline-spotlight-drift {
-  0%   { transform: translateX(-30%); opacity: 0.0; }
-  30%  { opacity: 0.45; }
-  70%  { opacity: 0.45; }
-  100% { transform: translateX(130%); opacity: 0.0; }
-}
-.animate-timeline-spotlight-drift {
-  animation: timeline-spotlight-drift 14s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-/* Respect user motion preferences — if someone has prefers-reduced-motion
-   set we still want the timeline to be interactive but stop the ambient
-   loops. These overrides kill any infinite animation on the timeline. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-timeline-dot-drift,
-  .animate-timeline-track-flow,
-  .animate-timeline-aura,
-  .animate-timeline-now-bob,
-  .animate-timeline-halo,
-  .animate-timeline-frame-breathe,
-  .animate-timeline-spotlight-drift { animation: none !important; }
+  .animate-timeline-scan,
+  .animate-timeline-now-pulse { animation: none !important; }
 }
 
 .typing-dot {

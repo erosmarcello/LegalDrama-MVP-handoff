@@ -429,8 +429,9 @@ function CaseWorkspaceContent() {
         </div>
       </div>
 
-      {/* View tab rail — quiet underline indicator */}
-      <div className="sticky top-[96px] z-30 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm">
+      {/* View tab rail — quiet underline indicator.
+          Pinned flush below the marquee (56px masthead + 44px marquee = 100px). */}
+      <div className="sticky top-[100px] z-30 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm">
         <div className="max-w-[1600px] mx-auto px-5 md:px-8 flex items-center overflow-x-auto">
           {[
             { key: "all", label: "Overview", icon: LayoutGrid },
@@ -521,8 +522,12 @@ function CaseWorkspaceContent() {
               </div>
             </div>
 
-            {/* Lane counts - Sticky within scroll */}
-            <div className="px-4 md:px-6 py-4 border-b border-border bg-background/95 backdrop-blur-md sticky top-0 z-30">
+            {/* Lane counts — static strip (no longer sticky).
+                Sticky here fought the masthead/marquee/tab-rail chrome above
+                (same z-30 as the tab rail, so it covered or peeked out of
+                them on scroll). The tab rail already surfaces the same
+                factual/procedural/scheduling counts at xl+ widths. */}
+            <div className="px-4 md:px-6 py-4 border-b border-border bg-background/95 backdrop-blur-md">
               <div className="max-w-6xl mx-auto flex items-center justify-end">
                 <div className="flex items-center gap-3">
                   <div className="hidden md:flex items-center gap-2">
@@ -657,41 +662,25 @@ function CaseWorkspaceContent() {
                 <div className={cn(
                   "relative border-2 border-border bg-card p-5 mb-6 overflow-visible",
                   "rounded-none",
-                  "animate-enter-scale",
-                  // Card frame slowly breathes — border tone and inset glow cycle
-                  // every 7s so the whole timeline feels alive even when idle.
-                  "animate-timeline-frame-breathe"
+                  "animate-enter-scale"
                 )}>
-                  {/* ── Ambient backdrop layers ──
-                      Nested in a hard-clipped inner container so the slow
-                      sweep/aura/halo animations stay inside the card frame,
-                      while the OUTER card keeps overflow-visible (the hover
-                      tooltip above the track needs to escape the card).
-                      All marked pointer-events-none so hover/click still hit
-                      the interactive dots. */}
+                  {/* ── Single scan pulse ──
+                      One thin hairline of soft light sweeps across the entire
+                      timeline card every 24 seconds. That's it. No auras, no
+                      spotlights, no glowing frame — the only ambient motion is
+                      this single purposeful pulse that reads as "live." The
+                      sweep is inside a clipped absolute container so it stays
+                      within the card edges even though the card is overflow-
+                      visible (needed for the hover tooltip to escape). */}
                   <div
                     aria-hidden="true"
                     className="absolute inset-0 pointer-events-none overflow-hidden"
                   >
-                    {/* Conic gold/red aura — 24s full rotation at very low
-                        alpha, blurred heavily so it reads as a warm wash
-                        behind the tracks, not a distinct shape. */}
                     <div
-                      className="absolute -inset-10 animate-timeline-aura"
+                      className="absolute top-0 left-0 h-full w-[14%] animate-timeline-scan"
                       style={{
                         background:
-                          "conic-gradient(from 0deg, transparent 0deg, var(--gold) 30deg, transparent 70deg, transparent 180deg, var(--red) 210deg, transparent 250deg, transparent 360deg)",
-                        filter: "blur(60px)",
-                        opacity: 0.18,
-                      }}
-                    />
-                    {/* Traveling gold spotlight — like a projector sweep left
-                        to right across the timeline once every 14s. */}
-                    <div
-                      className="absolute top-0 left-0 h-full w-1/3 animate-timeline-spotlight-drift"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--gold) 18%, transparent) 50%, transparent 100%)",
+                          "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--gold) 22%, transparent) 50%, transparent 100%)",
                         mixBlendMode: "screen",
                       }}
                     />
@@ -752,22 +741,6 @@ function CaseWorkspaceContent() {
                           }}
                         />
 
-                        {/* Flowing gradient sweep along the track — a bright
-                            highlight travels left→right every 8s, making each
-                            lane feel like a live data stream rather than a
-                            static rule. Offset per-lane so the three lanes
-                            don't all pulse together. */}
-                        <div
-                          aria-hidden="true"
-                          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full pointer-events-none animate-timeline-track-flow"
-                          style={{
-                            background: `linear-gradient(90deg, transparent 0%, transparent 35%, ${lane.color} 50%, transparent 65%, transparent 100%)`,
-                            opacity: 0.55,
-                            animationDelay: `${laneIndex * -2.6}s`,
-                            filter: `drop-shadow(0 0 6px ${lane.color})`,
-                          }}
-                        />
-
                         {/* Track highlight on hover */}
                         <div
                           className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[3px] rounded-full opacity-0 group-hover:opacity-40 transition-opacity duration-300"
@@ -786,75 +759,41 @@ function CaseWorkspaceContent() {
                             const isSelected = selectedEvent === event.id
                             const size = isHovered || isSelected ? 16 : 10
                             
-                            // Per-event drift phase — different offsets so the
-                            // dots don't bob in sync. Based on event index so
-                            // the pattern is stable across renders.
-                            const driftDelay = (eventIndex * 0.37) % 4
-                            // Halo offset — staggered so the radiating rings
-                            // don't fire at the same instant across the row.
-                            const haloDelay = (eventIndex * 0.53) % 2.8
                             return (
-                              <div
+                              <button
                                 key={event.id}
+                                onClick={() => setSelectedEvent(isSelected ? null : event.id)}
+                                onMouseEnter={() => setHoveredEvent(event.id)}
+                                onMouseLeave={() => setHoveredEvent(null)}
                                 className={cn(
-                                  "absolute top-1/2 pointer-events-none",
-                                  // Constant gentle vertical drift so the dot
-                                  // feels alive even when no one's interacting.
-                                  !isHovered && !isSelected && "animate-timeline-dot-drift"
+                                  "absolute top-1/2 rounded-full cursor-pointer timeline-dot",
+                                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                                  isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-card z-10",
+                                  "animate-dot-pop"
                                 )}
                                 style={{
                                   left: `${pos.toFixed(2)}%`,
+                                  backgroundColor: lane.color,
                                   width: `${size}px`,
                                   height: `${size}px`,
                                   marginLeft: `-${size / 2}px`,
-                                  animationDelay: `${driftDelay.toFixed(2)}s`,
+                                  boxShadow: isHovered || isSelected
+                                    ? `0 0 20px ${lane.color}, 0 0 40px ${lane.color}40`
+                                    : `0 2px 4px rgba(0,0,0,0.2)`,
+                                  animationDelay: `${(eventIndex * 0.04).toFixed(2)}s`,
                                   transform: 'translateY(-50%)',
                                 }}
+                                aria-label={`Timeline event: ${event.title}`}
                               >
-                                {/* Ambient halo — radiating expanding ring behind
-                                    the dot that continuously fades out. Only
-                                    renders at rest so it doesn't compete with
-                                    the hover/selected glow. */}
-                                {!isHovered && !isSelected && (
+                                {/* Inner glow — only when hovered/selected. Dots
+                                    at rest stay clean; the ambient sweep carries
+                                    the "live" signal so nothing else has to. */}
+                                {(isHovered || isSelected) && (
                                   <span
-                                    aria-hidden="true"
-                                    className="absolute top-1/2 left-1/2 rounded-full pointer-events-none animate-timeline-halo"
-                                    style={{
-                                      width: `${size * 2}px`,
-                                      height: `${size * 2}px`,
-                                      backgroundColor: lane.color,
-                                      opacity: 0.35,
-                                      animationDelay: `${haloDelay.toFixed(2)}s`,
-                                    }}
+                                    className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft"
                                   />
                                 )}
-                                <button
-                                  onClick={() => setSelectedEvent(isSelected ? null : event.id)}
-                                  onMouseEnter={() => setHoveredEvent(event.id)}
-                                  onMouseLeave={() => setHoveredEvent(null)}
-                                  className={cn(
-                                    "relative w-full h-full rounded-full cursor-pointer timeline-dot pointer-events-auto",
-                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                                    isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-card z-10",
-                                    "animate-dot-pop"
-                                  )}
-                                  style={{
-                                    backgroundColor: lane.color,
-                                    boxShadow: isHovered || isSelected
-                                      ? `0 0 20px ${lane.color}, 0 0 40px ${lane.color}40`
-                                      : `0 2px 4px rgba(0,0,0,0.2), 0 0 10px ${lane.color}44`,
-                                    animationDelay: `${(eventIndex * 0.04).toFixed(2)}s`,
-                                  }}
-                                  aria-label={`Timeline event: ${event.title}`}
-                                >
-                                  {/* Inner glow */}
-                                  {(isHovered || isSelected) && (
-                                    <span
-                                      className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft"
-                                    />
-                                  )}
-                                </button>
-                              </div>
+                              </button>
                             )
                           })}
                       </div>
@@ -862,42 +801,31 @@ function CaseWorkspaceContent() {
                   </div>
 
                   {/* ── "NOW" live-time indicator ──
-                      A vertical hairline pinned to today's date position,
-                      with a pulsing gold orb at the top and a label. The
-                      line itself micro-bobs (~3.5s) so it doesn't look
-                      glued to the page, and the orb carries the pulse-ring
-                      animation to emphasize "this is where we are right
-                      now." Position is computed once from new Date() so
-                      it doesn't flicker on hover. */}
+                      A still gold hairline pinned to today's date. The only
+                      motion is a subtle pulse on the orb at the top, which
+                      reads as a heartbeat. No bob, no ring flare — the
+                      ambient scan sweep above already signals "live." */}
                   {(() => {
-                    // Clamp to the visualization range. Today's date resolves
-                    // to somewhere mid-2026, well within our [Dec 24, Nov 26]
-                    // bounds.
                     const nowPct = getDatePercent(new Date().toISOString().slice(0, 10))
                     if (nowPct <= 0 || nowPct >= 100) return null
                     return (
                       <div
                         aria-hidden="true"
-                        className="absolute inset-y-6 pointer-events-none z-[5] animate-timeline-now-bob"
+                        className="absolute inset-y-6 pointer-events-none z-[5]"
                         style={{ left: `${nowPct.toFixed(2)}%` }}
                       >
                         <div
                           className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px"
                           style={{
                             background:
-                              "linear-gradient(to bottom, transparent, var(--gold), transparent)",
-                            boxShadow: "0 0 8px var(--gold)",
+                              "linear-gradient(to bottom, transparent, color-mix(in srgb, var(--gold) 60%, transparent), transparent)",
                           }}
                         />
                         <div className="absolute -top-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
                           <span
-                            className="w-2.5 h-2.5 rounded-full bg-[var(--gold)] animate-pulse-ring"
-                            style={{ boxShadow: "0 0 10px var(--gold)" }}
+                            className="w-1.5 h-1.5 rounded-full bg-[var(--gold)] animate-timeline-now-pulse"
                           />
-                          <span
-                            className="cinema-label text-[8px] text-[var(--gold)] tracking-[0.2em] px-1 bg-[#0a0a0a]/80"
-                            style={{ textShadow: "0 0 6px rgba(0,0,0,0.8)" }}
-                          >
+                          <span className="cinema-label text-[8px] text-[var(--gold)]/80 tracking-[0.2em] px-1 bg-[#0a0a0a]/80">
                             NOW
                           </span>
                         </div>
@@ -1485,8 +1413,14 @@ function CaseWorkspaceContent() {
   {/* DOCKET TAB */}
   {activeTab === "docket" && (
   <div className="flex flex-col animate-enter-up" style={{ animationDuration: '0.4s' }}>
-            {/* Controls - sticky within scroll */}
-            <div className="flex items-center gap-4 p-4 border-b-2 border-border bg-card/95 backdrop-blur-md flex-wrap sticky top-0 z-30 shadow-sm">
+            {/* Controls — static strip (no longer sticky).
+                The sticky here shared z-30 with the tab rail above and sat
+                inside an animate-enter-up wrapper (whose lingering
+                `transform` creates a containing block that detaches sticky
+                from the viewport). End result: the docket controls peeked
+                through or covered the three-layer chrome. The chrome stays
+                pinned on its own; these controls just scroll with content. */}
+            <div className="flex items-center gap-4 p-4 border-b-2 border-border bg-card/95 backdrop-blur-md flex-wrap shadow-sm">
               <div className="flex-1 min-w-[200px] relative">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
