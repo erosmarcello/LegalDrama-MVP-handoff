@@ -242,8 +242,6 @@ function DashboardContent() {
       <Masthead
         user={user}
         onSignOut={() => router.push("/")}
-        pacerConnected
-        showSettings
       />
 
       {/* ─── Archive hero ─── */}

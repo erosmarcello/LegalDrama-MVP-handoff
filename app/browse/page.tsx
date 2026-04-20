@@ -295,8 +295,6 @@ function BrowseContent() {
         user={user}
         onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
         onSignOut={() => setUser(null)}
-        pacerConnected
-        showSettings
         showSearch
         searchPlaceholder="Case name, number, or keyword"
         searchValue={searchQuery}

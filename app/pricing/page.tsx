@@ -4,13 +4,15 @@ import { useState } from "react"
 import Link from "next/link"
 import {
   CheckCircle,
-  Zap,
+  Clock,
   Users,
-  Crown,
   ChevronDown,
   ChevronUp,
   ArrowRight,
   Sparkles,
+  Feather,
+  PenTool,
+  PlayCircle,
   Film,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -19,109 +21,148 @@ import { SiteFooter } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
 
 /* ------------------------------------------------------------------ */
-/*  Plans                                                              */
+/*  Plans — freemium + Scrivener-style active-use trial                */
 /* ------------------------------------------------------------------ */
+
+type Billing = "monthly" | "annual"
 
 interface Plan {
   id: string
   name: string
-  price: string
-  period: string
   tagline: string
   reel: string
   icon: typeof Sparkles
   accent: string
   featured: boolean
+  price: { monthly: string; annual: string }
+  period: { monthly: string; annual: string }
+  note?: string
   features: string[]
   cta: string
+  ctaHref?: string
 }
 
 const PLANS: Plan[] = [
   {
-    id: "starter",
-    name: "Matinee",
-    price: "$99",
-    period: "one-time",
-    tagline: "A seat in the last row of the theater",
-    reel: "Reel 01",
+    id: "free",
+    name: "Open Mic",
+    tagline: "The writer's night. Walk in, watch a few cases.",
+    reel: "Reel 00",
     icon: Sparkles,
     accent: "#ffffff",
     featured: false,
+    price: { monthly: "Free", annual: "Free" },
+    period: { monthly: "forever · no card", annual: "forever · no card" },
+    note: "Perfect for loglines and one-sheets",
     features: [
-      "25 federal case searches",
-      "Basic screenplay generation",
-      "Mood board (read-only)",
-      "Email support",
-      "Fair-use citation export",
+      "3 federal case searches / month",
+      "Read-only mood boards",
+      "Dramatization preview · L0 → L2",
+      "Watermarked fair-use export",
+      "Community Discord support",
     ],
-    cta: "Buy Matinee Pass",
+    cta: "Start Free",
+    ctaHref: "/browse",
   },
   {
-    id: "pro",
-    name: "Prime Time",
-    price: "$499",
-    period: "one-time",
-    tagline: "Private screening with the director's notes",
-    reel: "Reel 02",
-    icon: Zap,
+    id: "staff",
+    name: "Staff Writer",
+    tagline: "The writers' room in your laptop.",
+    reel: "Reel 01",
+    icon: PenTool,
     accent: "var(--gold)",
     featured: true,
+    price: { monthly: "$19", annual: "$149" },
+    period: { monthly: "per month", annual: "per year · save 35%" },
+    note: "30-day trial · clock only ticks when you write",
     features: [
       "Unlimited federal case searches",
-      "Full dramatization controls",
-      "Editable mood board + exhibit pinboards",
-      "API access (PACER + court listener)",
-      "Fountain/Final Draft exports",
-      "Priority support · 24h SLA",
+      "Full dramatization · L0 Court Record → L4 Mythic",
+      "Editable mood boards + exhibit pinboards",
+      "True-crime beat-sheet & act-break templates",
+      "Fountain / Final Draft / FDX export",
+      "Auto-generated story bible per case",
+      "Priority email support · 24h SLA",
     ],
-    cta: "Go Prime Time",
+    cta: "Start 30-Day Trial",
   },
   {
-    id: "team",
-    name: "The Writers' Room",
-    price: "$59",
-    period: "per seat · mo",
-    tagline: "Your whole room on one set",
-    reel: "Reel 03",
+    id: "room",
+    name: "Writers' Room",
+    tagline: "Your whole staff on one set.",
+    reel: "Reel 02",
     icon: Users,
     accent: "var(--red)",
     featured: false,
+    price: { monthly: "$39", annual: "$29" },
+    period: { monthly: "per seat · month", annual: "per seat · month, billed yearly" },
+    note: "5 seat minimum · add/remove anytime",
     features: [
-      "Everything in Prime Time",
-      "Real-time collaborative scripting",
-      "Custom studio branding",
-      "Admin + billing dashboard",
-      "SAML/SSO · Private cases",
-      "Dedicated CSM",
+      "Everything in Staff Writer",
+      "Real-time collaborative outlining",
+      "Shared case library + story bibles",
+      "Studio branding on exports",
+      "SSO · private cases · audit log",
+      "Dedicated showrunner-success manager",
     ],
-    cta: "Book A Screening",
+    cta: "Book a Reading",
   },
 ]
 
+/* ------------------------------------------------------------------ */
+/*  FAQ                                                                */
+/* ------------------------------------------------------------------ */
+
 const FAQ_ITEMS = [
   {
-    q: "What happens after I use all 25 searches on Matinee?",
-    a: "Your existing projects remain fully accessible. To run additional searches, upgrade to Prime Time for unlimited access or purchase another Matinee pass.",
+    q: "How does the 30-day trial actually work?",
+    a: "Same trick Scrivener uses. Your 30 days are days of active use, not calendar days. Open the app on Monday, skip Tuesday, come back Saturday — that's two days off your clock, not five. Writing true crime is a marathon; the trial shouldn't expire while you're in the research hole.",
   },
   {
-    q: "Is the one-time price really one-time?",
-    a: "Yes. Matinee and Prime Time are single purchases with no recurring fees. You own the license indefinitely. Future major version upgrades may be offered at a discounted rate.",
+    q: "Is this a tool for writers or for lawyers?",
+    a: "Writers. Showrunners, staff writers, limited-series producers, true-crime documentarians, podcast producers. The source docs are federal court records, but everything the app does is dramatization tooling — beat sheets, character arcs, act breaks, mood boards, script exports. Nothing here is legal advice.",
   },
   {
-    q: "Can I upgrade from Matinee to Prime Time later?",
-    a: "Absolutely. Upgrade at any time and we credit your original Matinee purchase toward the Prime Time price. No data is lost during the transition.",
+    q: "Do I need a credit card to start the trial?",
+    a: "No. The trial runs on your email and the active-use counter. If you like it, upgrade inside the app when you're ready. If you don't, you drop back to Open Mic — your projects and exports stay yours.",
   },
   {
-    q: "How does Writers' Room billing work?",
-    a: "Writers' Room is billed monthly per seat. Add or remove seats at any time and your invoice adjusts automatically at the next billing cycle. Annual billing with a 20% discount is available.",
+    q: "What happens when the trial ends?",
+    a: "You keep everything you made — mood boards, exports, story bibles — and the account gracefully drops to Open Mic (3 searches a month, read-only boards). Nothing gets deleted. Nothing auto-charges. You upgrade on your own clock.",
   },
   {
-    q: "Do you offer refunds?",
-    a: "We offer a 14-day money-back guarantee on all plans. If LegalDrama is not the right fit, contact support for a full refund within the first two weeks.",
+    q: "Can I pitch work generated with LegalDrama.ai?",
+    a: "Yes. Every export includes fair-use citation footers pointing back to the public-record source. On Staff Writer and up, the watermark comes off — the output is yours to shop, pitch, and ultimately sell.",
   },
   {
-    q: "Is anything in LegalDrama.ai legal advice?",
-    a: "No. Everything here is public-record dramatization and creative tooling. For legal guidance, consult a licensed attorney in your jurisdiction.",
+    q: "Is a Writers' Room seat different from an individual Staff Writer?",
+    a: "Yes. Writers' Room adds shared case libraries, real-time collaborative outlining, studio branding, SSO, and admin controls. Staff Writer is for one person working solo. Rooms should be at least five seats — a room of one is Staff Writer.",
+  },
+  {
+    q: "Is any of this legal advice?",
+    a: "No. Everything in LegalDrama.ai is public-record dramatization and creative tooling. For legal guidance, consult a licensed attorney in your jurisdiction.",
+  },
+]
+
+/* ------------------------------------------------------------------ */
+/*  Trial mechanic explainer                                           */
+/* ------------------------------------------------------------------ */
+
+const TRIAL_STEPS = [
+  {
+    icon: PlayCircle,
+    title: "Sign up. Skip the card.",
+    body: "No payment up front. Email, a case of your choice, and you're in the writers' room.",
+  },
+  {
+    icon: Clock,
+    title: "The clock only ticks when you write.",
+    body: "Close the laptop for three weeks between research trips. Come back — still 28 days left. The trial measures active-use days, not calendar days.",
+  },
+  {
+    icon: Feather,
+    title: "Keep what you made.",
+    body: "Exports, mood boards, and story bibles stay yours forever. Upgrade to Staff Writer when the script sells — not before.",
   },
 ]
 
@@ -133,9 +174,18 @@ function PricingContent() {
   const { toast } = useToast()
   const [openFaq, setOpenFaq] = useState<number | null>(0)
   const [user, setUser] = useState<{ email: string; name: string } | null>(null)
+  const [billing, setBilling] = useState<Billing>("monthly")
 
-  const handlePlanClick = (planName: string) => {
-    toast(`${planName} selected — checkout coming soon`, "var(--gold)")
+  const handlePlanClick = (plan: Plan) => {
+    if (plan.id === "free") {
+      toast("Redirecting to the archive…", "var(--gold)")
+      return
+    }
+    if (plan.id === "staff") {
+      toast("Starting your 30-day trial — no card required", "var(--gold)")
+      return
+    }
+    toast(`${plan.name} selected — checkout coming soon`, "var(--gold)")
   }
 
   return (
@@ -144,7 +194,6 @@ function PricingContent() {
         user={user}
         onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
         onSignOut={() => setUser(null)}
-        showSettings
       />
 
       {/* ─── Hero ─── */}
@@ -161,23 +210,43 @@ function PricingContent() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="cinema-pulse-gold" aria-hidden />
             <span className="cinema-contract text-[12px] text-[var(--gold)]">
-              Subscription Tiers · No Hidden Residuals
+              Built For Writers · Tuned For True Crime
             </span>
           </div>
           <h1
-            className="cinema-title text-[44px] md:text-[72px] lg:text-[92px] leading-[0.9] text-white"
+            className="cinema-title text-[44px] md:text-[72px] lg:text-[88px] leading-[0.9] text-white"
             style={{ textShadow: "2px 2px 0 #000" }}
           >
-            Pick Your{" "}
-            <span style={{ color: "var(--red)" }}>Seat</span>.
+            Free To{" "}
+            <span style={{ color: "var(--red)" }}>Open</span>.
             <br />
-            Walk Into The{" "}
-            <span style={{ color: "var(--gold)" }}>Theater</span>.
+            The Clock Only Ticks When You{" "}
+            <span style={{ color: "var(--gold)" }}>Write</span>.
           </h1>
-          <p className="mt-5 font-sans text-[15px] leading-relaxed text-[var(--muted-foreground)] max-w-[58ch] mx-auto">
-            Three tickets. One reel of federal court records. Cancel any time —
-            your generated scripts, mood boards, and timelines stay yours.
+          <p className="mt-5 font-sans text-[15px] md:text-[16px] leading-relaxed text-[var(--muted-foreground)] max-w-[62ch] mx-auto">
+            A freemium tier that never expires, plus a Staff Writer trial that
+            measures your 30 days in active use — not calendar days. Built for
+            showrunners, limited-series writers, and true-crime producers who
+            live in the research hole between drafts.
           </p>
+
+          {/* Billing toggle */}
+          <div className="mt-9 inline-flex items-center border border-[var(--border)] bg-[#141414] p-1">
+            {(["monthly", "annual"] as Billing[]).map(b => (
+              <button
+                key={b}
+                onClick={() => setBilling(b)}
+                className={cn(
+                  "h-9 px-5 cinema-label text-[10px] transition-colors",
+                  billing === b
+                    ? "bg-[var(--gold)] text-[#0a0a0a]"
+                    : "text-[var(--muted-foreground)] hover:text-white"
+                )}
+              >
+                {b === "monthly" ? "Monthly" : "Annual · Save 35%"}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -200,8 +269,8 @@ function PricingContent() {
                 >
                   {plan.featured && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <div className="bg-[var(--gold)] px-3 py-1 cinema-contract text-[10px] text-[#0a0a0a] flex items-center gap-1.5">
-                        <Crown size={10} /> Most Popular
+                      <div className="bg-[var(--gold)] px-3 py-1 cinema-contract text-[10px] text-[#0a0a0a] flex items-center gap-1.5 whitespace-nowrap">
+                        <Clock size={10} /> 30-Day Active-Use Trial
                       </div>
                     </div>
                   )}
@@ -215,7 +284,7 @@ function PricingContent() {
                     </div>
 
                     <h3
-                      className="cinema-title mt-5 text-[34px] md:text-[40px] leading-[0.95] text-white"
+                      className="cinema-title mt-5 text-[32px] md:text-[38px] leading-[0.95] text-white"
                       style={{ textShadow: "1px 1px 0 #000" }}
                     >
                       {plan.name}
@@ -224,19 +293,24 @@ function PricingContent() {
                       {plan.tagline}
                     </p>
 
-                    <div className="mt-6 flex items-baseline gap-2 pb-5 border-b border-[var(--border)]">
+                    <div className="mt-6 flex items-baseline gap-2 pb-2 border-b border-[var(--border)]">
                       <span
                         className="cinema-title text-[44px] leading-none"
                         style={{ color: plan.accent, textShadow: "1px 1px 0 #000" }}
                       >
-                        {plan.price}
+                        {plan.price[billing]}
                       </span>
                       <span className="cinema-contract text-[11px] text-[var(--muted-foreground)]">
-                        {plan.period}
+                        {plan.period[billing]}
                       </span>
                     </div>
+                    {plan.note && (
+                      <div className="pt-2 pb-4 cinema-label text-[9px] text-[var(--muted-foreground)] leading-relaxed">
+                        {plan.note}
+                      </div>
+                    )}
 
-                    <ul className="mt-5 space-y-3 flex-1">
+                    <ul className="mt-4 space-y-3 flex-1">
                       {plan.features.map(feature => (
                         <li key={feature} className="flex items-start gap-3">
                           <CheckCircle
@@ -251,42 +325,54 @@ function PricingContent() {
                       ))}
                     </ul>
 
-                    <button
-                      onClick={() => handlePlanClick(plan.name)}
-                      className={cn(
-                        "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
-                        plan.featured
-                          ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
-                          : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
-                      )}
-                    >
-                      {plan.cta} <ArrowRight size={12} />
-                    </button>
+                    {plan.ctaHref ? (
+                      <Link
+                        href={plan.ctaHref}
+                        onClick={() => handlePlanClick(plan)}
+                        className={cn(
+                          "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
+                          plan.featured
+                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
+                            : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
+                        )}
+                      >
+                        {plan.cta} <ArrowRight size={12} />
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => handlePlanClick(plan)}
+                        className={cn(
+                          "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
+                          plan.featured
+                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
+                            : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
+                        )}
+                      >
+                        {plan.cta} <ArrowRight size={12} />
+                      </button>
+                    )}
                   </div>
                 </div>
               )
             })}
           </div>
 
-          {/* Comparison strip */}
+          {/* All tickets include */}
           <div className="mt-12 border border-[var(--border)] bg-[#141414] p-6 md:p-8">
             <div className="flex items-center gap-3 mb-4">
               <Film size={14} className="text-[var(--gold)]" />
               <span className="cinema-contract text-[11px] text-[var(--gold)]">
-                All Tickets Include
+                Included On Every Ticket
               </span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                "Federal public record access",
-                "AI-dramatization labels",
-                "Cited source documents",
-                "14-day refund window",
+                "Federal public-record access",
+                "Dramatization intensity control · L0 → L4",
+                "Fair-use citation on every export",
+                "Your work stays yours forever",
               ].map(item => (
-                <div
-                  key={item}
-                  className="flex items-start gap-2"
-                >
+                <div key={item} className="flex items-start gap-2">
                   <CheckCircle size={13} className="text-[var(--gold)] mt-0.5 shrink-0" />
                   <span className="font-sans text-[12px] text-[var(--muted-foreground)] leading-snug">
                     {item}
@@ -294,6 +380,54 @@ function PricingContent() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Trial mechanic explainer ─── */}
+      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+        <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-20">
+          <div className="text-center mb-10">
+            <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
+              § How The Writer's Trial Works
+            </div>
+            <h2
+              className="cinema-title text-[32px] md:text-[48px] leading-[0.95] text-white"
+              style={{ textShadow: "1px 1px 0 #000" }}
+            >
+              30 Days Of <span style={{ color: "var(--gold)" }}>Use</span>.
+              <br />
+              Not 30 Days On The <span style={{ color: "var(--red)" }}>Calendar</span>.
+            </h2>
+            <p className="mt-5 font-sans text-[14px] leading-relaxed text-[var(--muted-foreground)] max-w-[58ch] mx-auto">
+              Same trial mechanic the writers at Scrivener swear by — adapted
+              for the research-heavy rhythm of a true-crime limited series.
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {TRIAL_STEPS.map((step, idx) => {
+              const Icon = step.icon
+              return (
+                <div
+                  key={step.title}
+                  className="relative border border-[var(--border)] bg-[#141414] p-6 md:p-7 hover:border-[var(--gold)] transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="cinema-contract text-[10px] text-[var(--gold)]">
+                      Step {String(idx + 1).padStart(2, "0")}
+                    </div>
+                    <Icon size={18} className="text-[var(--gold)]" />
+                  </div>
+                  <h3 className="cinema-title text-[22px] md:text-[24px] leading-[1.05] text-white mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]">
+                    {step.body}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -324,9 +458,7 @@ function PricingContent() {
                     className="w-full flex items-center justify-between gap-4 px-5 md:px-6 py-4 text-left group"
                   >
                     <div className="flex items-center gap-3">
-                      <span
-                        className="cinema-contract text-[10px] w-6 text-[var(--gold)]"
-                      >
+                      <span className="cinema-contract text-[10px] w-6 text-[var(--gold)]">
                         {String(idx + 1).padStart(2, "0")}
                       </span>
                       <span className="font-sans text-[14px] font-medium text-white group-hover:text-[var(--gold)] transition-colors">
@@ -363,25 +495,25 @@ function PricingContent() {
             className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white"
             style={{ textShadow: "1px 1px 0 #000" }}
           >
-            Not Sure Which Seat To Book?
+            Not Ready To Pick A Tier?
           </h3>
-          <p className="mt-4 font-sans text-[14px] text-[var(--muted-foreground)] max-w-[50ch] mx-auto">
-            Our team walks through the plan with you, shows you a real case
-            workspace, and answers everything — even the legal questions we
-            can't answer.
+          <p className="mt-4 font-sans text-[14px] text-[var(--muted-foreground)] max-w-[54ch] mx-auto">
+            Open any case on the archive and see what the app feels like.
+            The Luigi Mangione docket is already loaded as a demo — no account,
+            no clock, no commitment.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/legal/contact"
+              href="/case/usa-v-mangione"
               className="h-11 px-6 bg-white text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
             >
-              Contact Support <ArrowRight size={12} />
+              Open The Demo Case <ArrowRight size={12} />
             </Link>
             <Link
               href="/browse"
               className="h-11 px-6 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[11px] hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors inline-flex items-center gap-2"
             >
-              Watch A Demo Case
+              Browse The Archive
             </Link>
           </div>
         </div>

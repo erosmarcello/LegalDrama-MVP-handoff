@@ -390,11 +390,7 @@ function SettingsContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
-      <Masthead
-        onSignIn={() => router.push("/")}
-        showSettings
-        pacerConnected
-      />
+      <Masthead onSignIn={() => router.push("/")} />
 
       {/* ── Main content ── */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-5 md:px-8 py-10">
