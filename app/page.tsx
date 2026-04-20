@@ -368,7 +368,7 @@ function HomePage() {
             <br />
             Waiting To Be
             <br />
-            <span style={{ color: "var(--gold)" }}>Read.</span>
+            <span style={{ color: "var(--gold)" }}>Written.</span>
           </h1>
 
           <div className="mt-8 md:mt-10 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
@@ -400,7 +400,7 @@ function HomePage() {
                   "hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors"
                 )}
               >
-                Browse Active Trials <ArrowRight size={13} />
+                Browse Active Cases <ArrowRight size={13} />
               </Link>
             </div>
           </div>
