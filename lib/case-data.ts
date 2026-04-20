@@ -307,52 +307,68 @@ export const FULL_DOCKET_ENTRIES: DocketEntry[] = [
 //   procedural = what happens on the docket (filings, motions, orders, rulings, hearings)
 //   scheduling = future/planned court dates (trial, voir dire, deadlines, conferences)
 //   narrative  = reserved for authored story beats (unused in base data)
-export const TIMELINE_EVENTS = [
+/**
+ * Timeline event shape. `beat` is an optional one-line script beat shown
+ * in the hover tooltip — keep it <= 80 chars, cinematic, present tense.
+ */
+export interface TimelineEvent {
+  id: string
+  lane: "factual" | "procedural" | "scheduling" | "narrative"
+  date: string
+  title: string
+  description?: string
+  tier: 1 | 2 | 3
+  docketNum?: number
+  /** One-line script beat (cold open, act turn, etc.). Hover surface. */
+  beat?: string
+}
+
+export const TIMELINE_EVENTS: TimelineEvent[] = [
   // ─── Factual (real-world events) ───
-  { id: "f1", lane: "factual" as const, date: "2024-12-04", title: "Thompson Killed", description: "Brian Thompson shot outside Hilton Midtown NYC", tier: 1 },
-  { id: "f2", lane: "factual" as const, date: "2024-12-09", title: "Mangione Arrested", description: "Arrested at McDonald's in Altoona, PA", tier: 1 },
-  { id: "f3", lane: "factual" as const, date: "2024-12-18", title: "Federal Complaint", description: "Sealed complaint filed in S.D.N.Y.", tier: 1, docketNum: 1 },
+  { id: "f1", lane: "factual", date: "2024-12-04", title: "Thompson Killed", description: "Brian Thompson shot outside Hilton Midtown NYC", tier: 1, beat: "COLD OPEN. 6:45 AM. Muzzle flash on 54th Street." },
+  { id: "f2", lane: "factual", date: "2024-12-09", title: "Mangione Arrested", description: "Arrested at McDonald's in Altoona, PA", tier: 1, beat: "ACT I CLOSE. A cashier looks twice. The manhunt ends under fluorescent lights." },
+  { id: "f3", lane: "factual", date: "2024-12-18", title: "Federal Complaint", description: "Sealed complaint filed in S.D.N.Y.", tier: 1, docketNum: 1, beat: "Jurisdiction chosen. The U.S. Attorney steps in front of the cameras." },
 
   // ─── Procedural (docket events, motions, rulings, hearings) ───
-  { id: "p1", lane: "procedural" as const, date: "2024-12-19", title: "Initial Appearance", description: "Detention ordered on consent", tier: 1, docketNum: 5 },
-  { id: "p1a", lane: "procedural" as const, date: "2024-12-19", title: "Karen Agnifilo Appears", description: "Lead defense counsel enters appearance", tier: 2, docketNum: 3 },
-  { id: "p1b", lane: "procedural" as const, date: "2024-12-19", title: "Brady Order", description: "Standard discovery obligation imposed on USA", tier: 3, docketNum: 7 },
-  { id: "p1c", lane: "procedural" as const, date: "2025-02-17", title: "Status Conference", description: "Case management schedule discussed", tier: 3, docketNum: 12 },
-  { id: "p1d", lane: "procedural" as const, date: "2025-03-10", title: "Discovery Motion Filed", description: "Defense seeks early disclosure", tier: 3, docketNum: 15 },
-  { id: "p1e", lane: "procedural" as const, date: "2025-04-01", title: "Discovery Order", description: "Court sets phased disclosure schedule", tier: 3, docketNum: 20 },
-  { id: "p2", lane: "procedural" as const, date: "2025-04-17", title: "Indictment", description: "Grand jury returns 4-count indictment", tier: 1, docketNum: 22 },
-  { id: "p2a", lane: "procedural" as const, date: "2025-04-24", title: "Death Penalty Notice", description: "Government files notice of intent to seek capital punishment", tier: 1, docketNum: 25 },
-  { id: "p3", lane: "procedural" as const, date: "2025-04-25", title: "Arraignment", description: "Not guilty plea entered on all counts", tier: 1, docketNum: 28 },
-  { id: "p3a", lane: "procedural" as const, date: "2025-05-15", title: "Learned Counsel Motion", description: "Defense seeks additional capital-case counsel", tier: 2, docketNum: 32 },
-  { id: "p3b", lane: "procedural" as const, date: "2025-05-29", title: "Marc Agnifilo Admitted", description: "Co-counsel admitted pro hac vice", tier: 2, docketNum: 35 },
-  { id: "p3c", lane: "procedural" as const, date: "2025-08-15", title: "Bill of Particulars", description: "Defense seeks specification of charges", tier: 3, docketNum: 45 },
-  { id: "p4", lane: "procedural" as const, date: "2025-09-20", title: "Motion to Dismiss", description: "Constitutional challenge to stalking statute filed", tier: 2, docketNum: 51 },
-  { id: "p5", lane: "procedural" as const, date: "2025-10-11", title: "Suppression Motion", description: "Challenges warrantless arrest and subsequent search", tier: 2, docketNum: 59 },
-  { id: "p5a", lane: "procedural" as const, date: "2025-11-20", title: "Oral Argument", description: "Court hears argument on pending motions", tier: 2, docketNum: 70 },
-  { id: "p5b", lane: "procedural" as const, date: "2025-12-10", title: "Hearing Set", description: "Court orders evidentiary suppression hearing for 1/23/26", tier: 2, docketNum: 75 },
-  { id: "p6", lane: "procedural" as const, date: "2026-01-23", title: "Suppression Hearing", description: "Two-day evidentiary hearing on arrest circumstances", tier: 1, docketNum: 90 },
-  { id: "p6a", lane: "procedural" as const, date: "2026-01-28", title: "Post-Hearing Briefs", description: "Parties file written closing arguments", tier: 3, docketNum: 100 },
-  { id: "p7", lane: "procedural" as const, date: "2026-01-30", title: "Suppression Denied", description: "Court finds arrest and search lawful under totality", tier: 1, docketNum: 102 },
-  { id: "p8", lane: "procedural" as const, date: "2026-01-30", title: "Counts Dismissed", description: "Counts 3 & 4 thrown out for insufficient federal nexus", tier: 1, docketNum: 103 },
-  { id: "p8a", lane: "procedural" as const, date: "2026-02-15", title: "Reconsideration Motion", description: "Defense seeks reconsideration of suppression ruling", tier: 2, docketNum: 108 },
-  { id: "p8b", lane: "procedural" as const, date: "2026-02-25", title: "Reconsideration Denied", description: "Court adheres to prior suppression ruling", tier: 2, docketNum: 112 },
-  { id: "p9", lane: "procedural" as const, date: "2026-02-27", title: "Death Penalty Dropped", description: "Government formally withdraws DP notice", tier: 1, docketNum: 113 },
-  { id: "p9a", lane: "procedural" as const, date: "2026-03-12", title: "Motion in Limine #1", description: "USA seeks to admit manifesto and writings", tier: 2, docketNum: 118 },
-  { id: "p9b", lane: "procedural" as const, date: "2026-03-18", title: "Motion to Continue", description: "Defense seeks 90-day trial postponement", tier: 2, docketNum: 120 },
+  { id: "p1", lane: "procedural", date: "2024-12-19", title: "Initial Appearance", description: "Detention ordered on consent", tier: 1, docketNum: 5, beat: "First time in the courtroom. Handcuffs. No bail fight — yet." },
+  { id: "p1a", lane: "procedural", date: "2024-12-19", title: "Karen Agnifilo Appears", description: "Lead defense counsel enters appearance", tier: 2, docketNum: 3, beat: "The former chief assistant DA crosses the aisle. The press takes notice." },
+  { id: "p1b", lane: "procedural", date: "2024-12-19", title: "Brady Order", description: "Standard discovery obligation imposed on USA", tier: 3, docketNum: 7, beat: "Procedural beat. The government is put on notice: turn it over." },
+  { id: "p1c", lane: "procedural", date: "2025-02-17", title: "Status Conference", description: "Case management schedule discussed", tier: 3, docketNum: 12, beat: "Pacing check. Attorneys trade calendars." },
+  { id: "p1d", lane: "procedural", date: "2025-03-10", title: "Discovery Motion Filed", description: "Defense seeks early disclosure", tier: 3, docketNum: 15, beat: "Defense tests the valve. How much, how soon?" },
+  { id: "p1e", lane: "procedural", date: "2025-04-01", title: "Discovery Order", description: "Court sets phased disclosure schedule", tier: 3, docketNum: 20, beat: "The judge sets a clock. Tape drives start rolling." },
+  { id: "p2", lane: "procedural", date: "2025-04-17", title: "Indictment", description: "Grand jury returns 4-count indictment", tier: 1, docketNum: 22, beat: "ACT II OPEN. Four counts. Stalking elevates the stakes." },
+  { id: "p2a", lane: "procedural", date: "2025-04-24", title: "Death Penalty Notice", description: "Government files notice of intent to seek capital punishment", tier: 1, docketNum: 25, beat: "The government raises the stakes to life-or-death. Gallery hushes." },
+  { id: "p3", lane: "procedural", date: "2025-04-25", title: "Arraignment", description: "Not guilty plea entered on all counts", tier: 1, docketNum: 28, beat: "\"Not guilty.\" Two words, six months after the muzzle flash." },
+  { id: "p3a", lane: "procedural", date: "2025-05-15", title: "Learned Counsel Motion", description: "Defense seeks additional capital-case counsel", tier: 2, docketNum: 32, beat: "Defense bench expands. A capital specialist is requested." },
+  { id: "p3b", lane: "procedural", date: "2025-05-29", title: "Marc Agnifilo Admitted", description: "Co-counsel admitted pro hac vice", tier: 2, docketNum: 35, beat: "The husband-wife defense team locks in. Strauss-Kahn's lawyer is in the room." },
+  { id: "p3c", lane: "procedural", date: "2025-08-15", title: "Bill of Particulars", description: "Defense seeks specification of charges", tier: 3, docketNum: 45, beat: "Defense pins the government down: which acts count, exactly?" },
+  { id: "p4", lane: "procedural", date: "2025-09-20", title: "Motion to Dismiss", description: "Constitutional challenge to stalking statute filed", tier: 2, docketNum: 51, beat: "\"The statute doesn't fit.\" Defense swings at the charging theory." },
+  { id: "p5", lane: "procedural", date: "2025-10-11", title: "Suppression Motion", description: "Challenges warrantless arrest and subsequent search", tier: 2, docketNum: 59, beat: "MIDPOINT. The backpack goes on trial before the defendant does." },
+  { id: "p5a", lane: "procedural", date: "2025-11-20", title: "Oral Argument", description: "Court hears argument on pending motions", tier: 2, docketNum: 70, beat: "Two hours at the podium. The Altoona stop is dissected frame by frame." },
+  { id: "p5b", lane: "procedural", date: "2025-12-10", title: "Hearing Set", description: "Court orders evidentiary suppression hearing for 1/23/26", tier: 2, docketNum: 75, beat: "The judge demands the cop on the stand." },
+  { id: "p6", lane: "procedural", date: "2026-01-23", title: "Suppression Hearing", description: "Two-day evidentiary hearing on arrest circumstances", tier: 1, docketNum: 90, beat: "ACT II CLOSE. The Altoona officer takes the stand. Cross-exam is surgical." },
+  { id: "p6a", lane: "procedural", date: "2026-01-28", title: "Post-Hearing Briefs", description: "Parties file written closing arguments", tier: 3, docketNum: 100, beat: "Both sides put it in writing. Judge has a weekend to decide." },
+  { id: "p7", lane: "procedural", date: "2026-01-30", title: "Suppression Denied", description: "Court finds arrest and search lawful under totality", tier: 1, docketNum: 102, beat: "Ruling reads from the bench. The manifesto stays in." },
+  { id: "p8", lane: "procedural", date: "2026-01-30", title: "Counts Dismissed", description: "Counts 3 & 4 thrown out for insufficient federal nexus", tier: 1, docketNum: 103, beat: "But two counts fall. Defense gets its first real win on the same day." },
+  { id: "p8a", lane: "procedural", date: "2026-02-15", title: "Reconsideration Motion", description: "Defense seeks reconsideration of suppression ruling", tier: 2, docketNum: 108, beat: "Hail Mary. Defense asks the judge to reread her own opinion." },
+  { id: "p8b", lane: "procedural", date: "2026-02-25", title: "Reconsideration Denied", description: "Court adheres to prior suppression ruling", tier: 2, docketNum: 112, beat: "Denied. The record is clean — it's trial or deal." },
+  { id: "p9", lane: "procedural", date: "2026-02-27", title: "Death Penalty Dropped", description: "Government formally withdraws DP notice", tier: 1, docketNum: 113, beat: "TURN. The needle comes off the table. Life without parole is the ceiling." },
+  { id: "p9a", lane: "procedural", date: "2026-03-12", title: "Motion in Limine #1", description: "USA seeks to admit manifesto and writings", tier: 2, docketNum: 118, beat: "The jury will hear his own words — or they won't. The fight begins." },
+  { id: "p9b", lane: "procedural", date: "2026-03-18", title: "Motion to Continue", description: "Defense seeks 90-day trial postponement", tier: 2, docketNum: 120, beat: "Defense pulls the clock. 90 days, or the trial goes on schedule." },
 
   // ─── Scheduling (future / planned court dates) ───
-  { id: "s1a", lane: "scheduling" as const, date: "2025-01-06", title: "Speedy Trial Paused", description: "Time excluded 1/6/25 – 2/17/25 for prep", tier: 3, docketNum: 8 },
-  { id: "s1", lane: "scheduling" as const, date: "2026-02-03", title: "Master Schedule", description: "14 trial prep deadlines set; trial 10/13/26", tier: 1, docketNum: 105 },
-  { id: "s1b", lane: "scheduling" as const, date: "2026-04-01", title: "Continuance Conference", description: "Court to address defense's postponement motion", tier: 3, docketNum: 123 },
-  { id: "s1c", lane: "scheduling" as const, date: "2026-06-15", title: "Expert Disclosures Due", description: "Rule 16 expert witness disclosure deadline", tier: 2 },
-  { id: "s1d", lane: "scheduling" as const, date: "2026-07-06", title: "Exhibit Exchange", description: "Parties exchange trial exhibit lists", tier: 2 },
-  { id: "s1e", lane: "scheduling" as const, date: "2026-07-20", title: "Jury Questionnaires", description: "Proposed juror questionnaires due", tier: 2 },
-  { id: "s2", lane: "scheduling" as const, date: "2026-08-04", title: "Motions in Limine Due", description: "Pre-trial motion deadline", tier: 2 },
-  { id: "s2a", lane: "scheduling" as const, date: "2026-08-18", title: "In Limine Responses", description: "Opposition briefs due on in-limine motions", tier: 3 },
-  { id: "s2b", lane: "scheduling" as const, date: "2026-08-25", title: "Strikes for Cause", description: "Deadline to file for-cause juror challenges", tier: 3 },
-  { id: "s3", lane: "scheduling" as const, date: "2026-09-02", title: "Final Pre-Trial", description: "Last conference before trial", tier: 1 },
-  { id: "s4", lane: "scheduling" as const, date: "2026-09-08", title: "Voir Dire Begins", description: "Jury selection starts", tier: 1 },
-  { id: "s5", lane: "scheduling" as const, date: "2026-10-13", title: "TRIAL BEGINS", description: "Opening statements scheduled", tier: 1 },
+  { id: "s1a", lane: "scheduling", date: "2025-01-06", title: "Speedy Trial Paused", description: "Time excluded 1/6/25 – 2/17/25 for prep", tier: 3, docketNum: 8, beat: "The clock stops. Both sides agree they need the runway." },
+  { id: "s1", lane: "scheduling", date: "2026-02-03", title: "Master Schedule", description: "14 trial prep deadlines set; trial 10/13/26", tier: 1, docketNum: 105, beat: "The calendar ignites. October 13 becomes the date on every board." },
+  { id: "s1b", lane: "scheduling", date: "2026-04-01", title: "Continuance Conference", description: "Court to address defense's postponement motion", tier: 3, docketNum: 123, beat: "Will the trial slip? Judge to decide in open court." },
+  { id: "s1c", lane: "scheduling", date: "2026-06-15", title: "Expert Disclosures Due", description: "Rule 16 expert witness disclosure deadline", tier: 2, beat: "Firearms, psych, DNA — each side names its experts or forfeits them." },
+  { id: "s1d", lane: "scheduling", date: "2026-07-06", title: "Exhibit Exchange", description: "Parties exchange trial exhibit lists", tier: 2, beat: "The evidence binders trade hands. No surprises past this date." },
+  { id: "s1e", lane: "scheduling", date: "2026-07-20", title: "Jury Questionnaires", description: "Proposed juror questionnaires due", tier: 2, beat: "The questions that will pick the jury land on the judge's desk." },
+  { id: "s2", lane: "scheduling", date: "2026-08-04", title: "Motions in Limine Due", description: "Pre-trial motion deadline", tier: 2, beat: "Last fight to shape what the jury will and won't see." },
+  { id: "s2a", lane: "scheduling", date: "2026-08-18", title: "In Limine Responses", description: "Opposition briefs due on in-limine motions", tier: 3, beat: "Reply briefs filed. Ammunition for the pre-trial conference." },
+  { id: "s2b", lane: "scheduling", date: "2026-08-25", title: "Strikes for Cause", description: "Deadline to file for-cause juror challenges", tier: 3, beat: "Both sides mark the names they can't live with." },
+  { id: "s3", lane: "scheduling", date: "2026-09-02", title: "Final Pre-Trial", description: "Last conference before trial", tier: 1, beat: "The last briefing before the curtain. Rulings from the bench, fast." },
+  { id: "s4", lane: "scheduling", date: "2026-09-08", title: "Voir Dire Begins", description: "Jury selection starts", tier: 1, beat: "Twelve strangers will decide. The selection begins." },
+  { id: "s5", lane: "scheduling", date: "2026-10-13", title: "TRIAL BEGINS", description: "Opening statements scheduled", tier: 1, beat: "ACT III. Opening statements. The country tunes in." },
 ]
 
 // ──────────────────────────────────────────────────────────────

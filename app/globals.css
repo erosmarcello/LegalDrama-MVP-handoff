@@ -76,6 +76,63 @@
   --lane-defense: #b3a369;
   --lane-court: #ffffff;
 
+  /* ── In-app extended palette ──────────────────────────────────────
+     Landing stays core 4 (black/white/red/gold). These extended tokens
+     are for the *inside* of the product (case workspace, timeline,
+     sidebars, tags) where we need more than 4 hues to carry meaning.
+     Every hue here is a muted, desaturated neighbor of the core 4 so
+     the UI still reads as cinema-noir, never neon.
+
+     Pattern:  *-deep   → dot/ring fills, lane tracks
+               *-muted  → chips, inactive text, track bases
+               *-soft   → hover halos, 15% wash surfaces
+  */
+  /* Prosecution / factual (warm red) */
+  --lane-factual-deep:   #8f1010;
+  --lane-factual-muted:  #6a1414;
+  --lane-factual-soft:   rgba(204, 24, 24, 0.18);
+
+  /* Procedural / docket (slate cyan) */
+  --lane-procedural-deep:  #2f6d8c;
+  --lane-procedural-muted: #1f4c63;
+  --lane-procedural-soft:  rgba(74, 140, 173, 0.18);
+
+  /* Scheduling / future court dates (aged gold) */
+  --lane-scheduling-deep:  #8c7f4f;
+  --lane-scheduling-muted: #6a5f3a;
+  --lane-scheduling-soft:  rgba(179, 163, 105, 0.18);
+
+  /* Narrative / authored beats (faded violet) */
+  --lane-narrative-deep:  #544978;
+  --lane-narrative-muted: #3d355a;
+  --lane-narrative-soft:  rgba(106, 90, 158, 0.20);
+
+  /* ── Event tier accents (importance weighting) ───────────────────
+     tier-1 = headline / must-see events  (gold leaning)
+     tier-2 = supporting procedural beats (cyan leaning)
+     tier-3 = fine-grained minor entries  (muted slate)
+  */
+  --tier-1: #d4a93a;     /* gold, slightly brighter for emphasis */
+  --tier-2: #6b8ea6;     /* cool slate */
+  --tier-3: #3a3a38;     /* near-border grey */
+
+  /* ── Drama/axis accents (chapter strips, badges) ─────────────────
+     Mirror DRAMA_LEVELS in lib/case-data.ts. Noir-safe (none are pure
+     primaries — everything is desaturated 60–70%).
+  */
+  --drama-record:    #4a6a4a;
+  --drama-docudrama: #4a7a8c;
+  --drama-thriller:  #a3802f;
+  --drama-alt:       #6a5a9e;
+  --drama-mythic:    #9c2020;
+
+  /* ── Surfaces: tiered dark layers ─────────────────────────────── */
+  --surface-1: #0d0d0d;   /* masthead, topmost */
+  --surface-2: #121212;   /* primary page surface */
+  --surface-3: #181816;   /* cards, tooltips */
+  --surface-4: #1e1d1b;   /* hover rows, popovers */
+  --surface-5: #24231f;   /* selected rows, elevated tiles */
+
   /* Gradient colors — used sparingly (noir prefers flats) */
   --gradient-start: #cc1818;
   --gradient-mid: #b3a369;
@@ -141,6 +198,33 @@
   --color-lane-scheduling: var(--lane-scheduling);
   --color-lane-narrative: var(--lane-narrative);
   --color-lane-danger: var(--lane-danger);
+
+  /* Extended in-app palette — exposed to Tailwind */
+  --color-lane-factual-deep: var(--lane-factual-deep);
+  --color-lane-factual-muted: var(--lane-factual-muted);
+  --color-lane-factual-soft: var(--lane-factual-soft);
+  --color-lane-procedural-deep: var(--lane-procedural-deep);
+  --color-lane-procedural-muted: var(--lane-procedural-muted);
+  --color-lane-procedural-soft: var(--lane-procedural-soft);
+  --color-lane-scheduling-deep: var(--lane-scheduling-deep);
+  --color-lane-scheduling-muted: var(--lane-scheduling-muted);
+  --color-lane-scheduling-soft: var(--lane-scheduling-soft);
+  --color-lane-narrative-deep: var(--lane-narrative-deep);
+  --color-lane-narrative-muted: var(--lane-narrative-muted);
+  --color-lane-narrative-soft: var(--lane-narrative-soft);
+  --color-tier-1: var(--tier-1);
+  --color-tier-2: var(--tier-2);
+  --color-tier-3: var(--tier-3);
+  --color-drama-record: var(--drama-record);
+  --color-drama-docudrama: var(--drama-docudrama);
+  --color-drama-thriller: var(--drama-thriller);
+  --color-drama-alt: var(--drama-alt);
+  --color-drama-mythic: var(--drama-mythic);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-4: var(--surface-4);
+  --color-surface-5: var(--surface-5);
 
   --radius-sm: 0px;
   --radius-md: 0px;

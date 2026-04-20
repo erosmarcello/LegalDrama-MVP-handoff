@@ -771,6 +771,114 @@ function CaseWorkspaceContent() {
                     ))}
                   </div>
                   
+                  {/* Hover tooltip — cinematic script beat */}
+                  {(() => {
+                    const hovered = hoveredEvent
+                      ? visibleEvents.find(e => e.id === hoveredEvent)
+                      : null
+                    if (!hovered || hovered.id === selectedEvent) return null
+                    const laneColor = getLaneColor(hovered.lane)
+                    const pos = getDatePercent(hovered.date)
+                    // Keep tooltip inside the card: anchor to left edge if
+                    // within 16% from the right wall, otherwise center on dot.
+                    const alignRight = pos > 84
+                    const alignLeft = pos < 16
+                    return (
+                      <div
+                        className={cn(
+                          "absolute z-30 pointer-events-none",
+                          "w-[280px]",
+                          "border bg-[var(--surface-3)]",
+                          "cinema-grain",
+                          "shadow-[0_20px_40px_rgba(0,0,0,0.6)]",
+                          "animate-enter-scale"
+                        )}
+                        style={{
+                          top: "-12px",
+                          transform: "translateY(-100%)",
+                          left: alignLeft
+                            ? "0%"
+                            : alignRight
+                            ? "auto"
+                            : `${pos.toFixed(2)}%`,
+                          right: alignRight ? "0%" : "auto",
+                          marginLeft:
+                            alignLeft || alignRight ? 0 : "-140px",
+                          borderColor: laneColor,
+                        }}
+                      >
+                        {/* Gold rule on top */}
+                        <div
+                          className="h-[2px]"
+                          style={{ background: laneColor }}
+                        />
+                        <div className="px-4 py-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span
+                              className="cinema-label text-[9px]"
+                              style={{ color: laneColor }}
+                            >
+                              {new Date(hovered.date).toLocaleDateString(
+                                "en-US",
+                                { month: "short", day: "numeric", year: "numeric" }
+                              )}
+                            </span>
+                            {hovered.docketNum && (
+                              <span className="cinema-label text-[9px] text-white/40">
+                                · DKT {hovered.docketNum}
+                              </span>
+                            )}
+                            <span
+                              className="ml-auto cinema-label text-[8px] px-1.5 py-0.5 border"
+                              style={{
+                                borderColor:
+                                  hovered.tier === 1
+                                    ? "var(--tier-1)"
+                                    : hovered.tier === 2
+                                    ? "var(--tier-2)"
+                                    : "var(--tier-3)",
+                                color:
+                                  hovered.tier === 1
+                                    ? "var(--tier-1)"
+                                    : hovered.tier === 2
+                                    ? "var(--tier-2)"
+                                    : "var(--tier-3)",
+                              }}
+                            >
+                              T{hovered.tier}
+                            </span>
+                          </div>
+                          <div
+                            className="cinema-title text-[14px] text-white leading-tight mb-2"
+                            style={{ textShadow: "1px 1px 0 #000" }}
+                          >
+                            {hovered.title}
+                          </div>
+                          {hovered.beat ? (
+                            <div className="cinema-contract-italic text-[11px] text-[var(--gold)]/90 leading-snug">
+                              {hovered.beat}
+                            </div>
+                          ) : hovered.description ? (
+                            <div className="font-serif italic text-[11px] text-white/70 leading-snug">
+                              {hovered.description}
+                            </div>
+                          ) : null}
+                        </div>
+                        {/* Downward pointer notch — hides when anchored at edges */}
+                        {!alignLeft && !alignRight && (
+                          <div
+                            className="absolute left-1/2 -translate-x-1/2 -bottom-[6px] w-3 h-3 rotate-45"
+                            style={{
+                              background: "var(--surface-3)",
+                              borderRight: `1px solid ${laneColor}`,
+                              borderBottom: `1px solid ${laneColor}`,
+                            }}
+                          />
+                        )}
+                      </div>
+                    )
+                  })()}
+
                   {/* Event count indicator */}
                   <div className="absolute bottom-2 right-3 flex items-center gap-2 opacity-50">
                     <span className="font-mono text-[9px] text-muted-foreground">
