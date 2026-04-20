@@ -2,17 +2,18 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { 
-  X, Upload, FolderOpen, Users, Play, Pause, Star, 
+import {
+  X, Upload, FolderOpen, Users, Play, Pause, Star,
   FileText, Zap, Flag, Calendar, MessageSquare, Clock,
-  Check, Copy, Trash2, Plus, ChevronUp, ChevronDown, 
+  Check, Copy, Trash2, Plus, ChevronUp, ChevronDown,
   Sparkles, Volume2, Image as ImageIcon, Video, Archive,
   RefreshCw, Edit3, Save, Share2, Settings, Eye,
   Download, Mic, Film, Wand2, ExternalLink, MoreHorizontal,
   Layers, Grid3X3, List, Search, Filter,
   Flame, Scale, Target, Gavel, Box, ImagePlus,
   Shield, AlertTriangle as AlertTriangleIcon, BarChart3, Timer,
-  FileSearch, TrendingUp, Activity, Hash
+  FileSearch, TrendingUp, Activity, Hash,
+  BookOpen, Library, Brain
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
@@ -239,6 +240,24 @@ const USER_MOOD_ASSETS: UserMoodAsset[] = [
     id: 108, modality: "photo", title: "Mood board — cold open", subtitle: "Grayscale · rain · red only.",
     date: "Apr 1, 2026", tag: "BOARD", tagColor: "var(--pink)",
     gradient: ["rgba(236, 72, 153, 0.28)", "rgba(0, 0, 0, 0.94)"], emoji: "🎬",
+    enabled: true,
+  },
+  // ── Corpus / ground-truth seeds ────────────────────────────────────
+  // Books + long-form text chunked, embedded, and cited back when the
+  // model writes. Rendered as doc cards with the brass "CORPUS" tag so
+  // the mood board clearly separates reference material from exhibits.
+  {
+    id: 109, modality: "doc", title: "Federal Rules of Evidence (2024 ed.)",
+    subtitle: "Full annotated text — procedural ground truth.",
+    date: "reference", tag: "CORPUS", tagColor: "var(--gold)",
+    gradient: ["rgba(179, 146, 73, 0.26)", "rgba(0, 0, 0, 0.94)"], pages: 412,
+    enabled: true,
+  },
+  {
+    id: 110, modality: "doc", title: "Mangione manifesto — full",
+    subtitle: "Three-page handwritten + typed transcript.",
+    date: "Dec 9, 2024", tag: "CORPUS", tagColor: "var(--gold)",
+    gradient: ["rgba(179, 146, 73, 0.2)", "rgba(0, 0, 0, 0.94)"], pages: 3,
     enabled: true,
   },
 ]
@@ -611,53 +630,83 @@ Based on: ${assetNames}`,
 
   // ===== UPLOAD TAB HANDLERS =====
   
-  const handleFileUpload = (files: FileList | null) => {
+  // Extensions we treat as "book / large text corpus" — these get the
+  // corpus tag + aged-brass ground-truth treatment automatically. The
+  // corpus dropzone additionally force-tags *anything* dropped on it
+  // (so a 900-page PDF book gets tagged corpus even if the primary
+  // dropzone would have bucketed it as "documents").
+  const CORPUS_EXTENSIONS = [
+    ".epub", ".txt", ".md", ".markdown",
+    ".rtf", ".mobi", ".azw3", ".fb2",
+    ".djvu", ".tex",
+  ]
+
+  const isCorpusFilename = (name: string) => {
+    const lower = name.toLowerCase()
+    return CORPUS_EXTENSIONS.some(ext => lower.endsWith(ext))
+  }
+
+  const handleFileUpload = (
+    files: FileList | null,
+    opts: { forceCorpus?: boolean } = {},
+  ) => {
     if (!files) return
-    
+
     const fileArray = Array.from(files)
     setUploadQueue(prev => [...prev, ...fileArray])
-    
+
     // Simulate upload progress for each file
     fileArray.forEach((file, index) => {
       const fileId = `${file.name}-${Date.now()}-${index}`
       let progress = 0
-      
+
+      // Corpus = ground-truth reference material (books, published
+      // opinions, long-form briefs, scholarly text). Tagged gold so the
+      // mood board + evidence list both show it as a distinct tier.
+      const isCorpus = opts.forceCorpus || isCorpusFilename(file.name)
+
       const interval = setInterval(() => {
         progress += Math.random() * 20
         if (progress >= 100) {
           progress = 100
           clearInterval(interval)
-          
+
           // Add to secondary evidence when complete
           const newEvidence = {
             id: Date.now() + index,
             name: file.name,
-            tag: file.type.startsWith("video") ? "video" 
+            tag: isCorpus ? "corpus"
+              : file.type.startsWith("video") ? "video"
               : file.type.startsWith("audio") ? "audio"
               : file.type.startsWith("image") ? "photos"
               : "documents",
-            detail: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
-            icon: file.type.startsWith("video") ? Video
+            detail: isCorpus
+              ? `${(file.size / 1024 / 1024).toFixed(1)} MB · ground truth`
+              : `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+            icon: isCorpus ? BookOpen
+              : file.type.startsWith("video") ? Video
               : file.type.startsWith("image") ? ImageIcon
               : file.type.startsWith("audio") ? Mic
               : FileText,
-            color: "var(--cyan)",
+            color: isCorpus ? "var(--gold)" : "var(--cyan)",
             enabled: true
           }
-          
+
           // All manual uploads land in the user-evidence bucket; Case Evidence
-          // is sourced from the docket and not user-populated.
+          // is sourced from the docket and not user-populated. Corpus items
+          // live in the same bucket but carry the gold tag so the grid shows
+          // them as reference/ground-truth rather than case exhibits.
           setSecondaryEvidence(prev => [...prev, newEvidence])
-          
+
           // Log activity
           setActivityLog(prev => [{
             time: "Just now",
             user: "You",
-            action: "uploaded",
+            action: isCorpus ? "added to corpus" : "uploaded",
             target: file.name,
-            color: "var(--cyan)"
+            color: isCorpus ? "var(--gold)" : "var(--cyan)"
           }, ...prev])
-          
+
           // Remove from progress tracking
           setTimeout(() => {
             setUploadProgress(prev => {
@@ -671,20 +720,36 @@ Based on: ${assetNames}`,
       }, 200)
     })
   }
-  
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(true)
   }
-  
+
   const handleDragLeave = () => {
     setIsDragging(false)
   }
-  
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
     handleFileUpload(e.dataTransfer.files)
+  }
+
+  // Corpus dropzone has its own drag state + handler so the UI can
+  // glow aged-brass instead of purple while a book is being dragged.
+  const [isDraggingCorpus, setIsDraggingCorpus] = useState(false)
+  const handleCorpusDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDraggingCorpus(true)
+  }
+  const handleCorpusDragLeave = () => {
+    setIsDraggingCorpus(false)
+  }
+  const handleCorpusDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDraggingCorpus(false)
+    handleFileUpload(e.dataTransfer.files, { forceCorpus: true })
   }
 
   // ===== COLLAB TAB HANDLERS =====
@@ -996,7 +1061,7 @@ Based on: ${assetNames}`,
                     multiple
                     className="hidden"
                     onChange={(e) => handleFileUpload(e.target.files)}
-                    accept=".pdf,.docx,.doc,.mp4,.m4a,.mp3,.jpg,.jpeg,.png,.zip"
+                    accept=".pdf,.docx,.doc,.mp4,.m4a,.mp3,.jpg,.jpeg,.png,.zip,.epub,.txt,.md,.markdown,.rtf,.mobi,.azw3,.fb2,.djvu,.tex"
                   />
                   <div className="flex items-center justify-center gap-5">
                     <div className="w-14 h-14 bg-surface-alt flex items-center justify-center shrink-0 border border-purple/30">
@@ -1007,14 +1072,106 @@ Based on: ${assetNames}`,
                         Drop files to upload, or click to browse
                       </p>
                       <p className="font-mono text-[11px] text-muted-foreground mt-1">
-                        PDF · DOCX · MP4 · M4A · MP3 · JPG · PNG · ZIP — up to 100MB per file
+                        PDF · DOCX · EPUB · TXT · MD · RTF · MP4 · MP3 · JPG · PNG · ZIP — up to 100MB per file
                       </p>
                       <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
                         Multi-file supported. Uploads land in <span className="text-purple font-bold">User Evidence</span>.
+                        Books &amp; long-form text auto-route to <span className="text-[var(--gold)] font-bold">Corpus</span>.
                       </p>
                     </div>
                   </div>
                 </label>
+
+                {/* ═══════════════════════════════════════════════════════
+                    CORPUS / GROUND-TRUTH LIBRARY — dedicated dropzone for
+                    books, published opinions, long-form briefs, scholarly
+                    text, trial transcripts, etc. Anything dropped here is
+                    force-tagged as corpus (gold) regardless of extension,
+                    so a 900-page PDF book gets routed to the ground-truth
+                    tier rather than generic "documents." These feed the
+                    retrieval layer for scene generation + legal reasoning.
+                    ═══════════════════════════════════════════════════════ */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Library size={14} className="text-[var(--gold)]" />
+                    <span className="font-mono text-[10px] font-bold text-[var(--gold)] tracking-wider">
+                      CORPUS · GROUND-TRUTH LIBRARY
+                    </span>
+                    <span className="font-mono text-[9px] text-muted-foreground">
+                      — books, treatises, long-form text for retrieval grounding
+                    </span>
+                  </div>
+                  <label
+                    onDragOver={handleCorpusDragOver}
+                    onDragLeave={handleCorpusDragLeave}
+                    onDrop={handleCorpusDrop}
+                    className={cn(
+                      "border-2 border-dashed px-6 py-7 transition-all cursor-pointer block",
+                      isDraggingCorpus
+                        ? "border-[var(--gold)] bg-[var(--gold)]/10"
+                        : "border-[var(--gold)]/40 hover:border-[var(--gold)] bg-[var(--gold)]/[0.03]"
+                    )}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e.target.files, { forceCorpus: true })}
+                      accept=".pdf,.epub,.txt,.md,.markdown,.rtf,.docx,.doc,.mobi,.azw3,.fb2,.djvu,.tex,.zip"
+                    />
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 bg-[var(--gold)]/10 flex items-center justify-center shrink-0 border border-[var(--gold)]/40">
+                        <BookOpen size={26} className="text-[var(--gold)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-sans text-base font-bold text-[var(--gold)]">
+                          Drop books &amp; corpora for ground truth
+                        </p>
+                        <p className="font-mono text-[11px] text-muted-foreground mt-1">
+                          EPUB · PDF · TXT · MD · RTF · MOBI · AZW3 · DJVU · TEX · ZIP — up to 500MB per file
+                        </p>
+                        <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
+                          Chunked, embedded, and indexed for retrieval. Feeds
+                          <span className="text-[var(--gold)] font-bold"> scene generation</span>,
+                          <span className="text-[var(--gold)] font-bold"> legal reasoning</span>,
+                          and <span className="text-[var(--gold)] font-bold">character voice</span>.
+                        </p>
+                      </div>
+                      <div className="hidden md:flex flex-col items-end gap-1 shrink-0 pr-1">
+                        <div className="flex items-center gap-1.5 font-mono text-[9px] text-[var(--gold)]/80 tracking-wider">
+                          <Brain size={10} /> RETRIEVAL-GROUND
+                        </div>
+                        <div className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground tracking-wider">
+                          <Hash size={10} /> CHUNK + EMBED
+                        </div>
+                        <div className="flex items-center gap-1.5 font-mono text-[9px] text-muted-foreground tracking-wider">
+                          <FileSearch size={10} /> CITE-ABLE
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                  {/* Examples — quick seeds so users see what belongs here */}
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <span className="font-mono text-[9px] text-muted-foreground tracking-wider">
+                      GOOD FITS →
+                    </span>
+                    {[
+                      "Federal Rules of Evidence",
+                      "Trial transcripts",
+                      "Luigi Mangione manifesto",
+                      "Healthcare-industry reporting",
+                      "Crim-pro treatises",
+                      "Judge Garnett's published opinions",
+                    ].map(sample => (
+                      <span
+                        key={sample}
+                        className="font-mono text-[9px] px-1.5 py-0.5 border border-[var(--gold)]/25 text-[var(--gold)]/70"
+                      >
+                        {sample}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Upload Progress */}
                 {Object.keys(uploadProgress).length > 0 && (
@@ -1149,6 +1306,16 @@ Based on: ${assetNames}`,
                       <span>
                         Audio and video get transcribed + scene-detected automatically. Expect 1-2 min
                         per 10 min of runtime.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-[var(--gold)] shrink-0">→</span>
+                      <span>
+                        Books and long-form text (EPUB, TXT, large PDFs) go to
+                        <span className="text-[var(--gold)] font-bold"> Corpus / Ground Truth</span> —
+                        we chunk by chapter &amp; section, embed them, and cite passages back when the
+                        model writes. Great for treatises, published opinions, trial transcripts, and
+                        subject-matter nonfiction tied to the case.
                       </span>
                     </li>
                   </ul>
