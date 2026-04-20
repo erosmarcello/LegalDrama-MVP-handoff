@@ -37,13 +37,11 @@ const CASE_EVIDENCE = [
   { id: 8, name: "DP Dropped Letter (Dkt 113)", date: "02/27/26", type: "notice", tier: "T1", icon: Flag, color: "var(--green)", enabled: false },
 ]
 
-// Secondary Evidence (user uploads)
-const SECONDARY_EVIDENCE = [
-  { id: 101, name: "Smith Deposition Transcript...", tag: "transcript", detail: "Witness deposition — 47 pages", icon: FileText, color: "var(--purple)", enabled: true },
-  { id: 102, name: "Opposition Emails.zip", tag: "documents", detail: "Email chain — 312 messages", icon: Archive, color: "var(--cyan)", enabled: false },
-  { id: 103, name: "Surveillance Video.mp4", tag: "video", detail: "Lobby camera — 4:23 duration", icon: Video, color: "var(--muted-foreground)", enabled: false },
-  { id: 104, name: "Courtroom Sketch Series", tag: "photos", detail: "6 courtroom illustrations", icon: ImageIcon, color: "var(--orange)", enabled: true },
-]
+// NOTE: The old table-style SECONDARY_EVIDENCE const (user uploads as a
+// list of {name, tag, detail, icon}) has been retired in favor of
+// USER_MOOD_ASSETS below, which shapes the same uploads as MoodAsset
+// records so they can render in the mood-board grid alongside the
+// case-derived mood board.
 
 // Timeline events for Organize tab
 const TIMELINE_EVENTS = [
@@ -183,6 +181,68 @@ const MOOD_CATEGORIES: MoodAsset[] = [
   },
 ]
 
+// ═══════════════════════════════════════════════════════════════════
+// USER MOOD BOARD — writer/producer-uploaded reference material
+// ═══════════════════════════════════════════════════════════════════
+// Same MoodAsset shape as MOOD_CATEGORIES so the existing MoodAssetCard
+// renderer can display these. These are NOT case-sourced — they're the
+// writer's reference scrapbook: location scouts, tonal refs, voice
+// memos, depo transcripts, courtroom sketches, email archives.
+// Each item carries an `enabled` flag so toggling from/out of the
+// generated script still works.
+type UserMoodAsset = MoodAsset & { enabled: boolean }
+const USER_MOOD_ASSETS: UserMoodAsset[] = [
+  {
+    id: 101, modality: "photo", title: "Courtroom sketches", subtitle: "6 illustrations · Vincent R.",
+    date: "Apr 6, 2026", tag: "SKETCH", tagColor: "var(--orange)",
+    gradient: ["rgba(251, 146, 60, 0.32)", "rgba(0, 0, 0, 0.94)"], emoji: "✒️",
+    enabled: true,
+  },
+  {
+    id: 102, modality: "doc", title: "Smith Deposition (47pp)", subtitle: "Witness prep transcript.",
+    date: "Mar 18, 2025", tag: "TRANSCRIPT", tagColor: "var(--purple)",
+    gradient: ["rgba(168, 85, 247, 0.22)", "rgba(0, 0, 0, 0.94)"], pages: 47,
+    enabled: true,
+  },
+  {
+    id: 103, modality: "doc", title: "Opposition Emails", subtitle: "Prosecutor correspondence — 312 msgs.",
+    date: "ongoing", tag: "ARCHIVE", tagColor: "var(--cyan)",
+    gradient: ["rgba(6, 182, 212, 0.24)", "rgba(0, 0, 0, 0.94)"], pages: 312,
+    enabled: false,
+  },
+  {
+    id: 104, modality: "video", title: "Lobby camera", subtitle: "Building security footage.",
+    date: "Dec 9, 2024", tag: "FOOTAGE", tagColor: "var(--muted-foreground)",
+    gradient: ["rgba(100, 116, 139, 0.28)", "rgba(0, 0, 0, 0.94)"], duration: "4:23",
+    enabled: false,
+  },
+  {
+    id: 105, modality: "photo", title: "W. 54th St scout", subtitle: "Location walk-through — dawn.",
+    date: "Feb 12, 2026", tag: "SCOUT", tagColor: "var(--cyan)",
+    gradient: ["rgba(29, 78, 216, 0.34)", "rgba(0, 0, 0, 0.94)"], emoji: "📍",
+    enabled: true,
+  },
+  {
+    id: 106, modality: "audio", title: "Voice memo — arc notes", subtitle: "\"LM's turn after Dkt 102.\"",
+    date: "Mar 3, 2026", tag: "NOTE", tagColor: "var(--green)",
+    gradient: ["rgba(34, 197, 94, 0.2)", "rgba(0, 0, 0, 0.94)"],
+    duration: "3:12", quote: "\"LM's arc needs a turn after Dkt 102.\"",
+    enabled: true,
+  },
+  {
+    id: 107, modality: "video", title: "Zodiac — tonal ref", subtitle: "Palette study for act II.",
+    date: "reference", tag: "TONAL REF", tagColor: "var(--yellow)",
+    gradient: ["rgba(234, 179, 8, 0.22)", "rgba(0, 0, 0, 0.94)"], duration: "2:11",
+    enabled: true,
+  },
+  {
+    id: 108, modality: "photo", title: "Mood board — cold open", subtitle: "Grayscale · rain · red only.",
+    date: "Apr 1, 2026", tag: "BOARD", tagColor: "var(--pink)",
+    gradient: ["rgba(236, 72, 153, 0.28)", "rgba(0, 0, 0, 0.94)"], emoji: "🎬",
+    enabled: true,
+  },
+]
+
 // Legal Intelligence — features that make lawyers say "whoa"
 const LEGAL_INTELLIGENCE = [
   { id: "strength", label: "Case Strength", value: 72, unit: "%", color: "var(--green)", trend: "+3", desc: "AI-estimated prosecution strength" },
@@ -247,7 +307,11 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   // Dramatization axis — 5 brutalist stops (Court Record → Mythic), not a 0-100 slider.
   const [dramaLevel, setDramaLevel] = useState<DramaLevel>(2)
   const [caseEvidence, setCaseEvidence] = useState(CASE_EVIDENCE)
-  const [secondaryEvidence, setSecondaryEvidence] = useState(SECONDARY_EVIDENCE)
+  // secondaryEvidence = user-uploaded reference material, rendered as a
+  // mood board (grid of MoodAssetCards) rather than the old table. Same
+  // enable/disable semantics — toggling a card flips its `enabled` flag
+  // which drives enabledCount and the generated-script pipeline.
+  const [secondaryEvidence, setSecondaryEvidence] = useState<UserMoodAsset[]>(USER_MOOD_ASSETS)
   const [isDragging, setIsDragging] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("")
   const [inviteRole, setInviteRole] = useState("Collaborator")
@@ -1249,50 +1313,43 @@ Based on: ${assetNames}`,
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <ImagePlus size={14} className="text-purple" />
-                        <span className="font-mono text-[10px] font-bold text-purple tracking-wider">USER EVIDENCE — YOUR UPLOADS</span>
-                        <span className="px-1.5 py-0.5 bg-purple/10 border border-purple/30 font-mono text-[9px] font-bold text-purple">{secondaryEvidence.length}</span>
+                        <span className="font-mono text-[10px] font-bold text-purple tracking-wider">USER EVIDENCE — MOOD BOARD</span>
+                        <span className="px-1.5 py-0.5 bg-purple/10 border border-purple/30 font-mono text-[9px] font-bold text-purple">{secondaryEvidence.length} ASSETS</span>
+                        <span className="font-mono text-[9px] text-muted-foreground">— your uploads &amp; writer&apos;s reference scrapbook</span>
                       </div>
-                      <button
-                        onClick={() => setActiveTab("upload")}
-                        className="px-3 py-1 border border-purple/40 font-mono text-[9px] font-bold text-purple hover:bg-purple/10 transition-colors flex items-center gap-1"
-                      >
-                        <Plus size={10} />
-                        ADD MORE
-                      </button>
+                      {/* Modality legend (mirrors the case mood-board header). */}
+                      <div className="flex items-center gap-2">
+                        <ModalityChip icon={ImageIcon} label="PHOTO" color="var(--red)" />
+                        <ModalityChip icon={Volume2} label="AUDIO" color="var(--green)" />
+                        <ModalityChip icon={Video} label="VIDEO" color="var(--cyan)" />
+                        <ModalityChip icon={FileText} label="DOC" color="var(--purple)" />
+                      </div>
                     </div>
 
-                    {/* Uploaded Evidence Dataset — table-style, relocated from case page */}
-                    <div className="border border-border mb-4">
-                      <div className="px-3 py-2 border-b border-border bg-surface-alt/50 flex items-center justify-between">
-                        <span className="font-mono text-[9px] font-bold text-muted-foreground tracking-wider">UPLOADED EVIDENCE DATASET</span>
-                        <span className="font-mono text-[9px] text-muted-foreground">{secondaryEvidence.length} items</span>
-                      </div>
-                      {secondaryEvidence.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => toggleAsset(item.id, false)}
-                          className={cn(
-                            "w-full flex items-center gap-3 px-3 py-2.5 border-b border-border last:border-0",
-                            "text-left transition-colors",
-                            item.enabled ? "hover:bg-purple/5" : "opacity-50 hover:opacity-80"
-                          )}
-                          style={{ color: item.color }}
-                        >
-                          <div className="w-7 h-7 flex items-center justify-center shrink-0 bg-current/10">
-                            <item.icon size={13} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-mono text-xs font-bold text-foreground truncate">{item.name}</div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="px-1 py-0.5 font-mono text-[8px] font-bold uppercase" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 20%, transparent)`, color: item.color }}>
-                                {item.tag}
-                              </span>
-                              <span className="font-mono text-[9px] text-muted-foreground truncate">{item.detail}</span>
-                            </div>
-                          </div>
-                          <div className={cn("w-3 h-3 shrink-0 rounded-full border-2", item.enabled ? "bg-current border-current" : "border-muted-foreground")} />
-                        </button>
+                    {/* ═══ USER MOOD BOARD GRID ═══
+                        Same MoodAssetCard renderer as the case-side mood board,
+                        but each card is toggleable (click to include/exclude
+                        from the generated script). Off-state cards dim +
+                        desaturate so the active set is instantly readable. */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      {secondaryEvidence.map((asset) => (
+                        <MoodAssetCard
+                          key={asset.id}
+                          asset={asset}
+                          enabled={asset.enabled}
+                          onToggle={() => toggleAsset(asset.id, false)}
+                        />
                       ))}
+                      {/* Add-new tile — styled like the case-side add tile but
+                          scoped to user uploads. Routes back to the Upload tab. */}
+                      <button
+                        onClick={() => setActiveTab("upload")}
+                        className="border-2 border-dashed border-purple/40 flex flex-col items-center justify-center py-10 hover:border-purple hover:bg-purple/5 cursor-pointer transition-all"
+                      >
+                        <Plus size={18} className="text-purple mb-1" />
+                        <span className="font-mono text-[10px] text-purple font-bold">Add reference</span>
+                        <span className="font-mono text-[8px] text-muted-foreground mt-0.5">photo · audio · video · doc</span>
+                      </button>
                     </div>
 
                     {/* User Evidence actions row */}
@@ -2452,9 +2509,21 @@ function ModalityChip({
   )
 }
 
-function MoodAssetCard({ asset }: { asset: typeof MOOD_CATEGORIES[number] }) {
+function MoodAssetCard({
+  asset,
+  enabled,
+  onToggle,
+}: {
+  asset: typeof MOOD_CATEGORIES[number]
+  /** Optional — when provided, card renders a toggle dot + dims when off. */
+  enabled?: boolean
+  /** Fires when the toggle dot is clicked (user mood board only). */
+  onToggle?: () => void
+}) {
   const [from, to] = asset.gradient
   const gradient = `linear-gradient(135deg, ${from} 0%, ${to} 100%)`
+  const isToggleable = typeof enabled === "boolean"
+  const isOff = isToggleable && !enabled
 
   return (
     <div
@@ -2463,15 +2532,33 @@ function MoodAssetCard({ asset }: { asset: typeof MOOD_CATEGORIES[number] }) {
         "border border-[var(--border)]",
         "transition-all duration-300",
         "hover:border-current hover:-translate-y-0.5",
-        "hover:shadow-[0_12px_32px_-10px_currentColor]"
+        "hover:shadow-[0_12px_32px_-10px_currentColor]",
+        isOff && "opacity-45 hover:opacity-75 grayscale-[0.4]"
       )}
       style={{ color: asset.tagColor }}
+      onClick={onToggle}
     >
       {/* ═══ TOP PREVIEW AREA — modality-specific ═══ */}
       {asset.modality === "photo" && <PhotoPreview asset={asset} gradient={gradient} />}
       {asset.modality === "audio" && <AudioPreview asset={asset} gradient={gradient} />}
       {asset.modality === "video" && <VideoPreview asset={asset} gradient={gradient} />}
       {asset.modality === "doc" && <DocPreview asset={asset} gradient={gradient} />}
+
+      {/* Toggle dot — only when the card is controllable (user mood board).
+          Pin to the top-right corner, above the modality preview. */}
+      {isToggleable && (
+        <div className="absolute top-2 right-2 z-10">
+          <span
+            className={cn(
+              "block w-3 h-3 rounded-full border-2 transition-all",
+              enabled
+                ? "bg-current border-current shadow-[0_0_10px_currentColor]"
+                : "bg-transparent border-[var(--muted-foreground)]"
+            )}
+            aria-label={enabled ? "Included in script" : "Excluded from script"}
+          />
+        </div>
+      )}
 
       {/* ═══ BOTTOM META — shared across all modalities ═══ */}
       <div className="px-4 py-3 border-t border-[var(--border)] bg-[#0a0a0a]">
