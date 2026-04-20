@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { SiteFooter } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
+import { AuthModal } from "@/components/auth-modal"
+import { useAuth } from "@/lib/auth-context"
 
 /* ------------------------------------------------------------------ */
 /*  Featured Cases Data                                                */
@@ -246,7 +248,8 @@ function BrowseContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [laneFilter, setLaneFilter] = useState<typeof LANE_FILTERS[number]["key"]>("all")
   const [statusFilter, setStatusFilter] = useState<typeof STATUS_FILTERS[number]["key"]>("all")
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const { user, signIn, signOut } = useAuth()
   const { toast } = useToast()
 
   // Simulate initial load
@@ -293,12 +296,25 @@ function BrowseContent() {
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       <Masthead
         user={user}
-        onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
-        onSignOut={() => setUser(null)}
+        onSignIn={() => setAuthOpen(true)}
+        onSignOut={() => {
+          signOut()
+          toast("Signed out of chambers", "var(--muted-foreground)")
+        }}
         showSearch
         searchPlaceholder="Case name, number, or keyword"
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
+      />
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onAuth={(u) => {
+          signIn(u)
+          setAuthOpen(false)
+          toast(`Welcome back, ${u.name.split(" ")[0] || "counselor"}`, "var(--gold)")
+        }}
       />
 
       {/* ─── Marquee header ─── */}

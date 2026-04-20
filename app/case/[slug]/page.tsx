@@ -28,6 +28,8 @@ import { SidebarChat } from "@/components/sidebar-chat"
 import { DramaLevelSlider } from "@/components/drama-level-slider"
 import { SiteFooter } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
+import { AuthModal } from "@/components/auth-modal"
+import { useAuth } from "@/lib/auth-context"
 
 // Lane definitions for timeline
 const LANES = [
@@ -64,6 +66,8 @@ function CaseWorkspaceContent() {
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const { user, signIn, signOut } = useAuth()
+  const [authOpen, setAuthOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -350,7 +354,25 @@ function CaseWorkspaceContent() {
       />
 
       {/* ═══ CINEMA-NOIR CHROME ═══ */}
-      <Masthead showSettings pacerConnected />
+      <Masthead
+        showSettings
+        pacerConnected
+        user={user}
+        onSignIn={() => setAuthOpen(true)}
+        onSignOut={() => {
+          signOut()
+          toast("Signed out of chambers", "var(--muted-foreground)")
+        }}
+      />
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onAuth={(u) => {
+          signIn(u)
+          setAuthOpen(false)
+          toast(`Welcome back, ${u.name.split(" ")[0] || "counselor"}`, "var(--gold)")
+        }}
+      />
 
       {/* Case marquee — slim strip with case #, live dot, action buttons */}
       <div className="sticky top-14 z-40 w-full border-b border-[var(--border)] bg-[#0a0a0a]/95 backdrop-blur-sm cinema-grain">

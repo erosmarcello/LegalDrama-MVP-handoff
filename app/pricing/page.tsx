@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { SiteFooter } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
+import { AuthModal } from "@/components/auth-modal"
+import { useAuth } from "@/lib/auth-context"
 
 /* ------------------------------------------------------------------ */
 /*  Plans — freemium + Scrivener-style active-use trial                */
@@ -173,7 +175,8 @@ const TRIAL_STEPS = [
 function PricingContent() {
   const { toast } = useToast()
   const [openFaq, setOpenFaq] = useState<number | null>(0)
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const { user, signIn, signOut } = useAuth()
   const [billing, setBilling] = useState<Billing>("monthly")
 
   const handlePlanClick = (plan: Plan) => {
@@ -192,8 +195,21 @@ function PricingContent() {
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       <Masthead
         user={user}
-        onSignIn={() => toast("Sign in coming soon", "var(--gold)")}
-        onSignOut={() => setUser(null)}
+        onSignIn={() => setAuthOpen(true)}
+        onSignOut={() => {
+          signOut()
+          toast("Signed out of chambers", "var(--muted-foreground)")
+        }}
+      />
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onAuth={(u) => {
+          signIn(u)
+          setAuthOpen(false)
+          toast(`Welcome back, ${u.name.split(" ")[0] || "counselor"}`, "var(--gold)")
+        }}
       />
 
       {/* ─── Hero ─── */}

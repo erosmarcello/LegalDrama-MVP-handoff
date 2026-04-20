@@ -25,6 +25,7 @@ import { AuthModal } from "@/components/auth-modal"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { SiteFooter } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
+import { useAuth } from "@/lib/auth-context"
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -181,8 +182,8 @@ function HomePage() {
     setMounted(true)
   }, [])
 
-  // Auth
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null)
+  // Auth — from shared context so sign-in persists across routes
+  const { user, signIn, signOut } = useAuth()
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin")
 
@@ -329,7 +330,7 @@ function HomePage() {
         user={user}
         onSignIn={handleSignIn}
         onSignOut={() => {
-          setUser(null)
+          signOut()
           toast("Signed out", "var(--muted-foreground)")
         }}
       />
@@ -1050,7 +1051,7 @@ function HomePage() {
         open={authOpen}
         onClose={() => setAuthOpen(false)}
         onAuth={u => {
-          setUser(u)
+          signIn(u)
           setAuthOpen(false)
           toast(`Welcome, ${u.name}`, "var(--gold)")
         }}

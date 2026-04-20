@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { Masthead } from "@/components/masthead"
 import { SiteFooter } from "@/components/site-footer"
+import { AuthModal } from "@/components/auth-modal"
+import { useAuth } from "@/lib/auth-context"
 
 /* ------------------------------------------------------------------ */
 /*  DATA                                                               */
@@ -192,9 +194,14 @@ function DashboardContent() {
   const { toast } = useToast()
   const [mounted, setMounted] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
-  const [user] = useState({ email: "user@legaldrama.ai", name: "Raj" })
+  const { user, signIn, signOut } = useAuth()
+  const [authOpen, setAuthOpen] = useState(false)
   const [laneFilter, setLaneFilter] = useState<"all" | BookmarkedCase["lane"]>("all")
   const [showClosed, setShowClosed] = useState(true)
+
+  // First-name greeting fallback. Dashboard is post-auth so we prompt them
+  // to sign in if they land here cold.
+  const greetingName = user?.name?.split(" ")[0] || "counselor"
 
   useEffect(() => {
     setMounted(true)
@@ -241,7 +248,22 @@ function DashboardContent() {
     <div className="min-h-screen flex flex-col bg-[#0a0a0a] text-white">
       <Masthead
         user={user}
-        onSignOut={() => router.push("/")}
+        onSignIn={() => setAuthOpen(true)}
+        onSignOut={() => {
+          signOut()
+          toast("Signed out of chambers", "var(--muted-foreground)")
+          router.push("/")
+        }}
+      />
+
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onAuth={(u) => {
+          signIn(u)
+          setAuthOpen(false)
+          toast(`Welcome back, ${u.name.split(" ")[0] || "counselor"}`, "var(--gold)")
+        }}
       />
 
       {/* ─── Archive hero ─── */}
@@ -266,7 +288,7 @@ function DashboardContent() {
             style={{ textShadow: "2px 2px 0 #000" }}
           >
             Welcome Back,{" "}
-            <span style={{ color: "var(--gold)" }}>{user.name}</span>.
+            <span style={{ color: "var(--gold)" }}>{greetingName}</span>.
           </h1>
           <p className="mt-4 font-sans text-[14px] md:text-[15px] leading-relaxed text-[var(--muted-foreground)] max-w-[58ch]">
             Your archive of bookmarked cases, saved searches, and reference files.

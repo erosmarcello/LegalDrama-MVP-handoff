@@ -3,8 +3,10 @@
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, LogOut, User as UserIcon } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { SettingsLauncher } from "@/components/settings-launcher"
+import { useAuth, type AuthUser } from "@/lib/auth-context"
 
 interface MastheadProps {
   onSettingsClick?: () => void
@@ -12,7 +14,12 @@ interface MastheadProps {
   pacerConnected?: boolean
   className?: string
   onSignIn?: () => void
-  user?: { email: string; name: string } | null
+  /**
+   * Optional user override. When omitted, the masthead reads from the
+   * global `AuthProvider` context so sign-in state persists across all
+   * routes (Luigi Mangione demo in particular).
+   */
+  user?: AuthUser | null
   onSignOut?: () => void
   /** Optional search input in the masthead (e.g. dashboard/browse). */
   showSearch?: boolean
@@ -30,13 +37,17 @@ const NAV_LINKS = [
 /**
  * Cinema-noir masthead.
  *
- * Visual language borrowed from "Law & Order title sequence meets PACER
- * database": condensed Anton wordmark, aged-gold metadata, wide-tracked
+ * Visual language borrowed from "Law & Order title sequence meets federal
+ * case archive": condensed Anton wordmark, aged-gold metadata, wide-tracked
  * nav in JetBrains Mono, pulsing red live indicator.
+ *
+ * Signed-in state: the "Sign In" button becomes a circular profile photo
+ * with a thin gold ring. Clicking opens a tiny dropdown (name, email,
+ * sign-out).
  */
 export function Masthead({
   onSignIn,
-  user,
+  user: userProp,
   onSignOut,
   pacerConnected = false,
   showSettings = false,
@@ -47,6 +58,15 @@ export function Masthead({
   searchValue,
 }: MastheadProps) {
   const pathname = usePathname()
+  const auth = useAuth()
+
+  // userProp wins when explicitly provided, else fall back to context.
+  const user = userProp === undefined ? auth.user : userProp
+
+  const handleSignOut = () => {
+    if (onSignOut) onSignOut()
+    else auth.signOut()
+  }
 
   return (
     <header
@@ -131,7 +151,7 @@ export function Masthead({
             </div>
           )}
 
-          {/* Live PACER status */}
+          {/* Live PACER status — only when page opts in (case page only) */}
           {pacerConnected && (
             <div className="hidden lg:flex items-center gap-2">
               <span className="cinema-pulse-dot" aria-hidden />
@@ -141,21 +161,11 @@ export function Masthead({
             </div>
           )}
 
+          {/* Settings launcher — icon-only */}
           {showSettings && <SettingsLauncher variant="chip" />}
 
           {user ? (
-            <button
-              onClick={onSignOut}
-              title="Sign out"
-              className={cn(
-                "w-9 h-9 flex items-center justify-center",
-                "border border-[var(--gold)] bg-transparent",
-                "cinema-label text-[12px] text-[var(--gold)]",
-                "hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors"
-              )}
-            >
-              {user.name.charAt(0).toUpperCase()}
-            </button>
+            <UserAvatarMenu user={user} onSignOut={handleSignOut} />
           ) : (
             <button
               onClick={onSignIn}
@@ -172,5 +182,143 @@ export function Masthead({
         </div>
       </div>
     </header>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  UserAvatarMenu — circular noir avatar with dropdown                */
+/* ------------------------------------------------------------------ */
+
+function UserAvatarMenu({
+  user,
+  onSignOut,
+}: {
+  user: AuthUser
+  onSignOut: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  // Close on outside click / Escape
+  useEffect(() => {
+    if (!open) return
+    const handleClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+    document.addEventListener("mousedown", handleClick)
+    document.addEventListener("keydown", handleEsc)
+    return () => {
+      document.removeEventListener("mousedown", handleClick)
+      document.removeEventListener("keydown", handleEsc)
+    }
+  }, [open])
+
+  const initial = (user.name?.charAt(0) || user.email.charAt(0) || "?").toUpperCase()
+  const displayName = user.name || user.email.split("@")[0]
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <button
+        onClick={() => setOpen(v => !v)}
+        aria-label={`Signed in as ${displayName}`}
+        title={displayName}
+        className={cn(
+          "relative w-9 h-9 rounded-full overflow-hidden",
+          "border border-[var(--gold)]",
+          "bg-[#0a0a0a] text-[var(--gold)]",
+          "cinema-label text-[12px]",
+          "transition-transform hover:scale-105",
+          "flex items-center justify-center"
+        )}
+      >
+        {user.avatar ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={user.avatar}
+            alt={displayName}
+            className="w-full h-full object-cover"
+            onError={e => {
+              // If the image fails, hide it and fall through to initial
+              ;(e.currentTarget as HTMLImageElement).style.display = "none"
+            }}
+          />
+        ) : (
+          <span>{initial}</span>
+        )}
+        {/* Always render the initial behind the image as fallback */}
+        {!user.avatar && <span aria-hidden>{initial}</span>}
+      </button>
+
+      {open && (
+        <div
+          className={cn(
+            "absolute top-[calc(100%+8px)] right-0 z-[60]",
+            "min-w-[220px]",
+            "border border-[var(--border)] bg-[#0f0f0f]",
+            "cinema-grain",
+            "shadow-[0_30px_80px_rgba(0,0,0,0.7)]",
+            "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]"
+          )}
+        >
+          <div className="px-4 pt-4 pb-3 border-b border-[var(--border)]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-[var(--gold)] bg-[#0a0a0a] flex items-center justify-center text-[var(--gold)] cinema-label text-[13px]">
+                {user.avatar ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={user.avatar}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{initial}</span>
+                )}
+              </div>
+              <div className="leading-tight min-w-0">
+                <div className="cinema-label text-[10px] text-[var(--gold)] truncate">
+                  {displayName}
+                </div>
+                <div className="cinema-contract text-[10px] text-white/60 truncate">
+                  {user.email}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="py-2">
+            <Link
+              href="/settings"
+              onClick={() => setOpen(false)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2",
+                "cinema-label text-[10px] text-white/70",
+                "hover:text-[var(--gold)] hover:bg-white/5 transition-colors"
+              )}
+            >
+              <UserIcon size={12} />
+              Account · Settings
+            </Link>
+            <button
+              onClick={() => {
+                setOpen(false)
+                onSignOut()
+              }}
+              className={cn(
+                "w-full flex items-center gap-2 px-4 py-2",
+                "cinema-label text-[10px] text-white/70",
+                "hover:text-[var(--red)] hover:bg-white/5 transition-colors"
+              )}
+            >
+              <LogOut size={12} />
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Anton, Source_Serif_4, JetBrains_Mono, EB_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/lib/auth-context'
 import './globals.css'
 
 const inter = Inter({
@@ -92,7 +93,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange={true}
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
         <Analytics />
       </body>
