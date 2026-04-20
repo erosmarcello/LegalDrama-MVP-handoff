@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteFooter, AiDisclaimerBar } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
 import { AuthModal } from "@/components/auth-modal"
 import { useAuth } from "@/lib/auth-context"
@@ -494,6 +494,7 @@ function BrowseContent() {
         </div>
       </main>
 
+      <AiDisclaimerBar />
       <SiteFooter />
     </div>
   )

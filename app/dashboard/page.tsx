@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/utils"
 import { ToastProvider, useToast } from "@/components/legal-ui"
 import { Masthead } from "@/components/masthead"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteFooter, AiDisclaimerBar } from "@/components/site-footer"
 import { AuthModal } from "@/components/auth-modal"
 import { useAuth } from "@/lib/auth-context"
 
@@ -574,6 +574,7 @@ function DashboardContent() {
         </section>
       </main>
 
+      <AiDisclaimerBar />
       <SiteFooter />
     </div>
   )

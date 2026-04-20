@@ -7,11 +7,11 @@ import {
   ArrowLeft, Bookmark, Star, ChevronLeft, ChevronRight,
   Play, Pause, Pencil, Check, X, Share, Download, Settings,
   Database, FileText, Clock, Users, Sparkles, Plus, Minus,
-  RefreshCw, Loader2, ExternalLink, Copy, Eye, MessageSquare,
+  RefreshCw, Loader2, ExternalLink, Copy, MessageSquare,
   Lock, Unlock, Save, RotateCcw, Wand2, AlertTriangle,
   Search, Filter, ChevronDown, Zap, Calendar, Target, Layers,
   Volume2, VolumeX, Flame, Scale, BookOpen, LayoutGrid, List,
-  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload, Folder,
+  ChevronUp, Info, Radio, Maximize2, Minimize2, Hash, ArrowRight, Upload,
   MapPin
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -26,7 +26,7 @@ import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
 import { DramaLevelSlider } from "@/components/drama-level-slider"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteFooter, AiDisclaimerBar } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
 import { AuthModal } from "@/components/auth-modal"
 import { useAuth } from "@/lib/auth-context"
@@ -418,13 +418,13 @@ function CaseWorkspaceContent() {
               <Share size={11} />
               <span className="hidden md:inline">Share</span>
             </button>
-            <button
-              onClick={() => setSettingsModalOpen(true)}
+            <Link
+              href="/settings"
               className="w-7 h-7 flex items-center justify-center border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors"
-              aria-label="Case settings"
+              aria-label="Open settings"
             >
               <Settings size={12} />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -657,10 +657,47 @@ function CaseWorkspaceContent() {
                 <div className={cn(
                   "relative border-2 border-border bg-card p-5 mb-6 overflow-visible",
                   "rounded-none",
-                  "animate-enter-scale"
+                  "animate-enter-scale",
+                  // Card frame slowly breathes — border tone and inset glow cycle
+                  // every 7s so the whole timeline feels alive even when idle.
+                  "animate-timeline-frame-breathe"
                 )}>
+                  {/* ── Ambient backdrop layers ──
+                      Nested in a hard-clipped inner container so the slow
+                      sweep/aura/halo animations stay inside the card frame,
+                      while the OUTER card keeps overflow-visible (the hover
+                      tooltip above the track needs to escape the card).
+                      All marked pointer-events-none so hover/click still hit
+                      the interactive dots. */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 pointer-events-none overflow-hidden"
+                  >
+                    {/* Conic gold/red aura — 24s full rotation at very low
+                        alpha, blurred heavily so it reads as a warm wash
+                        behind the tracks, not a distinct shape. */}
+                    <div
+                      className="absolute -inset-10 animate-timeline-aura"
+                      style={{
+                        background:
+                          "conic-gradient(from 0deg, transparent 0deg, var(--gold) 30deg, transparent 70deg, transparent 180deg, var(--red) 210deg, transparent 250deg, transparent 360deg)",
+                        filter: "blur(60px)",
+                        opacity: 0.18,
+                      }}
+                    />
+                    {/* Traveling gold spotlight — like a projector sweep left
+                        to right across the timeline once every 14s. */}
+                    <div
+                      className="absolute top-0 left-0 h-full w-1/3 animate-timeline-spotlight-drift"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--gold) 18%, transparent) 50%, transparent 100%)",
+                        mixBlendMode: "screen",
+                      }}
+                    />
+                  </div>
                   {/* Subtle background grid */}
-                  <div 
+                  <div
                     className="absolute inset-0 opacity-[0.03] pointer-events-none"
                     style={{
                       backgroundImage: 'linear-gradient(90deg, currentColor 1px, transparent 1px)',
@@ -706,19 +743,35 @@ function CaseWorkspaceContent() {
                         </span>
                         
                         {/* Track background with glow */}
-                        <div 
+                        <div
                           className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full transition-all duration-500"
-                          style={{ 
+                          style={{
                             backgroundColor: lane.color,
                             opacity: 0.2,
                             boxShadow: `0 0 8px ${lane.color}`
                           }}
                         />
-                        
+
+                        {/* Flowing gradient sweep along the track — a bright
+                            highlight travels left→right every 8s, making each
+                            lane feel like a live data stream rather than a
+                            static rule. Offset per-lane so the three lanes
+                            don't all pulse together. */}
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[2px] rounded-full pointer-events-none animate-timeline-track-flow"
+                          style={{
+                            background: `linear-gradient(90deg, transparent 0%, transparent 35%, ${lane.color} 50%, transparent 65%, transparent 100%)`,
+                            opacity: 0.55,
+                            animationDelay: `${laneIndex * -2.6}s`,
+                            filter: `drop-shadow(0 0 6px ${lane.color})`,
+                          }}
+                        />
+
                         {/* Track highlight on hover */}
-                        <div 
+                        <div
                           className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[3px] rounded-full opacity-0 group-hover:opacity-40 transition-opacity duration-300"
-                          style={{ 
+                          style={{
                             backgroundColor: lane.color,
                             boxShadow: `0 0 12px ${lane.color}`
                           }}
@@ -733,44 +786,125 @@ function CaseWorkspaceContent() {
                             const isSelected = selectedEvent === event.id
                             const size = isHovered || isSelected ? 16 : 10
                             
+                            // Per-event drift phase — different offsets so the
+                            // dots don't bob in sync. Based on event index so
+                            // the pattern is stable across renders.
+                            const driftDelay = (eventIndex * 0.37) % 4
+                            // Halo offset — staggered so the radiating rings
+                            // don't fire at the same instant across the row.
+                            const haloDelay = (eventIndex * 0.53) % 2.8
                             return (
-                              <button
+                              <div
                                 key={event.id}
-                                onClick={() => setSelectedEvent(isSelected ? null : event.id)}
-                                onMouseEnter={() => setHoveredEvent(event.id)}
-                                onMouseLeave={() => setHoveredEvent(null)}
                                 className={cn(
-                                  "absolute top-1/2 rounded-full cursor-pointer timeline-dot",
-                                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                                  isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-card z-10",
-                                  "animate-dot-pop"
+                                  "absolute top-1/2 pointer-events-none",
+                                  // Constant gentle vertical drift so the dot
+                                  // feels alive even when no one's interacting.
+                                  !isHovered && !isSelected && "animate-timeline-dot-drift"
                                 )}
-                                style={{ 
+                                style={{
                                   left: `${pos.toFixed(2)}%`,
-                                  backgroundColor: lane.color,
                                   width: `${size}px`,
                                   height: `${size}px`,
                                   marginLeft: `-${size / 2}px`,
-                                  boxShadow: isHovered || isSelected 
-                                    ? `0 0 20px ${lane.color}, 0 0 40px ${lane.color}40` 
-                                    : `0 2px 4px rgba(0,0,0,0.2)`,
-                                  animationDelay: `${(eventIndex * 0.04).toFixed(2)}s`,
+                                  animationDelay: `${driftDelay.toFixed(2)}s`,
                                   transform: 'translateY(-50%)',
                                 }}
                               >
-                                {/* Inner glow */}
-                                {(isHovered || isSelected) && (
-                                  <span 
-                                    className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft"
+                                {/* Ambient halo — radiating expanding ring behind
+                                    the dot that continuously fades out. Only
+                                    renders at rest so it doesn't compete with
+                                    the hover/selected glow. */}
+                                {!isHovered && !isSelected && (
+                                  <span
+                                    aria-hidden="true"
+                                    className="absolute top-1/2 left-1/2 rounded-full pointer-events-none animate-timeline-halo"
+                                    style={{
+                                      width: `${size * 2}px`,
+                                      height: `${size * 2}px`,
+                                      backgroundColor: lane.color,
+                                      opacity: 0.35,
+                                      animationDelay: `${haloDelay.toFixed(2)}s`,
+                                    }}
                                   />
                                 )}
-                              </button>
+                                <button
+                                  onClick={() => setSelectedEvent(isSelected ? null : event.id)}
+                                  onMouseEnter={() => setHoveredEvent(event.id)}
+                                  onMouseLeave={() => setHoveredEvent(null)}
+                                  className={cn(
+                                    "relative w-full h-full rounded-full cursor-pointer timeline-dot pointer-events-auto",
+                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                                    isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-card z-10",
+                                    "animate-dot-pop"
+                                  )}
+                                  style={{
+                                    backgroundColor: lane.color,
+                                    boxShadow: isHovered || isSelected
+                                      ? `0 0 20px ${lane.color}, 0 0 40px ${lane.color}40`
+                                      : `0 2px 4px rgba(0,0,0,0.2), 0 0 10px ${lane.color}44`,
+                                    animationDelay: `${(eventIndex * 0.04).toFixed(2)}s`,
+                                  }}
+                                  aria-label={`Timeline event: ${event.title}`}
+                                >
+                                  {/* Inner glow */}
+                                  {(isHovered || isSelected) && (
+                                    <span
+                                      className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft"
+                                    />
+                                  )}
+                                </button>
+                              </div>
                             )
                           })}
                       </div>
                     ))}
                   </div>
-                  
+
+                  {/* ── "NOW" live-time indicator ──
+                      A vertical hairline pinned to today's date position,
+                      with a pulsing gold orb at the top and a label. The
+                      line itself micro-bobs (~3.5s) so it doesn't look
+                      glued to the page, and the orb carries the pulse-ring
+                      animation to emphasize "this is where we are right
+                      now." Position is computed once from new Date() so
+                      it doesn't flicker on hover. */}
+                  {(() => {
+                    // Clamp to the visualization range. Today's date resolves
+                    // to somewhere mid-2026, well within our [Dec 24, Nov 26]
+                    // bounds.
+                    const nowPct = getDatePercent(new Date().toISOString().slice(0, 10))
+                    if (nowPct <= 0 || nowPct >= 100) return null
+                    return (
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-y-6 pointer-events-none z-[5] animate-timeline-now-bob"
+                        style={{ left: `${nowPct.toFixed(2)}%` }}
+                      >
+                        <div
+                          className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px"
+                          style={{
+                            background:
+                              "linear-gradient(to bottom, transparent, var(--gold), transparent)",
+                            boxShadow: "0 0 8px var(--gold)",
+                          }}
+                        />
+                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full bg-[var(--gold)] animate-pulse-ring"
+                            style={{ boxShadow: "0 0 10px var(--gold)" }}
+                          />
+                          <span
+                            className="cinema-label text-[8px] text-[var(--gold)] tracking-[0.2em] px-1 bg-[#0a0a0a]/80"
+                            style={{ textShadow: "0 0 6px rgba(0,0,0,0.8)" }}
+                          >
+                            NOW
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })()}
+
                   {/* Hover tooltip — cinematic script beat */}
                   {(() => {
                     const hovered = hoveredEvent
@@ -1039,106 +1173,10 @@ function CaseWorkspaceContent() {
                   ))}
                 </div>
               </div>
-            {/* Reference Files / Evidence Upload (from Raj PDF p.7) */}
-            <div className="p-4 md:p-6 border-t-[2.5px] border-[var(--border)] bg-[var(--card)]">
-              <div className="max-w-4xl mx-auto">
-                <h3 className="font-sans text-lg font-bold text-[var(--foreground)] mb-4 flex items-center gap-2">
-                  <Folder size={18} style={{ color: "var(--cyan)" }} />
-                  Reference Files
-                </h3>
-
-                {/* Upload options */}
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <label className="flex flex-col items-center gap-2 p-6 border border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--green)] hover:bg-[var(--green)]/5 transition-colors cursor-pointer">
-                    <div className="w-12 h-12 flex items-center justify-center border border-[var(--border)] bg-[var(--surface-alt)]">
-                      <Folder size={24} className="text-[var(--green)]" />
-                    </div>
-                    <span className="font-sans text-sm font-bold text-[var(--foreground)]">Link Google Drive Folder</span>
-                    <span className="font-serif text-xs text-[var(--muted-foreground)]">Sync a folder from your Google Drive.</span>
-                    <span className="mt-1 px-3 py-1.5 border border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold ">
-                      Connect to Google Drive Folder
-                    </span>
-                    <input type="file" className="hidden" onChange={() => toast("Linked Google Drive", "var(--green)")} />
-                  </label>
-
-                  <label className="flex flex-col items-center gap-2 p-6 border border-dashed border-[var(--border)] bg-[var(--surface)] hover:border-[var(--cyan)] hover:bg-[var(--cyan)]/5 transition-colors cursor-pointer">
-                    <div className="w-12 h-12 flex items-center justify-center border border-[var(--border)] bg-[var(--surface-alt)]">
-                      <Upload size={24} className="text-[var(--cyan)]" />
-                    </div>
-                    <span className="font-sans text-sm font-bold text-[var(--foreground)]">Upload Files Directly</span>
-                    <span className="font-serif text-xs text-[var(--muted-foreground)]">Upload documents, videos, and other files.</span>
-                    <span className="mt-1 px-3 py-1.5 border border-[var(--cyan)] bg-[var(--cyan)] text-white font-mono text-[10px] font-bold ">
-                      Upload Evidence Files
-                    </span>
-                    <input type="file" multiple className="hidden" onChange={() => toast("Files uploaded!", "var(--green)")} />
-                  </label>
-                </div>
-
-                {/* Uploaded Evidence Dataset */}
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <div className="font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">
-                      Uploaded Evidence Dataset <span className="text-[var(--green)] normal-case">— Private evidence uploads</span>
-                    </div>
-                    <div className="border border-[var(--border)] bg-[var(--surface)]">
-                      {/* Header */}
-                      <div className="flex items-center px-4 py-2 border-b-[2.5px] border-[var(--border)] bg-[var(--surface-alt)]">
-                        <span className="flex-1 font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase">File Name</span>
-                        <span className="w-24 font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase text-center">Type</span>
-                        <span className="w-24 font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase text-center">Status</span>
-                      </div>
-                      {/* Rows */}
-                      {[
-                        { name: "Smith Deposition Transcript.pdf", type: "Transcript", icon: FileText, iconColor: "var(--red)" },
-                        { name: "Opposition Emails.zip", type: "Documents", icon: Folder, iconColor: "var(--cyan)" },
-                        { name: "Surveillance Video.mp4", type: "Video", icon: Eye, iconColor: "var(--purple)" },
-                      ].map((file, i) => (
-                        <div key={i} className={cn(
-                          "flex items-center px-4 py-2.5",
-                          i < 2 && "border-b border-[var(--border)]",
-                          "hover:bg-[var(--selection)] transition-colors"
-                        )}>
-                          <div className="flex-1 flex items-center gap-2 min-w-0">
-                            <file.icon size={14} style={{ color: file.iconColor }} />
-                            <span className="font-mono text-xs text-[var(--foreground)] truncate">{file.name}</span>
-                          </div>
-                          <span className="w-24 font-mono text-[10px] text-[var(--muted-foreground)] text-center">{file.type}</span>
-                          <span className="w-24 font-mono text-[10px] text-[var(--green)] font-bold text-center flex items-center justify-center gap-1">
-                            <Check size={10} /> Uploaded
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center justify-between mt-3">
-                      <button
-                        onClick={() => toast("Upload coming soon...", "var(--cyan)")}
-                        className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--border)] font-mono text-[10px] font-bold text-[var(--foreground)]  hover:border-[var(--cyan)]"
-                      >
-                        <Plus size={12} /> Add More Evidence
-                      </button>
-                      <button
-                        onClick={() => toast("Analyzing evidence...", "var(--green)")}
-                        className="flex items-center gap-1.5 px-4 py-1.5 border border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold "
-                      >
-                        <Sparkles size={12} /> Analyze Evidence
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Tips sidebar */}
-                  <div className="hidden lg:block w-48 p-3 border border-[var(--border)] bg-[var(--surface-alt)]">
-                    <div className="font-mono text-[9px] font-bold text-[var(--foreground)] uppercase mb-2">Tips</div>
-                    <ul className="space-y-1.5 font-serif text-[11px] text-[var(--muted-foreground)] list-disc pl-3">
-                      <li>Ensure files are relevant to the case.</li>
-                      <li>Include deposition transcripts, emails, videos, and more.</li>
-                      <li>Keep data confidential and secure.</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Reference Files block removed — relocated into the unified
+                Upload pane (ContentModal → "User Evidence" / "All" sub-tabs).
+                Access via the masthead Upload button or the character /
+                timeline "Upload Evidence" CTAs. */}
 
             </div>
           </div>
@@ -1653,10 +1691,10 @@ function CaseWorkspaceContent() {
                                     backgroundColor: lane.color,
                                     width: size,
                                     height: size,
-                                    boxShadow: isHovered || isSelected 
-                                      ? `0 0 24px ${lane.color}, 0 0 48px ${lane.color}40` 
+                                    boxShadow: isHovered || isSelected
+                                      ? `0 0 24px ${lane.color}, 0 0 48px ${lane.color}40`
                                       : `0 2px 6px rgba(0,0,0,0.2)`,
-                                    ringColor: lane.color,
+                                    ["--tw-ring-color" as string]: lane.color,
                                     transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
                                   }}
                                 >
@@ -1841,6 +1879,10 @@ function CaseWorkspaceContent() {
         )}
       </main>
       <SidebarChat />
+      {/* Persistent NotebookLM-style AI disclaimer — always visible above
+          the full footer so the user never loses sight of the hallucination
+          warning even on the long scrolly case workspace. */}
+      <AiDisclaimerBar />
       <SiteFooter />
     </div>
   )
@@ -1870,7 +1912,9 @@ function DocketEntryCard({
   animationDelay = 0,
   showFullDetails = false,
 }: DocketEntryCardProps) {
-  const laneColor = getLaneColor(entry.lane)
+  // `entry.lane` is optional in the data model; fall back to factual
+  // so the card always has a color even if the upstream record omits it.
+  const laneColor = getLaneColor(entry.lane ?? "factual")
   const aiSummary = AI_SUMMARIES[entry.number]
   
   return (

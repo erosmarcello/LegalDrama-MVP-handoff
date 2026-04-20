@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import Link from "next/link"
 import { Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { SettingsModal } from "@/components/settings-modal"
 
 interface SettingsLauncherProps {
   /** Optional className appended to the trigger button. */
@@ -21,22 +20,23 @@ interface SettingsLauncherProps {
 }
 
 /**
- * Persistent Settings launcher. Icon-only noir gear trigger that opens
- * the full `SettingsModal`. Tooltip carries the label; the visual chrome
- * stays out of the way.
+ * Persistent Settings launcher.
+ *
+ * Previously this opened a floating `SettingsModal` pop-up. Per product
+ * direction we now have a full-site `/settings` route, so this becomes a
+ * thin Link wrapper that navigates the user there. The styling, hover
+ * rotation, and tooltip are preserved — only the behavior flips from
+ * "open modal" to "navigate to settings site."
  */
 export function SettingsLauncher({
   className,
   variant = "chip",
 }: SettingsLauncherProps) {
-  const [open, setOpen] = useState(false)
-
-  const sharedButton = (
-    <button
-      type="button"
+  return (
+    <Link
+      href="/settings"
       aria-label="Open settings"
       title="Settings"
-      onClick={() => setOpen(true)}
       className={cn(
         "group inline-flex items-center justify-center",
         "border transition-colors duration-150",
@@ -50,13 +50,6 @@ export function SettingsLauncher({
         size={variant === "square" ? 15 : 13}
         className="transition-transform group-hover:rotate-45"
       />
-    </button>
-  )
-
-  return (
-    <>
-      {sharedButton}
-      <SettingsModal isOpen={open} onClose={() => setOpen(false)} />
-    </>
+    </Link>
   )
 }

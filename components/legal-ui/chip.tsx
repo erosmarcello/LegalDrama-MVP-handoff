@@ -7,7 +7,15 @@ interface ChipProps {
   color?: string
   mono?: boolean
   bold?: boolean
+  /**
+   * Denser padding/typography for tight dock chips.
+   * Callers across the case page depend on this — keeping the prop here
+   * also keeps the styles consistent (single source of truth).
+   */
+  small?: boolean
   className?: string
+  /** Inline style passthrough for dynamic color mixing at call sites. */
+  style?: React.CSSProperties
 }
 
 /**
@@ -19,13 +27,15 @@ export function Chip({
   color,
   mono = false,
   bold = false,
+  small = false,
   className,
+  style,
 }: ChipProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 px-2 py-0.5",
-        "text-[9px] whitespace-nowrap border transition-colors",
+        "inline-flex items-center whitespace-nowrap border transition-colors",
+        small ? "gap-0.5 px-1.5 py-0 text-[8px]" : "gap-1 px-2 py-0.5 text-[9px]",
         mono ? "cinema-label" : "cinema-contract-tight",
         bold ? "font-bold" : "font-semibold",
         className
@@ -38,6 +48,7 @@ export function Chip({
         borderColor: color
           ? `color-mix(in srgb, ${color} 45%, var(--border))`
           : "var(--border)",
+        ...style,
       }}
     >
       {children}

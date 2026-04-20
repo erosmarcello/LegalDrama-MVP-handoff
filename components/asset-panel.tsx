@@ -155,7 +155,7 @@ function AssetLibraryTab({ toast }: { toast: (msg: string, color?: string) => vo
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    const typeMap: Record<AssetSubView, string> = { photos: "photo", videos: "video", documents: "document", audio: "audio" }
+    const typeMap: Record<AssetSubView, string> = { all: "mixed", photos: "photo", videos: "video", documents: "document", audio: "audio" }
     toast(`Uploaded to ${subView}!`, "var(--green)")
   }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Link from "next/link"
 import { 
   X, Upload, FolderOpen, Users, Play, Pause, Star, 
   FileText, Zap, Flag, Calendar, MessageSquare, Clock,
@@ -70,23 +71,116 @@ const DOCKET_ENTRIES = [
   { num: 105, title: "SCHEDULING ORDER ★ — Master trial schedule", date: "02/03/26" },
 ]
 
-// Mood board categories — expanded visual taxonomy
-const MOOD_CATEGORIES = [
-  { id: 1, name: "Courtroom Wide", color: "var(--red)", assets: 3, tag: "INT" },
-  { id: 2, name: "Defendant Close", color: "var(--orange)", assets: 5, tag: "CHAR" },
-  { id: 3, name: "Evidence Table", color: "var(--yellow)", assets: 2, tag: "PROP" },
-  { id: 4, name: "Jury Box", color: "var(--green)", assets: 1, tag: "INT" },
-  { id: 5, name: "Judge's Bench", color: "var(--cyan)", assets: 4, tag: "INT" },
-  { id: 6, name: "Witness Stand", color: "var(--purple)", assets: 2, tag: "CHAR" },
-  { id: 7, name: "Counsel Table", color: "var(--pink)", assets: 3, tag: "CHAR" },
-  { id: 8, name: "Gallery / Public", color: "var(--muted-foreground)", assets: 1, tag: "INT" },
-  { id: 9, name: "Exterior — Courthouse", color: "var(--green)", assets: 2, tag: "EXT" },
-  { id: 10, name: "Crime Scene — Hilton", color: "var(--red)", assets: 6, tag: "EXT" },
-  { id: 11, name: "Arrest — Altoona", color: "var(--orange)", assets: 4, tag: "EXT" },
-  { id: 12, name: "Document Close-up", color: "var(--cyan)", assets: 9, tag: "PROP" },
-  { id: 13, name: "Surveillance Footage", color: "var(--yellow)", assets: 3, tag: "VID" },
-  { id: 14, name: "Manifesto Pages", color: "var(--red)", assets: 2, tag: "PROP" },
-  { id: 15, name: "Victim — B. Thompson", color: "var(--pink)", assets: 1, tag: "CHAR" },
+// ═══════════════════════════════════════════════════════════════════
+// MOOD BOARD ASSETS — modality-aware scene reference library
+// ═══════════════════════════════════════════════════════════════════
+// Each asset declares its modality so the card renderer can build the
+// right UI (waveform for audio, play-overlay for video, page skeleton
+// for docs, emoji + gradient for photo). Gradients mix two palette
+// tokens so cards feel lit rather than flat.
+type MoodModality = "photo" | "audio" | "video" | "doc"
+type MoodAsset = {
+  id: number
+  modality: MoodModality
+  title: string
+  subtitle: string
+  date: string
+  /** Uppercase color-coded category label (e.g. CRIME SCENE, EVIDENCE) */
+  tag: string
+  tagColor: string
+  /** Two colors for the card gradient — first is anchor, second is wash */
+  gradient: [string, string]
+  /** Photo only — emoji rendered large in the preview area */
+  emoji?: string
+  /** Audio only — mm:ss duration + a quoted transcript snippet */
+  duration?: string
+  quote?: string
+  /** Video only — mm:ss duration shown bottom-right */
+  pageCount?: never
+  /** Doc only — page count displayed as "10pp" pill */
+  pages?: number
+  span?: "tall"
+}
+
+const MOOD_CATEGORIES: MoodAsset[] = [
+  {
+    id: 1, modality: "photo", title: "W. 54th St", subtitle: "Evidence markers.",
+    date: "Dec 4, 2024", tag: "CRIME SCENE", tagColor: "var(--red)",
+    gradient: ["rgba(220, 38, 38, 0.35)", "rgba(0, 0, 0, 0.9)"], emoji: "🔍",
+  },
+  {
+    id: 2, modality: "photo", title: "9mm + silencer", subtitle: "Operable.",
+    date: "Dec 9, 2024", tag: "EVIDENCE", tagColor: "var(--amber)",
+    gradient: ["rgba(245, 158, 11, 0.28)", "rgba(0, 0, 0, 0.92)"], emoji: "📎",
+  },
+  {
+    id: 3, modality: "audio", title: "911 call", subtitle: "'He's sitting right there.'",
+    date: "Dec 9, 2024", tag: "CALL", tagColor: "var(--amber)",
+    gradient: ["rgba(245, 158, 11, 0.22)", "rgba(0, 0, 0, 0.94)"],
+    duration: "0:42", quote: "'He's sitting right there.'",
+  },
+  {
+    id: 4, modality: "photo", title: "Shell casing 'DENY'", subtitle: "9mm inscribed.",
+    date: "Dec 4, 2024", tag: "EVIDENCE", tagColor: "var(--amber)",
+    gradient: ["rgba(168, 85, 247, 0.22)", "rgba(0, 0, 0, 0.94)"], emoji: "📎",
+  },
+  {
+    id: 5, modality: "photo", title: "Booking photo", subtitle: "Altoona PD.",
+    date: "Dec 9, 2024", tag: "ARREST", tagColor: "var(--pink)",
+    gradient: ["rgba(236, 72, 153, 0.28)", "rgba(0, 0, 0, 0.94)"], emoji: "🚓",
+  },
+  {
+    id: 6, modality: "audio", title: "Hostel clerk", subtitle: "'He did it real quick.'",
+    date: "Dec 5, 2024", tag: "INTERVIEW", tagColor: "var(--green)",
+    gradient: ["rgba(34, 197, 94, 0.18)", "rgba(0, 0, 0, 0.94)"],
+    duration: "12:07", quote: "'He did it real quick.'",
+  },
+  {
+    id: 7, modality: "video", title: "Shooting footage", subtitle: "11 seconds.",
+    date: "Dec 4, 2024", tag: "SURVEILLANCE", tagColor: "var(--cyan)",
+    gradient: ["rgba(6, 182, 212, 0.26)", "rgba(0, 0, 0, 0.94)"], duration: "0:11",
+  },
+  {
+    id: 8, modality: "photo", title: "Surveillance", subtitle: "Hostel camera.",
+    date: "Dec 4, 2024", tag: "SURVEILLANCE", tagColor: "var(--cyan)",
+    gradient: ["rgba(29, 78, 216, 0.38)", "rgba(0, 0, 0, 0.94)"], emoji: "📹",
+  },
+  {
+    id: 9, modality: "doc", title: "Complaint (10pp)", subtitle: "FBI affidavit.",
+    date: "Dec 18, 2024", tag: "FILING", tagColor: "var(--red)",
+    gradient: ["rgba(220, 38, 38, 0.18)", "rgba(0, 0, 0, 0.94)"], pages: 10,
+  },
+  {
+    id: 10, modality: "doc", title: "Suppression (40pp)", subtitle: "Inventory search.",
+    date: "Jan 30, 2026", tag: "MOTION", tagColor: "var(--purple)",
+    gradient: ["rgba(168, 85, 247, 0.2)", "rgba(0, 0, 0, 0.94)"], pages: 40,
+  },
+  {
+    id: 11, modality: "photo", title: "Manifesto pages", subtitle: "'It had to be done.'",
+    date: "Dec 9, 2024", tag: "EVIDENCE", tagColor: "var(--amber)",
+    gradient: ["rgba(245, 158, 11, 0.22)", "rgba(0, 0, 0, 0.94)"], emoji: "📄",
+  },
+  {
+    id: 12, modality: "photo", title: "B. Thompson", subtitle: "Victim portrait.",
+    date: "Archival", tag: "CHAR", tagColor: "var(--pink)",
+    gradient: ["rgba(236, 72, 153, 0.22)", "rgba(0, 0, 0, 0.94)"], emoji: "🕯️",
+  },
+  {
+    id: 13, modality: "video", title: "Courthouse exit", subtitle: "Press gauntlet.",
+    date: "Feb 27, 2026", tag: "PRESS", tagColor: "var(--orange)",
+    gradient: ["rgba(251, 146, 60, 0.28)", "rgba(0, 0, 0, 0.94)"], duration: "2:48",
+  },
+  {
+    id: 14, modality: "audio", title: "Voir dire", subtitle: "'Have you followed...?'",
+    date: "Oct 10, 2026", tag: "PROCEEDING", tagColor: "var(--purple)",
+    gradient: ["rgba(168, 85, 247, 0.2)", "rgba(0, 0, 0, 0.94)"],
+    duration: "34:12", quote: "'Have you followed this case online?'",
+  },
+  {
+    id: 15, modality: "doc", title: "Jury questionnaire (62pp)", subtitle: "Vetting matrix.",
+    date: "Sep 2026", tag: "FILING", tagColor: "var(--cyan)",
+    gradient: ["rgba(6, 182, 212, 0.2)", "rgba(0, 0, 0, 0.94)"], pages: 62,
+  },
 ]
 
 // Legal Intelligence — features that make lawyers say "whoa"
@@ -157,7 +251,10 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   const [isDragging, setIsDragging] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("")
   const [inviteRole, setInviteRole] = useState("Collaborator")
-  const [uploadMode, setUploadMode] = useState<"case" | "secondary">("case")
+  // Organize tab — 3-way evidence category filter (Case / User / All), defaults to All.
+  // The Upload pane is now single-purpose (uploading files only); this toggle
+  // lives in Organize, where evidence populates after upload / from the docket.
+  const [evidenceView, setEvidenceView] = useState<"case" | "user" | "all">("all")
   const [visibleLanes, setVisibleLanes] = useState(new Set(["factual", "procedural", "scheduling"]))
 
   // Screenplay tab state
@@ -167,6 +264,15 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   const [editableScript, setEditableScript] = useState("")
   const [savedScripts, setSavedScripts] = useState<{id: string, name: string, content: string, dramaLevel: DramaLevel, createdAt: Date}[]>([])
   const [copySuccess, setCopySuccess] = useState(false)
+
+  // Screenplay production controls — these parameterize the generation
+  // request beyond just drama level. Length determines pacing (runtime
+  // target), POV picks the narrative anchor, format controls export /
+  // typesetting (industry-standard FDX vs plaintext Fountain vs PDF).
+  const [scriptLength, setScriptLength] = useState<"cold-open" | "teaser" | "half-hour" | "hour" | "pilot" | "feature">("hour")
+  const [scriptPOV, setScriptPOV] = useState<"prosecution" | "defense" | "defendant" | "omniscient" | "press">("omniscient")
+  const [scriptFormat, setScriptFormat] = useState<"screenplay" | "teleplay" | "stage" | "treatment">("screenplay")
+  const [scriptTitle, setScriptTitle] = useState("THE DENIED")
   
   // Upload tab state
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({})
@@ -475,9 +581,8 @@ Based on: ${assetNames}`,
             enabled: true
           }
           
-          if (uploadMode === "case") {
-            // Would need different structure, for now add to secondary
-          }
+          // All manual uploads land in the user-evidence bucket; Case Evidence
+          // is sourced from the docket and not user-populated.
           setSecondaryEvidence(prev => [...prev, newEvidence])
           
           // Log activity
@@ -680,8 +785,9 @@ Based on: ${assetNames}`,
 
             {/* Right controls */}
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => { onOpenSettings?.(); }}
+              <Link
+                href="/settings"
+                onClick={() => { onOpenSettings?.(); onClose(); }}
                 className={cn(
                   "px-3 h-8 flex items-center gap-2",
                   "border border-[var(--border)] text-white/60",
@@ -691,7 +797,7 @@ Based on: ${assetNames}`,
               >
                 <Settings size={11} />
                 Settings
-              </button>
+              </Link>
 
               <div className="w-px h-6 bg-[var(--border)]" />
 
@@ -769,59 +875,56 @@ Based on: ${assetNames}`,
         <div className="flex-1 flex overflow-hidden bg-background">
           {/* CENTER - Main Content Area */}
           <div className="flex-1 overflow-y-auto p-6 bg-background">
-            {/* UPLOAD TAB */}
+            {/* ═════════════════════════════════════════════════════════
+                UPLOAD TAB — single-purpose: just upload files.
+                Categorization (Case Evidence / User Evidence / All) and
+                the mood board live in the Organize tab. All uploads here
+                flow into the "User Evidence" bucket; Case Evidence is
+                docket-sourced and populated automatically from PACER.
+                ═════════════════════════════════════════════════════════ */}
             {activeTab === "upload" && (
               <div className="space-y-6">
                 {/* Upload Evidence Header */}
-                <div className="flex items-center gap-2">
-                  <Upload size={16} className="text-purple" />
-                  <span className="font-mono text-xs font-bold text-purple tracking-wider">UPLOAD EVIDENCE</span>
-                </div>
-                
-                {/* Case / Secondary Toggle */}
-                <div className="flex gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Upload size={16} className="text-purple" />
+                    <span className="font-mono text-xs font-bold text-purple tracking-wider">UPLOAD EVIDENCE</span>
+                  </div>
                   <button
-                    onClick={() => setUploadMode("case")}
+                    onClick={() => setActiveTab("organize")}
                     className={cn(
-                      "px-4 py-2 flex items-center gap-2",
-                      "font-mono text-xs font-bold",
-                      "border-2 transition-all",
-                      "",
-                      uploadMode === "case"
-                        ? "border-red bg-red text-white"
-                        : "border-border text-foreground hover:border-red"
+                      "px-3 py-1.5 flex items-center gap-2",
+                      "border border-border text-muted-foreground",
+                      "font-mono text-[10px] font-bold tracking-wider",
+                      "hover:border-cyan hover:text-cyan transition-colors"
                     )}
+                    title="Jump to Organize to browse / categorize evidence"
                   >
-                    <Flame size={14} />
-                    CASE EVIDENCE
-                  </button>
-                  <button
-                    onClick={() => setUploadMode("secondary")}
-                    className={cn(
-                      "px-4 py-2 flex items-center gap-2",
-                      "font-mono text-xs font-bold",
-                      "border-2 transition-all",
-                      "",
-                      uploadMode === "secondary"
-                        ? "border-purple bg-purple text-white"
-                        : "border-border text-foreground hover:border-purple"
-                    )}
-                  >
-                    <ImagePlus size={14} />
-                    MOOD BOARD
+                    <FolderOpen size={12} />
+                    BROWSE EVIDENCE
+                    <ChevronDown size={10} className="-rotate-90" />
                   </button>
                 </div>
-                
-                {/* Dropzone — compact */}
+
+                {/* Subheader explainer */}
+                <p className="font-mono text-[11px] text-muted-foreground leading-relaxed max-w-2xl">
+                  Drop files, link a drive, or paste a URL. Everything you upload here lands in
+                  <span className="text-purple font-bold"> User Evidence</span>. Docket filings
+                  populate <span className="text-red font-bold">Case Evidence</span> automatically
+                  from PACER. To browse, classify, or toggle sources, jump to
+                  <span className="text-cyan font-bold"> Organize</span>.
+                </p>
+
+                {/* Primary Dropzone — simplified, single-mode */}
                 <label
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   className={cn(
-                    "border-2 border-dashed px-6 py-6 text-center transition-all cursor-pointer block",
+                    "border-2 border-dashed px-8 py-10 text-center transition-all cursor-pointer block",
                     isDragging
-                      ? uploadMode === "case" ? "border-red bg-red/10" : "border-purple bg-purple/10"
-                      : "border-border hover:border-muted-foreground"
+                      ? "border-purple bg-purple/10"
+                      : "border-border hover:border-purple/60"
                   )}
                 >
                   <input
@@ -831,31 +934,36 @@ Based on: ${assetNames}`,
                     onChange={(e) => handleFileUpload(e.target.files)}
                     accept=".pdf,.docx,.doc,.mp4,.m4a,.mp3,.jpg,.jpeg,.png,.zip"
                   />
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="w-10 h-10 bg-surface-alt flex items-center justify-center shrink-0">
-                      <Upload size={20} className={uploadMode === "case" ? "text-red" : "text-purple"} />
+                  <div className="flex items-center justify-center gap-5">
+                    <div className="w-14 h-14 bg-surface-alt flex items-center justify-center shrink-0 border border-purple/30">
+                      <Upload size={26} className="text-purple" />
                     </div>
                     <div className="text-left">
-                      <p className={cn("font-sans text-sm font-bold", uploadMode === "case" ? "text-red" : "text-purple")}>
-                        {uploadMode === "case"
-                          ? "Drop docket filings — authoritative court record"
-                          : "Drop visual refs — mood, tone, scene inspiration"}
+                      <p className="font-sans text-base font-bold text-purple">
+                        Drop files to upload, or click to browse
                       </p>
-                      <p className="font-mono text-[10px] text-muted-foreground">
-                        {uploadMode === "case"
-                          ? "PDF · DOCX — pleadings, orders, exhibits, transcripts — up to 100MB"
-                          : "JPG · PNG · MP4 · M4A · ZIP — stills, clips, audio cues — up to 100MB"}
+                      <p className="font-mono text-[11px] text-muted-foreground mt-1">
+                        PDF · DOCX · MP4 · M4A · MP3 · JPG · PNG · ZIP — up to 100MB per file
+                      </p>
+                      <p className="font-mono text-[10px] text-muted-foreground mt-0.5">
+                        Multi-file supported. Uploads land in <span className="text-purple font-bold">User Evidence</span>.
                       </p>
                     </div>
                   </div>
                 </label>
-                
+
                 {/* Upload Progress */}
                 {Object.keys(uploadProgress).length > 0 && (
-                  <div className="space-y-2 mt-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Activity size={12} className="text-purple" />
+                      <span className="font-mono text-[10px] font-bold text-purple tracking-wider">
+                        IN FLIGHT · {Object.keys(uploadProgress).length} file{Object.keys(uploadProgress).length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
                     {Object.entries(uploadProgress).map(([fileId, progress]) => (
-                      <div key={fileId} className="flex items-center gap-3 p-3 bg-surface rounded-lg border border-border">
-                        <div className="w-8 h-8 rounded-lg bg-purple/20 flex items-center justify-center">
+                      <div key={fileId} className="flex items-center gap-3 p-3 bg-surface border border-border">
+                        <div className="w-8 h-8 bg-purple/20 flex items-center justify-center">
                           <FileText size={16} className="text-purple" />
                         </div>
                         <div className="flex-1">
@@ -863,8 +971,8 @@ Based on: ${assetNames}`,
                             <span className="font-mono text-xs">{fileId.split("-")[0]}</span>
                             <span className="font-mono text-xs text-muted-foreground">{Math.round(progress)}%</span>
                           </div>
-                          <div className="h-1.5 bg-border rounded-full overflow-hidden">
-                            <div 
+                          <div className="h-1.5 bg-border overflow-hidden">
+                            <div
                               className="h-full bg-gradient-to-r from-purple to-pink transition-all duration-200"
                               style={{ width: `${progress}%` }}
                             />
@@ -874,14 +982,57 @@ Based on: ${assetNames}`,
                     ))}
                   </div>
                 )}
-                
+
+                {/* ALTERNATE UPLOAD CHANNELS */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Google Drive */}
+                  <button
+                    className={cn(
+                      "flex items-center gap-3 p-4",
+                      "border-2 border-border bg-card",
+                      "hover:border-cyan hover:bg-cyan/5 transition-all text-left"
+                    )}
+                  >
+                    <div className="w-10 h-10 bg-cyan/20 flex items-center justify-center shrink-0">
+                      <FolderOpen size={20} className="text-cyan" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono text-xs font-bold text-cyan">CONNECT GOOGLE DRIVE</div>
+                      <div className="font-mono text-[10px] text-muted-foreground truncate">
+                        Pull folders of refs, scripts, transcripts
+                      </div>
+                    </div>
+                    <ExternalLink size={12} className="text-muted-foreground shrink-0" />
+                  </button>
+
+                  {/* PACER */}
+                  <button
+                    className={cn(
+                      "flex items-center gap-3 p-4",
+                      "border-2 border-border bg-card",
+                      "hover:border-red hover:bg-red/5 transition-all text-left"
+                    )}
+                  >
+                    <div className="w-10 h-10 bg-red/20 flex items-center justify-center shrink-0">
+                      <Scale size={20} className="text-red" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono text-xs font-bold text-red">LINK PACER DOCKET</div>
+                      <div className="font-mono text-[10px] text-muted-foreground truncate">
+                        Auto-sync filings into Case Evidence
+                      </div>
+                    </div>
+                    <ExternalLink size={12} className="text-muted-foreground shrink-0" />
+                  </button>
+                </div>
+
                 {/* AI Auto-Labeling */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <Sparkles size={14} className="text-cyan" />
                     <span className="font-mono text-[10px] font-bold text-cyan tracking-wider">AI AUTO-LABELING</span>
+                    <span className="font-mono text-[9px] text-muted-foreground">— runs on every file after upload</span>
                   </div>
-                  
                   <div className="flex flex-wrap gap-2">
                     {AI_CAPABILITIES.map((cap, i) => (
                       <div
@@ -889,8 +1040,7 @@ Based on: ${assetNames}`,
                         className={cn(
                           "flex items-center gap-2 px-3 py-2",
                           "border border-border bg-card",
-                          "",
-                          "hover:border-current transition-colors cursor-pointer"
+                          "hover:border-current transition-colors"
                         )}
                         style={{ color: cap.color }}
                       >
@@ -900,215 +1050,285 @@ Based on: ${assetNames}`,
                     ))}
                   </div>
                 </div>
-                
-                {/* ═══ MOOD BOARD — Expanded Visual Taxonomy ═══ */}
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Grid3X3 size={14} className="text-orange" />
-                      <span className="font-mono text-[10px] font-bold text-orange tracking-wider">MOOD BOARD — SCENE REFERENCE LIBRARY</span>
-                      <span className="px-1.5 py-0.5 bg-orange/10 border border-orange/30 font-mono text-[8px] font-bold text-orange">{MOOD_CATEGORIES.length} BOARDS</span>
-                    </div>
-                    <div className="flex gap-1.5">
-                      <button className="px-2 py-1 border border-border font-mono text-[8px] text-muted-foreground hover:text-foreground transition-colors">
-                        <Grid3X3 size={10} />
-                      </button>
-                      <button className="px-2 py-1 border border-border font-mono text-[8px] text-muted-foreground hover:text-foreground transition-colors">
-                        <List size={10} />
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Masonry-style mood grid — 4 columns, varied heights */}
-                  <div className="grid grid-cols-4 gap-3">
-                    {MOOD_CATEGORIES.map((cat, i) => {
-                      // Vary card heights for visual interest
-                      const isLarge = i === 0 || i === 9 || i === 4
-                      const isMedium = i === 1 || i === 5 || i === 11
-                      return (
-                        <div
-                          key={cat.id}
-                          className={cn(
-                            "group border-2 border-border bg-surface-alt/30 overflow-hidden",
-                            "hover:border-current cursor-pointer transition-all",
-                            "hover:shadow-[0_0_12px_-4px_currentColor]",
-                            isLarge ? "row-span-2" : ""
-                          )}
-                          style={{ color: cat.color }}
-                        >
-                          {/* Visual area */}
-                          <div
-                            className={cn(
-                              "relative flex items-center justify-center bg-gradient-to-br from-surface-alt to-border/30",
-                              isLarge ? "h-32" : isMedium ? "h-20" : "h-16"
-                            )}
-                          >
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-current/5" />
-                            <span className="font-mono text-[8px] font-bold opacity-20 uppercase">{cat.tag}</span>
-                            {/* Asset count badge */}
-                            <div className="absolute top-1.5 right-1.5 px-1 py-0.5 bg-black/50 backdrop-blur-sm font-mono text-[7px] font-bold text-white">
-                              {cat.assets}
-                            </div>
-                          </div>
-                          {/* Label */}
-                          <div className="px-2 py-1.5 border-t border-border/50">
-                            <div className="font-mono text-[9px] font-bold text-foreground truncate">{cat.name}</div>
-                            <div className="font-mono text-[7px] text-muted-foreground">{cat.assets} reference{cat.assets !== 1 ? "s" : ""}</div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                    {/* Add new board */}
-                    <div className="border-2 border-dashed border-purple/40 flex flex-col items-center justify-center py-6 hover:border-purple hover:bg-purple/5 cursor-pointer transition-all">
-                      <Plus size={18} className="text-purple mb-1" />
-                      <span className="font-mono text-[9px] text-purple font-bold">New Board</span>
-                    </div>
+                {/* Tips — guidance for uploaders */}
+                <div className="border border-yellow/30 bg-yellow/5 p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangleIcon size={14} className="text-yellow" />
+                    <span className="font-mono text-[10px] font-bold text-yellow tracking-wider">UPLOADER TIPS</span>
                   </div>
-                </div>
-
-                {/* ═══ LEGAL INTELLIGENCE — Expert Features ═══ */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Scale size={14} className="text-green" />
-                    <span className="font-mono text-[10px] font-bold text-green tracking-wider">LEGAL INTELLIGENCE</span>
-                    <span className="px-1.5 py-0.5 bg-green/10 border border-green/30 font-mono text-[8px] font-bold text-green animate-pulse">LIVE</span>
-                  </div>
-
-                  {/* Metrics row */}
-                  <div className="grid grid-cols-4 gap-2 mb-4">
-                    {LEGAL_INTELLIGENCE.map((metric) => (
-                      <div key={metric.id} className="border-2 border-border bg-card p-3 hover:border-current transition-colors group cursor-default" style={{ borderLeftColor: metric.color, borderLeftWidth: '3px' }}>
-                        <div className="font-mono text-[8px] text-muted-foreground uppercase tracking-wider mb-1">{metric.label}</div>
-                        <div className="flex items-end gap-1.5">
-                          <span className="font-sans text-xl font-black" style={{ color: metric.color }}>{metric.value}</span>
-                          <span className="font-mono text-[9px] text-muted-foreground mb-0.5">{metric.unit}</span>
-                        </div>
-                        <div className="flex items-center gap-1 mt-1">
-                          <TrendingUp size={8} style={{ color: metric.color }} />
-                          <span className="font-mono text-[8px]" style={{ color: metric.color }}>{metric.trend}</span>
-                        </div>
-                        <div className="font-mono text-[7px] text-muted-foreground mt-1">{metric.desc}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* FRCP Quick Reference */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <FileSearch size={12} className="text-cyan" />
-                      <span className="font-mono text-[9px] font-bold text-cyan tracking-wider">FED. R. CRIM. P. — APPLICABLE</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {FRCP_QUICK_REF.map((rule, i) => (
-                        <div
-                          key={i}
-                          className={cn(
-                            "px-2 py-2 border bg-card cursor-pointer transition-all",
-                            rule.active
-                              ? "border-cyan/40 hover:border-cyan hover:bg-cyan/5"
-                              : "border-border opacity-50 hover:opacity-80"
-                          )}
-                        >
-                          <div className="font-mono text-[9px] font-bold text-cyan">{rule.rule}</div>
-                          <div className="font-mono text-[8px] text-foreground truncate">{rule.title}</div>
-                          <div className="font-mono text-[7px] text-muted-foreground mt-0.5">{rule.deadline}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <ul className="space-y-1.5 font-mono text-[11px] text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow shrink-0">→</span>
+                      <span>
+                        Text-based PDFs index best. For scans, run OCR first or upload images — our vision
+                        models handle them, but they take longer.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow shrink-0">→</span>
+                      <span>
+                        Name files descriptively (<code className="text-cyan">"smith-depo-2025-09-12.pdf"</code>
+                        beats <code className="text-cyan">"scan0021.pdf"</code>) — it helps the AI tag
+                        and cross-reference them.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow shrink-0">→</span>
+                      <span>
+                        Group related exhibits into ZIPs. We'll unpack, classify, and line them up in the
+                        <span className="text-cyan font-bold"> Organize </span> view.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-yellow shrink-0">→</span>
+                      <span>
+                        Audio and video get transcribed + scene-detected automatically. Expect 1-2 min
+                        per 10 min of runtime.
+                      </span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             )}
             
-            {/* ORGANIZE TAB */}
+            {/* ═════════════════════════════════════════════════════════
+                ORGANIZE TAB — this is where uploaded/populated evidence
+                lives. The 3-way filter (Case / User / All) controls what
+                grids render below it. Timelines + Docket are always visible
+                (they're case-wide context, not per-bucket).
+                ═════════════════════════════════════════════════════════ */}
             {activeTab === "organize" && (
               <div className="space-y-6">
-                {/* Timelines Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Layers size={14} className="text-cyan" />
-                        <span className="font-mono text-xs font-bold tracking-wider">TIMELINES</span>
-                      </div>
-                      <button className={cn(
-                        "px-3 py-1 flex items-center gap-1",
-                        "bg-surface-alt text-foreground",
-                        "font-mono text-[10px] font-bold",
-                        "",
-                        "border border-border"
-                      )}>
-                        <ChevronDown size={12} />
-                        VISIBLE
-                      </button>
-                    </div>
-                    
-                    {/* Lane Filters */}
+                {/* ═══ EVIDENCE CATEGORY TOGGLE — 3-way switch ═══ */}
+                <div className="border border-border bg-surface-alt/30 p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      {Object.entries(LANES).map(([key, lane]) => (
+                      <FolderOpen size={14} className="text-cyan" />
+                      <span className="font-mono text-xs font-bold text-cyan tracking-wider">EVIDENCE VIEW</span>
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        — toggle what appears in the board below
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      {enabledCount}/{totalCount} sources active
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "all" as const, label: "ALL", icon: Layers, color: "var(--cyan)", count: totalCount, desc: "Everything, unified" },
+                      { id: "case" as const, label: "CASE EVIDENCE", icon: Scale, color: "var(--red)", count: caseEvidence.length, desc: "Docket-sourced filings" },
+                      { id: "user" as const, label: "USER EVIDENCE", icon: ImagePlus, color: "var(--purple)", count: secondaryEvidence.length, desc: "Your uploads & refs" },
+                    ].map((opt) => {
+                      const active = evidenceView === opt.id
+                      return (
                         <button
-                          key={key}
-                          onClick={() => toggleLane(key)}
+                          key={opt.id}
+                          onClick={() => setEvidenceView(opt.id)}
                           className={cn(
-                            "px-3 py-1.5 flex items-center gap-2",
-                            "font-mono text-[10px] font-bold",
+                            "flex items-start gap-3 p-3 text-left",
                             "border-2 transition-all",
-                            "",
-                            visibleLanes.has(key)
-                              ? "border-current bg-current/10"
-                              : "border-border text-muted-foreground opacity-50"
+                            active
+                              ? "bg-current/10 shadow-[3px_3px_0_var(--shadow-color)]"
+                              : "border-border hover:border-current/50 opacity-70 hover:opacity-100"
                           )}
-                          style={{ color: visibleLanes.has(key) ? lane.color : undefined }}
+                          style={{ color: opt.color, borderColor: active ? opt.color : undefined }}
                         >
-                          <div 
-                            className="w-2 h-2 rounded-full" 
-                            style={{ backgroundColor: lane.color }}
-                          />
-                          {lane.label}
+                          <div
+                            className="w-8 h-8 flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: `color-mix(in srgb, ${opt.color} 20%, transparent)` }}
+                          >
+                            <opt.icon size={16} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold tracking-wider">{opt.label}</span>
+                              <span
+                                className="px-1.5 py-0.5 font-mono text-[9px] font-bold"
+                                style={{ backgroundColor: active ? opt.color : "transparent", color: active ? "var(--background)" : opt.color, border: `1px solid ${opt.color}` }}
+                              >
+                                {opt.count}
+                              </span>
+                            </div>
+                            <div className="font-mono text-[10px] text-muted-foreground mt-0.5">{opt.desc}</div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* ═══ CASE EVIDENCE GRID — visible in "case" + "all" ═══ */}
+                {(evidenceView === "case" || evidenceView === "all") && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Scale size={14} className="text-red" />
+                        <span className="font-mono text-[10px] font-bold text-red tracking-wider">CASE EVIDENCE — FROM THE DOCKET</span>
+                        <span className="px-1.5 py-0.5 bg-red/10 border border-red/30 font-mono text-[9px] font-bold text-red">{caseEvidence.length}</span>
+                      </div>
+                      <span className="font-mono text-[9px] text-muted-foreground">Auto-synced from PACER</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {caseEvidence.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => toggleAsset(item.id, true)}
+                          className={cn(
+                            "flex items-start gap-3 p-3 text-left",
+                            "border bg-card transition-all",
+                            item.enabled
+                              ? "border-current shadow-[inset_0_0_20px_-10px_currentColor]"
+                              : "border-border opacity-50 hover:opacity-80"
+                          )}
+                          style={{ color: item.color }}
+                        >
+                          <div className="w-8 h-8 flex items-center justify-center shrink-0 bg-current/10">
+                            <item.icon size={14} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-mono text-xs font-bold text-foreground truncate">{item.name}</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="font-mono text-[9px] text-muted-foreground">{item.date}</span>
+                              <span className="px-1 py-0.5 font-mono text-[8px] font-bold" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 20%, transparent)`, color: item.color }}>
+                                {item.tier}
+                              </span>
+                              <span className="font-mono text-[8px] text-muted-foreground uppercase">{item.type}</span>
+                            </div>
+                          </div>
+                          <div className={cn("w-3 h-3 shrink-0 rounded-full border-2", item.enabled ? "bg-current border-current" : "border-muted-foreground")} />
                         </button>
                       ))}
                     </div>
                   </div>
-                  
-                  {/* Timeline Chips */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {TIMELINE_EVENTS.filter(e => visibleLanes.has(e.lane)).map((event, i) => (
-                      <div
-                        key={i}
-                        className={cn(
-                          "px-3 py-2 flex items-center gap-2",
-                          "border-2 bg-card",
-                          "",
-                          "cursor-pointer hover:shadow-md transition-all"
-                        )}
-                        style={{ 
-                          borderColor: LANES[event.lane as keyof typeof LANES].color,
-                          borderLeftWidth: '4px'
-                        }}
-                      >
-                        <span className="font-mono text-[10px] font-bold" style={{ color: LANES[event.lane as keyof typeof LANES].color }}>
-                          {event.date}
-                        </span>
-                        <span className="font-mono text-[11px]">{event.title}</span>
-                        <MoreHorizontal size={14} className="text-muted-foreground" />
+                )}
+
+                {/* ═══ MOOD BOARD — modality-aware scene reference library ═══
+                    Renders photo / audio / video / doc cards with distinct UI
+                    per modality. Visible in "case" + "all" views. ═══ */}
+                {(evidenceView === "case" || evidenceView === "all") && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Grid3X3 size={14} className="text-orange" />
+                        <span className="font-mono text-[10px] font-bold text-orange tracking-wider">FROM CASE EVIDENCE</span>
+                        <span className="px-1.5 py-0.5 bg-orange/10 border border-orange/30 font-mono text-[9px] font-bold text-orange">{MOOD_CATEGORIES.length} ASSETS</span>
+                        <span className="font-mono text-[9px] text-muted-foreground">— scene reference library derived from the record</span>
                       </div>
-                    ))}
+                      {/* Modality legend */}
+                      <div className="flex items-center gap-2">
+                        <ModalityChip icon={ImageIcon} label="PHOTO" color="var(--red)" />
+                        <ModalityChip icon={Volume2} label="AUDIO" color="var(--green)" />
+                        <ModalityChip icon={Video} label="VIDEO" color="var(--cyan)" />
+                        <ModalityChip icon={FileText} label="DOC" color="var(--purple)" />
+                      </div>
+                    </div>
+
+                    {/* Masonry-ish 3-col grid. Photo/video tiles are square-ish;
+                        audio + doc tiles are wider rows in the right column. */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {MOOD_CATEGORIES.map((asset) => (
+                        <MoodAssetCard key={asset.id} asset={asset} />
+                      ))}
+                      {/* Add-new tile */}
+                      <button
+                        onClick={() => setActiveTab("upload")}
+                        className="border-2 border-dashed border-purple/40 flex flex-col items-center justify-center py-10 hover:border-purple hover:bg-purple/5 cursor-pointer transition-all"
+                      >
+                        <Plus size={18} className="text-purple mb-1" />
+                        <span className="font-mono text-[10px] text-purple font-bold">Add asset</span>
+                        <span className="font-mono text-[8px] text-muted-foreground mt-0.5">photo · audio · video · doc</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Case Docket Section */}
+                )}
+
+                {/* ═══ USER EVIDENCE — visible in "user" + "all" ═══ */}
+                {(evidenceView === "user" || evidenceView === "all") && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <ImagePlus size={14} className="text-purple" />
+                        <span className="font-mono text-[10px] font-bold text-purple tracking-wider">USER EVIDENCE — YOUR UPLOADS</span>
+                        <span className="px-1.5 py-0.5 bg-purple/10 border border-purple/30 font-mono text-[9px] font-bold text-purple">{secondaryEvidence.length}</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab("upload")}
+                        className="px-3 py-1 border border-purple/40 font-mono text-[9px] font-bold text-purple hover:bg-purple/10 transition-colors flex items-center gap-1"
+                      >
+                        <Plus size={10} />
+                        ADD MORE
+                      </button>
+                    </div>
+
+                    {/* Uploaded Evidence Dataset — table-style, relocated from case page */}
+                    <div className="border border-border mb-4">
+                      <div className="px-3 py-2 border-b border-border bg-surface-alt/50 flex items-center justify-between">
+                        <span className="font-mono text-[9px] font-bold text-muted-foreground tracking-wider">UPLOADED EVIDENCE DATASET</span>
+                        <span className="font-mono text-[9px] text-muted-foreground">{secondaryEvidence.length} items</span>
+                      </div>
+                      {secondaryEvidence.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => toggleAsset(item.id, false)}
+                          className={cn(
+                            "w-full flex items-center gap-3 px-3 py-2.5 border-b border-border last:border-0",
+                            "text-left transition-colors",
+                            item.enabled ? "hover:bg-purple/5" : "opacity-50 hover:opacity-80"
+                          )}
+                          style={{ color: item.color }}
+                        >
+                          <div className="w-7 h-7 flex items-center justify-center shrink-0 bg-current/10">
+                            <item.icon size={13} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-mono text-xs font-bold text-foreground truncate">{item.name}</div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="px-1 py-0.5 font-mono text-[8px] font-bold uppercase" style={{ backgroundColor: `color-mix(in srgb, ${item.color} 20%, transparent)`, color: item.color }}>
+                                {item.tag}
+                              </span>
+                              <span className="font-mono text-[9px] text-muted-foreground truncate">{item.detail}</span>
+                            </div>
+                          </div>
+                          <div className={cn("w-3 h-3 shrink-0 rounded-full border-2", item.enabled ? "bg-current border-current" : "border-muted-foreground")} />
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* User Evidence actions row */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setActiveTab("upload")}
+                        className="px-4 py-2 flex items-center gap-2 bg-purple text-white font-mono text-xs font-bold hover:bg-purple/90 transition-colors"
+                      >
+                        <Upload size={14} />
+                        Upload More
+                      </button>
+                      <button
+                        onClick={() => handleQuickAction("AI Summarize")}
+                        className="px-4 py-2 flex items-center gap-2 border-2 border-border font-mono text-xs font-bold hover:border-cyan hover:text-cyan transition-colors"
+                      >
+                        <Sparkles size={14} />
+                        Analyze All
+                      </button>
+                      <button
+                        className="px-4 py-2 flex items-center gap-2 border-2 border-border font-mono text-xs font-bold hover:border-green hover:text-green transition-colors"
+                      >
+                        <FolderOpen size={14} />
+                        Connect Drive
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ═══ DOCKET — always visible (case-wide context) ═══ */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
                     <FileText size={14} className="text-purple" />
                     <span className="font-mono text-xs font-bold text-purple tracking-wider">CASE DOCKET</span>
-                    <span className={cn(
-                      "px-1.5 py-0.5 bg-purple/20 text-purple",
-                      "font-mono text-[10px] font-bold",
-                      "rounded"
-                    )}>{DOCKET_ENTRIES.length}</span>
+                    <span className="px-1.5 py-0.5 bg-purple/20 text-purple font-mono text-[10px] font-bold">{DOCKET_ENTRIES.length}</span>
                   </div>
-                  
-                  <div className="border border-border  overflow-hidden">
+                  <div className="border border-border overflow-hidden">
                     {DOCKET_ENTRIES.map((entry, i) => (
                       <div
                         key={i}
@@ -1130,61 +1350,120 @@ Based on: ${assetNames}`,
                       </div>
                     ))}
                   </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 mt-4">
-                    <button 
+                  <div className="flex gap-2 mt-3">
+                    <button
                       onClick={() => handleQuickAction("AI Summarize")}
-                      className={cn(
-                        "px-4 py-2 flex items-center gap-2",
-                        "bg-red text-white",
-                        "font-mono text-xs font-bold",
-                        "",
-                        "hover:bg-red/90 transition-colors"
-                      )}
+                      className="px-4 py-2 flex items-center gap-2 bg-red text-white font-mono text-xs font-bold hover:bg-red/90 transition-colors"
                     >
                       <Sparkles size={14} />
                       AI Summarize
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleQuickAction("Generate Script")}
-                      className={cn(
-                        "px-4 py-2 flex items-center gap-2",
-                        "border-2 border-border",
-                        "font-mono text-xs font-bold",
-                        "",
-                        "hover:border-purple hover:text-purple transition-colors"
-                      )}
+                      className="px-4 py-2 flex items-center gap-2 border-2 border-border font-mono text-xs font-bold hover:border-purple hover:text-purple transition-colors"
                     >
                       <Film size={14} />
                       Generate Treatment
                     </button>
-                    <button 
-                      onClick={() => handleQuickAction("Audio Summary")}
-                      className={cn(
-                        "px-4 py-2 flex items-center gap-2",
-                        "border-2 border-border",
-                        "font-mono text-xs font-bold",
-                        "",
-                        "hover:border-cyan hover:text-cyan transition-colors"
-                      )}
-                    >
-                      <Volume2 size={14} />
-                      Audio Summary
-                    </button>
-                    <button 
+                    <button
                       onClick={handleExportDocket}
-                      className={cn(
-                        "px-4 py-2 flex items-center gap-2",
-                        "border-2 border-border",
-                        "font-mono text-xs font-bold",
-                        "",
-                        "hover:border-green hover:text-green transition-colors"
-                      )}
+                      className="px-4 py-2 flex items-center gap-2 border-2 border-border font-mono text-xs font-bold hover:border-green hover:text-green transition-colors"
                     >
                       <Download size={14} />
                       Export CSV
                     </button>
+                  </div>
+                </div>
+
+                {/* ═══ TIMELINES — always visible (case-wide context) ═══ */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Layers size={14} className="text-cyan" />
+                      <span className="font-mono text-xs font-bold text-cyan tracking-wider">TIMELINES</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {Object.entries(LANES).map(([key, lane]) => (
+                        <button
+                          key={key}
+                          onClick={() => toggleLane(key)}
+                          className={cn(
+                            "px-3 py-1.5 flex items-center gap-2",
+                            "font-mono text-[10px] font-bold border-2 transition-all",
+                            visibleLanes.has(key)
+                              ? "border-current bg-current/10"
+                              : "border-border text-muted-foreground opacity-50"
+                          )}
+                          style={{ color: visibleLanes.has(key) ? lane.color : undefined }}
+                        >
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: lane.color }} />
+                          {lane.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {TIMELINE_EVENTS.filter(e => visibleLanes.has(e.lane)).map((event, i) => (
+                      <div
+                        key={i}
+                        className="px-3 py-2 flex items-center gap-2 border-2 bg-card cursor-pointer hover:shadow-md transition-all"
+                        style={{ borderColor: LANES[event.lane as keyof typeof LANES].color, borderLeftWidth: '4px' }}
+                      >
+                        <span className="font-mono text-[10px] font-bold" style={{ color: LANES[event.lane as keyof typeof LANES].color }}>
+                          {event.date}
+                        </span>
+                        <span className="font-mono text-[11px]">{event.title}</span>
+                        <MoreHorizontal size={14} className="text-muted-foreground" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ═══ LEGAL INTELLIGENCE — moved here from Upload ═══ */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Scale size={14} className="text-green" />
+                    <span className="font-mono text-[10px] font-bold text-green tracking-wider">LEGAL INTELLIGENCE</span>
+                    <span className="px-1.5 py-0.5 bg-green/10 border border-green/30 font-mono text-[8px] font-bold text-green animate-pulse">LIVE</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {LEGAL_INTELLIGENCE.map((metric) => (
+                      <div key={metric.id} className="border-2 border-border bg-card p-3 hover:border-current transition-colors group cursor-default" style={{ borderLeftColor: metric.color, borderLeftWidth: '3px' }}>
+                        <div className="font-mono text-[8px] text-muted-foreground uppercase tracking-wider mb-1">{metric.label}</div>
+                        <div className="flex items-end gap-1.5">
+                          <span className="font-sans text-xl font-black" style={{ color: metric.color }}>{metric.value}</span>
+                          <span className="font-mono text-[9px] text-muted-foreground mb-0.5">{metric.unit}</span>
+                        </div>
+                        <div className="flex items-center gap-1 mt-1">
+                          <TrendingUp size={8} style={{ color: metric.color }} />
+                          <span className="font-mono text-[8px]" style={{ color: metric.color }}>{metric.trend}</span>
+                        </div>
+                        <div className="font-mono text-[7px] text-muted-foreground mt-1">{metric.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileSearch size={12} className="text-cyan" />
+                      <span className="font-mono text-[9px] font-bold text-cyan tracking-wider">FED. R. CRIM. P. — APPLICABLE</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {FRCP_QUICK_REF.map((rule, i) => (
+                        <div
+                          key={i}
+                          className={cn(
+                            "px-2 py-2 border bg-card cursor-pointer transition-all",
+                            rule.active
+                              ? "border-cyan/40 hover:border-cyan hover:bg-cyan/5"
+                              : "border-border opacity-50 hover:opacity-80"
+                          )}
+                        >
+                          <div className="font-mono text-[9px] font-bold text-cyan">{rule.rule}</div>
+                          <div className="font-mono text-[8px] text-foreground truncate">{rule.title}</div>
+                          <div className="font-mono text-[7px] text-muted-foreground mt-0.5">{rule.deadline}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1212,87 +1491,181 @@ Based on: ${assetNames}`,
                   )}
                 </div>
                 
-                {/* Dramatization Axis — 5 brutalist stops (Court Record → Mythic) */}
-                <div
-                  role="radiogroup"
-                  aria-label="Dramatization level"
-                  className="flex gap-2"
-                >
-                  {DRAMA_LEVELS.map((dl) => {
-                    const active = dl.id === dramaLevel
-                    const filled = dl.id <= dramaLevel
-                    return (
-                      <button
-                        key={dl.id}
-                        type="button"
-                        role="radio"
-                        aria-checked={active}
-                        aria-label={`${dl.label} (level ${dl.id})`}
-                        tabIndex={active ? 0 : -1}
-                        disabled={isGenerating}
-                        onClick={() => setDramaLevel(dl.id)}
-                        onKeyDown={(e) => {
-                          const max = DRAMA_LEVELS.length - 1
-                          if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                            e.preventDefault()
-                            setDramaLevel(Math.min(max, dramaLevel + 1) as DramaLevel)
-                          } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                            e.preventDefault()
-                            setDramaLevel(Math.max(0, dramaLevel - 1) as DramaLevel)
-                          } else if (e.key === "Home") {
-                            e.preventDefault()
-                            setDramaLevel(0)
-                          } else if (e.key === "End") {
-                            e.preventDefault()
-                            setDramaLevel(max as DramaLevel)
-                          }
-                        }}
-                        title={dl.label}
-                        className={cn(
-                          "group flex-1 flex flex-col items-start gap-2 p-3 text-left",
-                          "border transition-all",
-                          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
-                          "disabled:opacity-50 disabled:cursor-not-allowed",
-                          active
-                            ? "border-[var(--foreground)] shadow-[3px_3px_0_var(--shadow-color)]"
-                            : "border-[var(--border)] hover:border-[var(--foreground)]/60"
-                        )}
-                        style={{
-                          backgroundColor: filled ? dl.color : "transparent",
-                          color: filled ? "var(--background)" : "var(--muted-foreground)",
-                          opacity: filled ? 1 : 0.55,
-                        }}
-                      >
-                        <span className="font-mono text-[9px] font-bold tracking-widest">
-                          L{dl.id}
-                        </span>
-                        <span className="font-sans text-xs font-black leading-tight">
-                          {dl.label}
-                        </span>
-                      </button>
-                    )
-                  })}
+                {/* ═══ DRAMATIZATION SCRUBBER — fluid horizontal slider ═══
+                    Replaces the old stepped-box radio group. Uses a native
+                    <input type="range"> styled as a gradient scrubber across
+                    the 5 stops. Dragging the thumb feels continuous even
+                    though the state snaps to integer DramaLevels on commit.
+                    The gradient track bakes in the full palette journey so
+                    users see what's coming before they get there. */}
+                <DramaScrubber
+                  value={dramaLevel}
+                  onChange={setDramaLevel}
+                  disabled={isGenerating}
+                  assetsSelected={enabledCount}
+                />
+
+                {/* ═══ SCRIPT META HEADER — working title + stats strip ═══
+                    Flagship chrome: users see their script's identity and
+                    the shape of what they're building (pages, runtime,
+                    scenes, characters) the moment they land on this tab. */}
+                <div className="border border-border bg-gradient-to-br from-pink/5 via-transparent to-purple/5 p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Film size={14} className="text-pink" />
+                    <span className="font-mono text-[10px] font-bold text-pink tracking-widest">WORKING TITLE</span>
+                    <input
+                      type="text"
+                      value={scriptTitle}
+                      onChange={(e) => setScriptTitle(e.target.value.toUpperCase())}
+                      className="flex-1 bg-transparent border-0 border-b border-transparent focus:border-pink/50 font-sans text-2xl font-black tracking-widest text-foreground outline-none transition-colors"
+                      placeholder="UNTITLED"
+                      disabled={isGenerating}
+                    />
+                    <span className="font-mono text-[9px] text-muted-foreground">
+                      Drafted from <span className="text-red">USA v. Mangione</span>
+                    </span>
+                  </div>
+                  {/* Stats strip */}
+                  <div className="grid grid-cols-5 gap-2">
+                    <ScriptStat label="PAGES" value={generatedScript ? Math.max(1, Math.ceil(generatedScript.length / 450)).toString() : "—"} color="var(--cyan)" icon={FileText} />
+                    <ScriptStat label="RUNTIME" value={generatedScript ? `~${Math.max(1, Math.ceil(generatedScript.length / 450))} min` : "—"} color="var(--green)" icon={Clock} />
+                    <ScriptStat label="SCENES" value={generatedScript ? (generatedScript.match(/^(INT\.|EXT\.)/gm)?.length || 1).toString() : "—"} color="var(--amber)" icon={Layers} />
+                    <ScriptStat label="WORDS" value={generatedScript ? generatedScript.split(/\s+/).length.toLocaleString() : "—"} color="var(--purple)" icon={Hash} />
+                    <ScriptStat label="DRAFT" value={savedScripts.length > 0 ? `v${savedScripts.length + 1}` : "v1"} color="var(--pink)" icon={Edit3} />
+                  </div>
                 </div>
 
-                {/* Current Level Badge */}
-                <div className="flex items-center gap-4">
-                  <div
-                    className="px-5 py-2.5 font-mono text-sm font-black transition-all duration-300"
-                    style={{
-                      backgroundColor: `color-mix(in srgb, ${dramColor} 20%, transparent)`,
-                      color: dramColor,
-                      border: `2.5px solid ${dramColor}`,
-                      boxShadow: `3px 3px 0 var(--shadow-color)`,
-                    }}
-                  >
-                    {dramLabel} · L{dramaLevel}
+                {/* ═══ PRODUCTION CONTROLS — POV · Length · Format ═══ */}
+                <div className="grid grid-cols-3 gap-3">
+                  {/* LENGTH */}
+                  <div className="border border-border bg-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Timer size={12} className="text-cyan" />
+                      <span className="font-mono text-[10px] font-bold text-cyan tracking-wider">LENGTH</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {([
+                        { id: "cold-open", label: "Cold Open", mins: "3m" },
+                        { id: "teaser", label: "Teaser", mins: "8m" },
+                        { id: "half-hour", label: "Half Hour", mins: "22m" },
+                        { id: "hour", label: "Hour", mins: "42m" },
+                        { id: "pilot", label: "Pilot", mins: "60m" },
+                        { id: "feature", label: "Feature", mins: "110m" },
+                      ] as const).map((opt) => {
+                        const active = scriptLength === opt.id
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => setScriptLength(opt.id)}
+                            disabled={isGenerating}
+                            className={cn(
+                              "p-2 flex flex-col items-start gap-0.5 text-left transition-all border",
+                              active
+                                ? "border-cyan bg-cyan/10 text-cyan shadow-[2px_2px_0_var(--shadow-color)]"
+                                : "border-border text-muted-foreground hover:border-cyan/40 hover:text-foreground"
+                            )}
+                          >
+                            <span className="font-sans text-[11px] font-bold">{opt.label}</span>
+                            <span className="font-mono text-[8px] opacity-70">{opt.mins}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {enabledCount} assets selected
-                  </span>
+
+                  {/* POINT OF VIEW */}
+                  <div className="border border-border bg-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target size={12} className="text-purple" />
+                      <span className="font-mono text-[10px] font-bold text-purple tracking-wider">POINT OF VIEW</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {([
+                        { id: "prosecution", label: "Prosecution", desc: "Gov't as protagonist", color: "var(--red)" },
+                        { id: "defense", label: "Defense", desc: "Counsel's narrative arc", color: "var(--cyan)" },
+                        { id: "defendant", label: "Defendant", desc: "Interior monologue", color: "var(--purple)" },
+                        { id: "omniscient", label: "Omniscient", desc: "Birds-eye, impartial", color: "var(--amber)" },
+                        { id: "press", label: "Press Gallery", desc: "Court reporter POV", color: "var(--orange)" },
+                      ] as const).map((opt) => {
+                        const active = scriptPOV === opt.id
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => setScriptPOV(opt.id)}
+                            disabled={isGenerating}
+                            className={cn(
+                              "w-full flex items-center gap-2 px-2 py-1.5 text-left transition-all",
+                              active ? "bg-current/10" : "hover:bg-surface-alt opacity-70 hover:opacity-100"
+                            )}
+                            style={{ color: active ? opt.color : "var(--muted-foreground)" }}
+                          >
+                            <div
+                              className="w-2 h-2 rounded-full border"
+                              style={{
+                                backgroundColor: active ? opt.color : "transparent",
+                                borderColor: opt.color,
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-sans text-[11px] font-bold text-foreground">{opt.label}</div>
+                              <div className="font-mono text-[8px] text-muted-foreground truncate">{opt.desc}</div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* FORMAT */}
+                  <div className="border border-border bg-card p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileText size={12} className="text-amber" />
+                      <span className="font-mono text-[10px] font-bold text-amber tracking-wider">FORMAT</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5 mb-3">
+                      {([
+                        { id: "screenplay", label: "Screenplay", sub: "feature / film" },
+                        { id: "teleplay", label: "Teleplay", sub: "TV / streaming" },
+                        { id: "stage", label: "Stage Play", sub: "theatrical" },
+                        { id: "treatment", label: "Treatment", sub: "prose outline" },
+                      ] as const).map((opt) => {
+                        const active = scriptFormat === opt.id
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => setScriptFormat(opt.id)}
+                            disabled={isGenerating}
+                            className={cn(
+                              "p-2 flex flex-col items-start gap-0.5 text-left transition-all border",
+                              active
+                                ? "border-amber bg-amber/10 text-amber shadow-[2px_2px_0_var(--shadow-color)]"
+                                : "border-border text-muted-foreground hover:border-amber/40 hover:text-foreground"
+                            )}
+                          >
+                            <span className="font-sans text-[11px] font-bold">{opt.label}</span>
+                            <span className="font-mono text-[8px] opacity-70">{opt.sub}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div className="pt-3 border-t border-border">
+                      <div className="font-mono text-[8px] font-bold text-muted-foreground tracking-wider mb-1.5">EXPORT AS</div>
+                      <div className="flex flex-wrap gap-1">
+                        {["PDF", "FDX", "Fountain", "DOCX", "TXT"].map((fmt) => (
+                          <button
+                            key={fmt}
+                            disabled={!generatedScript || isGenerating}
+                            className="px-2 py-0.5 border border-border font-mono text-[9px] font-bold text-muted-foreground hover:border-amber hover:text-amber transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={`Export as ${fmt}`}
+                          >
+                            {fmt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
+
                 {/* Treatment Preview OR Generated Script */}
                 {!generatedScript && !isGenerating ? (
                   <div className="relative group">
@@ -1809,6 +2182,506 @@ Based on: ${assetNames}`,
           <X size={14} />
           CLOSE
         </button>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCRIPT META STAT — tiny dashboard tile for the screenplay header
+// ═══════════════════════════════════════════════════════════════════
+// Five of these line up above the production controls to give the writer
+// a live read on their draft: page count, estimated runtime, scene count,
+// word count, and draft version. Each tile carries its own accent color
+// on the left border + icon so the strip reads as a dashboard, not just
+// five identical chips.
+//
+// Values are derived, not stored — pages = ceil(chars / 450), runtime is
+// pages→minutes at industry parity, scenes counts INT./EXT. slug lines,
+// words is a whitespace split, draft counts saved script versions.
+
+function ScriptStat({
+  label,
+  value,
+  color,
+  icon: Icon,
+}: {
+  label: string
+  value: string
+  color: string
+  icon: typeof FileText
+}) {
+  return (
+    <div
+      className="relative border border-border bg-card/60 px-3 py-2.5 overflow-hidden group hover:bg-card transition-colors"
+      style={{ borderLeftColor: color, borderLeftWidth: "2px" }}
+    >
+      {/* faint color wash on hover so the whole tile glows with its accent */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-[0.06] transition-opacity pointer-events-none"
+        style={{ background: color }}
+      />
+      <div className="relative flex items-center gap-1.5 mb-1">
+        <Icon size={10} style={{ color }} />
+        <span className="font-mono text-[8px] text-muted-foreground tracking-[0.14em] uppercase">
+          {label}
+        </span>
+      </div>
+      <div
+        className="relative font-sans text-lg font-black leading-none tabular-nums"
+        style={{ color }}
+      >
+        {value}
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DRAMATIZATION SCRUBBER — fluid horizontal slider
+// ═══════════════════════════════════════════════════════════════════
+// The old stepped-box UI made the most-used control feel like a radio
+// quiz. This version gives it a proper scrubber: gradient track painted
+// across the 5 stops, a colored thumb that glides, tick marks beneath,
+// and a live "now set to" badge with the current label/color.
+//
+// Under the hood the state still snaps to integer DramaLevels (the whole
+// rest of the app reads discrete levels 0..4), but the UX feels fluid
+// because the slider accepts continuous input and only quantizes on
+// commit.
+
+function DramaScrubber({
+  value,
+  onChange,
+  disabled,
+  assetsSelected,
+}: {
+  value: DramaLevel
+  onChange: (v: DramaLevel) => void
+  disabled?: boolean
+  assetsSelected: number
+}) {
+  const max = DRAMA_LEVELS.length - 1
+  const active = DRAMA_LEVELS[value]
+  // Percent position of the thumb (0..100) for painting progress + label
+  const pct = (value / max) * 100
+
+  // Build a single CSS gradient that traverses every drama color in order
+  const gradientStops = DRAMA_LEVELS
+    .map((dl, i) => `${dl.color} ${(i / max) * 100}%`)
+    .join(", ")
+
+  return (
+    <div className="space-y-4">
+      {/* Header row — current label + assets counter */}
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-baseline gap-3">
+          <span
+            className="font-sans text-2xl font-black tracking-tight transition-colors duration-300"
+            style={{ color: active.color }}
+          >
+            {active.label}
+          </span>
+          <span
+            className="font-mono text-[11px] font-bold tracking-widest"
+            style={{ color: active.color, opacity: 0.7 }}
+          >
+            · L{value} / L{max}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 font-mono text-[10px] text-muted-foreground">
+          <span>{assetsSelected} assets</span>
+          <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <span>{active.short}</span>
+        </div>
+      </div>
+
+      {/* Scrubber track container */}
+      <div className="relative select-none">
+        {/* Gradient-painted track — visible part users see */}
+        <div
+          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-3 rounded-full overflow-hidden"
+          style={{
+            background: `linear-gradient(90deg, ${gradientStops})`,
+            boxShadow: `inset 0 0 0 1px var(--border), 0 0 18px -6px ${active.color}`,
+            opacity: disabled ? 0.4 : 1,
+          }}
+          aria-hidden
+        >
+          {/* Dim veil past the thumb so "unreached" levels feel quieter */}
+          <div
+            className="absolute top-0 bottom-0 right-0 bg-black/55"
+            style={{ left: `${pct}%` }}
+          />
+        </div>
+
+        {/* Native range input — sits on top, invisible track, custom thumb */}
+        <input
+          type="range"
+          min={0}
+          max={max}
+          step={1}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(Number(e.target.value) as DramaLevel)}
+          aria-label="Dramatization level"
+          aria-valuetext={active.label}
+          className={cn(
+            "relative w-full h-10 bg-transparent appearance-none cursor-pointer z-10",
+            "focus:outline-none",
+            disabled && "cursor-not-allowed",
+            // webkit thumb
+            "[&::-webkit-slider-thumb]:appearance-none",
+            "[&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6",
+            "[&::-webkit-slider-thumb]:rounded-full",
+            "[&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-white",
+            "[&::-webkit-slider-thumb]:shadow-[0_4px_12px_rgba(0,0,0,0.6)]",
+            "[&::-webkit-slider-thumb]:transition-transform",
+            "[&::-webkit-slider-thumb]:cursor-grab",
+            "active:[&::-webkit-slider-thumb]:cursor-grabbing",
+            "active:[&::-webkit-slider-thumb]:scale-110",
+            // firefox thumb
+            "[&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6",
+            "[&::-moz-range-thumb]:rounded-full",
+            "[&::-moz-range-thumb]:border-[3px] [&::-moz-range-thumb]:border-white",
+            "[&::-moz-range-thumb]:shadow-[0_4px_12px_rgba(0,0,0,0.6)]",
+            "[&::-moz-range-thumb]:cursor-grab",
+            "active:[&::-moz-range-thumb]:cursor-grabbing"
+          )}
+          style={
+            {
+              // Color the custom thumb via CSS custom properties applied inline
+              // so the transition tracks the active level's color.
+              ["--thumb-bg" as string]: active.color,
+            } as React.CSSProperties
+          }
+        />
+        {/* Style override: inject thumb background color (can't be done via arbitrary TW variants cleanly) */}
+        <style jsx>{`
+          input[type="range"]::-webkit-slider-thumb {
+            background-color: var(--thumb-bg);
+          }
+          input[type="range"]::-moz-range-thumb {
+            background-color: var(--thumb-bg);
+          }
+        `}</style>
+
+        {/* Tick marks under the track — one per stop with label */}
+        <div className="mt-3 flex items-start justify-between px-0">
+          {DRAMA_LEVELS.map((dl) => {
+            const isActive = dl.id === value
+            const isPast = dl.id < value
+            return (
+              <button
+                key={dl.id}
+                type="button"
+                disabled={disabled}
+                onClick={() => onChange(dl.id)}
+                className={cn(
+                  "group flex flex-col items-center gap-1.5 cursor-pointer",
+                  "transition-all duration-200",
+                  "disabled:cursor-not-allowed",
+                  isActive ? "scale-[1.05]" : "hover:scale-[1.03]"
+                )}
+                style={{ width: `${100 / DRAMA_LEVELS.length}%` }}
+                aria-label={`Jump to ${dl.label}`}
+              >
+                <div
+                  className="w-[2px] h-2 transition-all"
+                  style={{
+                    backgroundColor: isActive || isPast ? dl.color : "var(--border)",
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                />
+                <span
+                  className={cn(
+                    "font-mono text-[9px] font-bold tracking-widest uppercase transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                  )}
+                  style={{ color: isActive ? dl.color : undefined }}
+                >
+                  {dl.label}
+                </span>
+                <span
+                  className="font-mono text-[8px] tabular-nums"
+                  style={{
+                    color: isActive ? dl.color : "var(--muted-foreground)",
+                    opacity: isActive ? 0.9 : 0.5,
+                  }}
+                >
+                  L{dl.id}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MOOD BOARD — modality-aware card renderer
+// ═══════════════════════════════════════════════════════════════════
+// Four distinct card layouts keyed by asset.modality:
+//   • photo  — large emoji on a colored gradient + color-coded tag label
+//   • audio  — play button + animated waveform + duration + transcript quote
+//   • video  — gradient + centered play overlay + duration pill bottom-right
+//   • doc    — folder icon + skeleton "page lines" + page-count pill
+// All cards share: rounded border, gradient backplate, title/subtitle/date
+// footer. Color comes from the asset's own `tagColor` so each card lights
+// itself. Hover lifts the card + brightens the border.
+
+function ModalityChip({
+  icon: Icon,
+  label,
+  color,
+}: {
+  icon: typeof Upload
+  label: string
+  color: string
+}) {
+  return (
+    <div
+      className="flex items-center gap-1 px-1.5 py-0.5 border"
+      style={{ color, borderColor: `color-mix(in srgb, ${color} 35%, transparent)` }}
+    >
+      <Icon size={9} />
+      <span className="font-mono text-[8px] font-bold tracking-wider">{label}</span>
+    </div>
+  )
+}
+
+function MoodAssetCard({ asset }: { asset: typeof MOOD_CATEGORIES[number] }) {
+  const [from, to] = asset.gradient
+  const gradient = `linear-gradient(135deg, ${from} 0%, ${to} 100%)`
+
+  return (
+    <div
+      className={cn(
+        "group relative overflow-hidden cursor-pointer",
+        "border border-[var(--border)]",
+        "transition-all duration-300",
+        "hover:border-current hover:-translate-y-0.5",
+        "hover:shadow-[0_12px_32px_-10px_currentColor]"
+      )}
+      style={{ color: asset.tagColor }}
+    >
+      {/* ═══ TOP PREVIEW AREA — modality-specific ═══ */}
+      {asset.modality === "photo" && <PhotoPreview asset={asset} gradient={gradient} />}
+      {asset.modality === "audio" && <AudioPreview asset={asset} gradient={gradient} />}
+      {asset.modality === "video" && <VideoPreview asset={asset} gradient={gradient} />}
+      {asset.modality === "doc" && <DocPreview asset={asset} gradient={gradient} />}
+
+      {/* ═══ BOTTOM META — shared across all modalities ═══ */}
+      <div className="px-4 py-3 border-t border-[var(--border)] bg-[#0a0a0a]">
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="font-sans text-[14px] font-bold text-white truncate">{asset.title}</div>
+        </div>
+        <div className="font-sans text-[11px] text-[var(--muted-foreground)] truncate mt-0.5">
+          {asset.subtitle}
+        </div>
+        <div className="font-mono text-[9px] text-[var(--muted-foreground)]/70 mt-1.5 tracking-wider">
+          {asset.date}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ───── PHOTO — big emoji on gradient, colored tag label ───── */
+function PhotoPreview({
+  asset,
+  gradient,
+}: {
+  asset: typeof MOOD_CATEGORIES[number]
+  gradient: string
+}) {
+  return (
+    <div
+      className="relative h-[180px] flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: gradient }}
+    >
+      {/* subtle film grain overlay */}
+      <div className="absolute inset-0 cinema-grain opacity-40" />
+      <div className="relative text-5xl leading-none mb-2 transition-transform group-hover:scale-110 duration-500">
+        {asset.emoji}
+      </div>
+      <div
+        className="relative font-mono text-[10px] font-bold tracking-[0.2em]"
+        style={{ color: asset.tagColor }}
+      >
+        {asset.tag}
+      </div>
+    </div>
+  )
+}
+
+/* ───── AUDIO — play button + waveform + duration + quote ───── */
+function AudioPreview({
+  asset,
+  gradient,
+}: {
+  asset: typeof MOOD_CATEGORIES[number]
+  gradient: string
+}) {
+  // Stable pseudo-random bar heights keyed by asset id so the waveform
+  // looks authored, not jittery across re-renders.
+  const bars = Array.from({ length: 36 }, (_, i) => {
+    const seed = (asset.id * 7 + i * 13) % 100
+    return 0.25 + (seed / 100) * 0.75
+  })
+
+  return (
+    <div
+      className="relative p-4 flex items-center gap-3 min-h-[108px]"
+      style={{ background: gradient }}
+    >
+      <div className="absolute inset-0 cinema-grain opacity-30" />
+      {/* Play button */}
+      <button
+        className={cn(
+          "relative w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+          "border-2 transition-all",
+          "hover:scale-110"
+        )}
+        style={{
+          color: asset.tagColor,
+          borderColor: asset.tagColor,
+          backgroundColor: `color-mix(in srgb, ${asset.tagColor} 12%, transparent)`,
+        }}
+        aria-label={`Play ${asset.title}`}
+      >
+        <Play size={14} fill="currentColor" className="ml-0.5" />
+      </button>
+
+      {/* Waveform */}
+      <div className="relative flex-1 flex items-center gap-[2px] h-8 min-w-0">
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            className="flex-1 rounded-[1px] transition-opacity group-hover:opacity-100"
+            style={{
+              height: `${h * 100}%`,
+              minHeight: "4px",
+              backgroundColor: asset.tagColor,
+              opacity: 0.55 + (i / bars.length) * 0.4,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Duration */}
+      <div className="relative shrink-0 font-mono text-[11px] font-bold text-white/90 tabular-nums">
+        {asset.duration}
+      </div>
+    </div>
+  )
+}
+
+/* ───── VIDEO — gradient + centered play overlay + duration pill ───── */
+function VideoPreview({
+  asset,
+  gradient,
+}: {
+  asset: typeof MOOD_CATEGORIES[number]
+  gradient: string
+}) {
+  return (
+    <div
+      className="relative h-[180px] flex items-center justify-center overflow-hidden"
+      style={{ background: gradient }}
+    >
+      <div className="absolute inset-0 cinema-grain opacity-40" />
+      {/* Scanline effect */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-30"
+        style={{
+          backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 3px)",
+        }}
+      />
+      {/* Play overlay */}
+      <button
+        className={cn(
+          "relative w-14 h-14 rounded-full flex items-center justify-center",
+          "border-2 transition-all group-hover:scale-110",
+          "bg-black/40 backdrop-blur-sm"
+        )}
+        style={{ borderColor: "rgba(255,255,255,0.6)" }}
+        aria-label={`Play ${asset.title}`}
+      >
+        <Play size={20} fill="white" className="text-white ml-0.5" />
+      </button>
+
+      {/* Duration pill, bottom-right */}
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-sm font-mono text-[11px] font-bold text-white tabular-nums">
+        {asset.duration}
+      </div>
+
+      {/* Tag chip, top-left */}
+      <div
+        className="absolute top-2 left-2 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-sm"
+        style={{ color: asset.tagColor }}
+      >
+        {asset.tag}
+      </div>
+    </div>
+  )
+}
+
+/* ───── DOC — folder icon + skeleton page lines + page pill ───── */
+function DocPreview({
+  asset,
+  gradient,
+}: {
+  asset: typeof MOOD_CATEGORIES[number]
+  gradient: string
+}) {
+  return (
+    <div
+      className="relative p-4 flex items-start gap-3 min-h-[108px]"
+      style={{ background: gradient }}
+    >
+      <div className="absolute inset-0 cinema-grain opacity-30" />
+      {/* Doc icon */}
+      <div
+        className="relative w-9 h-11 flex items-center justify-center shrink-0 rounded-sm"
+        style={{
+          backgroundColor: `color-mix(in srgb, ${asset.tagColor} 18%, transparent)`,
+          border: `1px solid ${asset.tagColor}`,
+        }}
+      >
+        <FileText size={16} style={{ color: asset.tagColor }} />
+      </div>
+
+      {/* Skeleton page lines */}
+      <div className="relative flex-1 space-y-1.5 mt-1 min-w-0">
+        <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${asset.tagColor} 35%, transparent)` }} />
+        <div className="h-1.5 w-11/12 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${asset.tagColor} 25%, transparent)` }} />
+        <div className="h-1.5 w-10/12 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${asset.tagColor} 25%, transparent)` }} />
+        <div className="h-1.5 w-8/12 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${asset.tagColor} 18%, transparent)` }} />
+      </div>
+
+      {/* Page count pill, bottom-left under icon */}
+      {asset.pages !== undefined && (
+        <div
+          className="absolute bottom-2 left-3 px-1.5 py-0.5 font-mono text-[10px] font-bold tabular-nums"
+          style={{
+            color: asset.tagColor,
+            backgroundColor: `color-mix(in srgb, ${asset.tagColor} 15%, transparent)`,
+            border: `1px solid color-mix(in srgb, ${asset.tagColor} 40%, transparent)`,
+          }}
+        >
+          {asset.pages}pp
+        </div>
+      )}
+
+      {/* Tag label, top-right */}
+      <div
+        className="absolute top-3 right-3 font-mono text-[9px] font-bold tracking-wider"
+        style={{ color: asset.tagColor }}
+      >
+        {asset.tag}
       </div>
     </div>
   )

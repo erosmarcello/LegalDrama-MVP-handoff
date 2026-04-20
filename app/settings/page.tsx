@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import {
@@ -31,6 +31,10 @@ import {
   Zap,
   Mail,
   Monitor,
+  Camera,
+  Upload as UploadIcon,
+  X,
+  ImagePlus,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -40,7 +44,7 @@ import {
   useToast,
   LegalInput,
 } from "@/components/legal-ui"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteFooter, AiDisclaimerBar } from "@/components/site-footer"
 import { Masthead } from "@/components/masthead"
 
 /* ─── Tab definitions ─── */
@@ -113,6 +117,22 @@ const INTEGRATION_CATEGORIES = [
         connected: true,
         lastSync: "5 min ago",
         features: ["Instant alerts", "Docket analytics", "Judicial history", "Case prediction"],
+      },
+      {
+        id: "docketbird",
+        name: "DocketBird",
+        fullName: "DocketBird Federal Court Intelligence",
+        description:
+          "Live federal docket monitoring with push alerts, full-text search across filings, and cross-case party tracking. Powers case pulse feeds in the workspace.",
+        connected: true,
+        lastSync: "Just now",
+        features: [
+          "Push alerts",
+          "Cross-docket search",
+          "Party tracking",
+          "PDF hydration",
+          "Bulk export",
+        ],
       },
       {
         id: "courtlistener",
@@ -357,7 +377,45 @@ function SettingsContent() {
     email: "john@lawfirm.com",
     firm: "Doe & Associates LLP",
     role: "Senior Partner",
+    bio: "True-crime producer & federal-court narrative lead. Developing limited series with A24 and HBO Max.",
+    location: "Los Angeles, CA",
+    website: "https://johndoe.prod",
+    guild: "WGA West · Member #C-2048",
   })
+
+  // ─── Profile photo state ───
+  // Supports (a) uploaded blob URL, (b) fallback DiceBear avatar keyed to the user's name,
+  // (c) cleared/removed state. `photoInputRef` lets the upload button trigger the hidden
+  // <input type="file"> so we don't have to render a label-wrapped dropzone in two places.
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement | null>(null)
+  const fallbackAvatar = `https://api.dicebear.com/7.x/notionists-neutral/svg?seed=${encodeURIComponent(
+    profile.name
+  )}&backgroundColor=0a0a0a`
+
+  const handlePhotoFile = (file: File | null) => {
+    if (!file) return
+    // Naive size guard — 5 MB keeps localStorage / network sane for demo purposes.
+    if (file.size > 5 * 1024 * 1024) {
+      toast("Photo exceeds 5 MB limit", "var(--red)")
+      return
+    }
+    if (!file.type.startsWith("image/")) {
+      toast("File must be an image", "var(--red)")
+      return
+    }
+    // Revoke any previous object URL so the browser can garbage-collect the blob.
+    if (photoUrl) URL.revokeObjectURL(photoUrl)
+    const next = URL.createObjectURL(file)
+    setPhotoUrl(next)
+    toast("Photo updated", "var(--gold)")
+  }
+
+  const handlePhotoRemove = () => {
+    if (photoUrl) URL.revokeObjectURL(photoUrl)
+    setPhotoUrl(null)
+    toast("Photo removed", "var(--muted-foreground)")
+  }
 
   const handleSave = () => toast("Settings saved", "var(--gold)")
 
@@ -463,46 +521,257 @@ function SettingsContent() {
 
         {/* ═══ PROFILE ═══ */}
         {activeTab === "profile" && (
-          <NoirCard accent="var(--gold)">
-            <h2 className="cinema-title text-[24px] text-white mb-1">
-              Profile
-            </h2>
-            <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
-              Your credits on the call sheet
-            </p>
+          <div className="space-y-4">
+            {/* ── Profile Photo ──
+                Split into two stacked-card layers: a large avatar column on
+                the left and an instructions column on the right, so the
+                upload affordance is obvious without looking like a form field.
+                Hidden <input type="file"> is triggered by both the drop zone
+                and the Upload button so the user can pick either path. */}
+            <NoirCard accent="var(--gold)">
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                    Profile Photo
+                  </h2>
+                  <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)]">
+                    Your headshot on set
+                  </p>
+                </div>
+                <Chip mono color="var(--gold)">
+                  <Camera size={9} />
+                  Headshot
+                </Chip>
+              </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <LegalInput
-                label="Full Name"
-                value={profile.name}
-                onChange={e => setProfile({ ...profile, name: e.target.value })}
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0] ?? null
+                  handlePhotoFile(file)
+                  // reset so selecting the same file twice still fires onChange
+                  if (e.target) e.target.value = ""
+                }}
               />
-              <LegalInput
-                label="Email"
-                type="email"
-                value={profile.email}
-                onChange={e =>
-                  setProfile({ ...profile, email: e.target.value })
-                }
-              />
-              <LegalInput
-                label="Firm / Organization"
-                value={profile.firm}
-                onChange={e => setProfile({ ...profile, firm: e.target.value })}
-              />
-              <LegalInput
-                label="Role"
-                value={profile.role}
-                onChange={e => setProfile({ ...profile, role: e.target.value })}
-              />
-            </div>
 
-            <div className="flex justify-end mt-6">
-              <LegalButton active color="var(--gold)" onClick={handleSave}>
-                Save Changes
-              </LegalButton>
-            </div>
-          </NoirCard>
+              <div className="grid md:grid-cols-[auto,1fr] gap-6 items-start">
+                {/* Avatar preview — drag+click target */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => photoInputRef.current?.click()}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      photoInputRef.current?.click()
+                    }
+                  }}
+                  onDragOver={e => {
+                    e.preventDefault()
+                    e.currentTarget.classList.add("ring-2", "ring-[var(--gold)]")
+                  }}
+                  onDragLeave={e =>
+                    e.currentTarget.classList.remove("ring-2", "ring-[var(--gold)]")
+                  }
+                  onDrop={e => {
+                    e.preventDefault()
+                    e.currentTarget.classList.remove("ring-2", "ring-[var(--gold)]")
+                    const file = e.dataTransfer.files?.[0] ?? null
+                    handlePhotoFile(file)
+                  }}
+                  className={cn(
+                    "relative w-36 h-36 shrink-0 overflow-hidden cursor-pointer",
+                    "border border-[var(--border)] bg-[#0f0f0f]",
+                    "hover:border-[var(--gold)] transition-colors",
+                    "focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/40"
+                  )}
+                  aria-label="Upload profile photo"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photoUrl ?? fallbackAvatar}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* dashed corners to signal drop zone even when a photo is set */}
+                  <div className="absolute inset-1 pointer-events-none border border-dashed border-[var(--gold)]/0 group-hover:border-[var(--gold)]/40" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1 flex items-center justify-center gap-1">
+                    <ImagePlus size={10} className="text-[var(--gold)]" />
+                    <span className="cinema-label text-[8px] text-[var(--gold)]">
+                      {photoUrl ? "Replace" : "Upload"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right side: instructions + action buttons */}
+                <div className="min-w-0">
+                  <div className="cinema-contract text-[12px] text-white mb-2">
+                    Upload or drag & drop
+                  </div>
+                  <p className="font-sans text-[12px] text-[var(--muted-foreground)] leading-relaxed mb-4">
+                    Square images work best. Max{" "}
+                    <span className="text-white">5&nbsp;MB</span>. PNG, JPG, or
+                    WebP. Your headshot appears on shared screenplays, guild
+                    exports, and collaborator mentions throughout LegalDrama.ai.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <LegalButton
+                      small
+                      active
+                      color="var(--gold)"
+                      onClick={() => photoInputRef.current?.click()}
+                    >
+                      <UploadIcon size={11} />
+                      {photoUrl ? "Replace Photo" : "Upload Photo"}
+                    </LegalButton>
+                    {photoUrl && (
+                      <LegalButton
+                        small
+                        color="var(--red)"
+                        onClick={handlePhotoRemove}
+                      >
+                        <X size={11} />
+                        Remove
+                      </LegalButton>
+                    )}
+                    <span className="cinema-label text-[9px] text-[var(--muted-foreground)] ml-2">
+                      {photoUrl ? "Custom photo active" : "Using generated avatar"}
+                    </span>
+                  </div>
+
+                  {/* Thumbnail ghost previews — how the avatar renders in different
+                      contexts (masthead, mentions, script cover). Helps reassure
+                      the user their photo looks right at every size. */}
+                  <div className="flex items-center gap-4 pt-4 border-t border-[var(--border)]">
+                    <span className="cinema-label text-[9px] text-[var(--muted-foreground)] w-20">
+                      Preview
+                    </span>
+                    <div className="flex items-center gap-3">
+                      {[48, 32, 20].map(size => (
+                        <div
+                          key={size}
+                          className="border border-[var(--border)] bg-[#0f0f0f] overflow-hidden"
+                          style={{ width: size, height: size }}
+                          aria-label={`${size}px preview`}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={photoUrl ?? fallbackAvatar}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                      <span className="cinema-label text-[9px] text-[var(--muted-foreground)]">
+                        48 · 32 · 20
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </NoirCard>
+
+            {/* ── Core profile fields ── */}
+            <NoirCard>
+              <h2 className="cinema-title text-[24px] text-white mb-1">
+                Credits
+              </h2>
+              <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
+                Your name on the call sheet
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <LegalInput
+                  label="Full Name"
+                  value={profile.name}
+                  onChange={e =>
+                    setProfile({ ...profile, name: e.target.value })
+                  }
+                />
+                <LegalInput
+                  label="Email"
+                  type="email"
+                  value={profile.email}
+                  onChange={e =>
+                    setProfile({ ...profile, email: e.target.value })
+                  }
+                />
+                <LegalInput
+                  label="Firm / Organization"
+                  value={profile.firm}
+                  onChange={e =>
+                    setProfile({ ...profile, firm: e.target.value })
+                  }
+                />
+                <LegalInput
+                  label="Role / Title"
+                  value={profile.role}
+                  onChange={e =>
+                    setProfile({ ...profile, role: e.target.value })
+                  }
+                />
+                <LegalInput
+                  label="Location"
+                  value={profile.location}
+                  onChange={e =>
+                    setProfile({ ...profile, location: e.target.value })
+                  }
+                />
+                <LegalInput
+                  label="Website"
+                  value={profile.website}
+                  onChange={e =>
+                    setProfile({ ...profile, website: e.target.value })
+                  }
+                />
+                <div className="md:col-span-2">
+                  <LegalInput
+                    label="Guild / Union Membership"
+                    value={profile.guild}
+                    onChange={e =>
+                      setProfile({ ...profile, guild: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block">
+                    <span className="cinema-label text-[9px] text-[var(--muted-foreground)] mb-1.5 block">
+                      Bio
+                    </span>
+                    <textarea
+                      value={profile.bio}
+                      onChange={e =>
+                        setProfile({ ...profile, bio: e.target.value })
+                      }
+                      rows={3}
+                      maxLength={280}
+                      className={cn(
+                        "w-full bg-[#0f0f0f] border border-[var(--border)]",
+                        "px-3 py-2 font-sans text-[13px] text-white",
+                        "resize-none focus:outline-none focus:border-[var(--gold)]",
+                        "transition-colors"
+                      )}
+                    />
+                    <div className="flex justify-end mt-1">
+                      <span className="cinema-label text-[8px] text-[var(--muted-foreground)]">
+                        {profile.bio.length} / 280
+                      </span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-6">
+                <LegalButton active color="var(--gold)" onClick={handleSave}>
+                  Save Changes
+                </LegalButton>
+              </div>
+            </NoirCard>
+          </div>
         )}
 
         {/* ═══ ACCOUNT ═══ */}
@@ -1041,6 +1310,7 @@ function SettingsContent() {
         )}
       </main>
 
+      <AiDisclaimerBar />
       <SiteFooter />
     </div>
   )

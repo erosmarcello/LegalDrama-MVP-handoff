@@ -9,8 +9,34 @@ import {
   Loader2,
   ArrowUpRight,
   Scale,
+  Brain,
+  FileSearch,
+  Scroll,
+  Eye,
+  Fingerprint,
+  Sparkles,
+  BookOpen,
+  Compass,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+/* ──────────────────────────────────────────────────────────────
+ * Agentic "thinking" verbs — rotated while the AI is processing.
+ * Paired with a contextual lucide icon. The copy is intentionally
+ * present-tense, active, and noir — this is a legal-drama product
+ * so every verb should feel like courthouse work, not chat.
+ * ────────────────────────────────────────────────────────────── */
+const THINKING_STATES: { verb: string; Icon: typeof Brain }[] = [
+  { verb: "Reasoning",             Icon: Brain },
+  { verb: "Combing the docket",    Icon: FileSearch },
+  { verb: "Reading between lines", Icon: Eye },
+  { verb: "Cross-referencing",     Icon: Fingerprint },
+  { verb: "Consulting precedent",  Icon: Scroll },
+  { verb: "Weighing the evidence", Icon: Scale },
+  { verb: "Drafting the reply",    Icon: BookOpen },
+  { verb: "Connecting the dots",   Icon: Compass },
+  { verb: "Closing the argument",  Icon: Sparkles },
+]
 
 type Role = "user" | "assistant"
 type ChatMessage = { role: Role; content: string }
@@ -492,19 +518,26 @@ export function SidebarChat() {
         </button>
       )}
 
-      {/* Chat panel */}
+      {/* Chat panel — fixed bottom-right, never leaves anchor. */}
       {open && (
         <div
           ref={panelRef}
           className={cn(
+            // ── Anchoring: fixed creates its own positioning context for
+            //    the ::before gold rule; do NOT also add `relative` — it
+            //    overrides `fixed` and the panel falls into document flow
+            //    on the left side (the bug that shipped before).
             "fixed bottom-6 right-6 z-[60]",
             "w-[min(92vw,420px)] h-[min(80vh,600px)]",
             "flex flex-col",
-            "border border-[var(--border)]",
             "bg-[#0f0f0f] text-white cinema-grain",
             "shadow-[0_30px_80px_rgba(0,0,0,0.7)]",
-            "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
-            "relative",
+            "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)] before:z-[1]",
+            // Noir pulsing border — thinking state pulses purple (active
+            // reasoning), idle pulses gold (waiting). Driven by keyframes
+            // defined in globals.css: sidebar-chat-pulse-{gold,purple}.
+            "sidebar-chat-panel",
+            streaming ? "sidebar-chat-panel-active" : "sidebar-chat-panel-idle",
           )}
           role="dialog"
           aria-modal="true"
@@ -698,15 +731,64 @@ function MessageBubble({
         )}
       >
         {renderContentWithPills(content, onNavigate)}
-        {streaming && !content && (
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--muted-foreground)]">
-            <Loader2 size={12} className="animate-spin" />
-            thinking
-          </span>
-        )}
+        {streaming && !content && <ThinkingIndicator />}
         {streaming && content && <span className="inline-block w-2 h-4 bg-current ml-0.5 animate-pulse" />}
       </div>
     </div>
+  )
+}
+
+/**
+ * Agentic thinking indicator — rotates through THINKING_STATES every
+ * ~1.4s while the AI is processing. Each state is a verb + icon pair.
+ * The icon pulses, the verb trails an animated ellipsis. Designed to
+ * look like the agent is actually *doing* something, not just idling.
+ */
+function ThinkingIndicator() {
+  const [idx, setIdx] = useState(0)
+
+  // Randomize the starting verb so back-to-back queries don't always
+  // open with "Reasoning". Feels more alive.
+  useEffect(() => {
+    setIdx(Math.floor(Math.random() * THINKING_STATES.length))
+  }, [])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIdx((i) => (i + 1) % THINKING_STATES.length)
+    }, 1400)
+    return () => clearInterval(id)
+  }, [])
+
+  const { verb, Icon } = THINKING_STATES[idx]
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-2",
+        "font-mono text-[11px] tracking-wide",
+        "text-[var(--gold)]",
+      )}
+      aria-live="polite"
+      aria-label={`${verb} — processing`}
+    >
+      <span
+        className={cn(
+          "inline-flex items-center justify-center w-5 h-5",
+          "border border-[var(--gold)]/40 bg-black/30",
+          "text-[var(--gold)]",
+          "sidebar-chat-thinking-icon",
+        )}
+      >
+        <Icon size={11} />
+      </span>
+      <span className="sidebar-chat-thinking-verb">{verb}</span>
+      <span className="sidebar-chat-thinking-dots" aria-hidden>
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+      </span>
+    </span>
   )
 }
 

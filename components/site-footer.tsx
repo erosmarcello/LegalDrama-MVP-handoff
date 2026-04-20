@@ -7,7 +7,37 @@ import { Scale, AlertTriangle, Shield, Github, Twitter } from "lucide-react"
 interface SiteFooterProps {
   className?: string
   /** When true, renders the slimmer compact variant (workspace chrome). */
-  variant?: "default" | "compact"
+  variant?: "default" | "compact" | "ai-disclaimer"
+}
+
+/**
+ * Tiny single-line AI disclaimer bar — NotebookLM-style.
+ * Use standalone above the main SiteFooter on AI-generation workspaces
+ * (the case demo), so the user sees the bottom of the page AND the
+ * hallucination warning stays persistently visible.
+ */
+export function AiDisclaimerBar({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "w-full border-t border-[var(--border)] bg-[#0b0b0b]",
+        "px-5 py-2.5 flex items-center justify-center gap-2",
+        className
+      )}
+      role="note"
+      aria-label="AI disclaimer"
+    >
+      <AlertTriangle
+        size={11}
+        className="shrink-0 text-[var(--muted-foreground)]/70"
+        aria-hidden
+      />
+      <p className="font-sans text-[11px] text-center text-[var(--muted-foreground)]/80 leading-tight">
+        <span className="text-[var(--muted-foreground)]">Legal disclaimer:</span>{" "}
+        LegalDrama.ai can be inaccurate. Please double-check responses.
+      </p>
+    </div>
+  )
 }
 
 const YEAR = new Date().getFullYear()
@@ -41,6 +71,9 @@ const RESOURCES_LINKS = [
  * pulsing red copyright stamp.
  */
 export function SiteFooter({ className, variant = "default" }: SiteFooterProps) {
+  if (variant === "ai-disclaimer") {
+    return <AiDisclaimerBar className={className} />
+  }
   if (variant === "compact") {
     return (
       <footer
@@ -225,7 +258,7 @@ function DisclaimerCard({
   borderLeft = false,
 }: {
   accent: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>
   label: string
   body: string
   borderLeft?: boolean

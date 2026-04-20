@@ -774,6 +774,111 @@
 .animate-timeline-pulse { animation: timeline-pulse 3s ease-in-out infinite; }
 .animate-dot-pulse { animation: dot-pulse 2s ease-in-out infinite; }
 
+/* ═════════════════════════════════════════════════════════════════
+   TIMELINE BREATHING — constant ambient motion for the main timeline
+   ─────────────────────────────────────────────────────────────────
+   Added per product direction: the timeline should feel alive at rest,
+   not freeze between user interactions. Each utility below layers one
+   subtle loop; together they give the card a "breathing" quality.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Gentle vertical bob for event dots — per-dot phase offsets stagger
+   the motion so dots don't all bob in lockstep. */
+@keyframes timeline-dot-drift {
+  0%, 100% { transform: translateY(-50%) translateZ(0); }
+  50%      { transform: translateY(calc(-50% - 2px)) translateZ(0); }
+}
+.animate-timeline-dot-drift {
+  animation: timeline-dot-drift 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Horizontal gradient sweep along a lane track — like a pulse traveling
+   down a wire. Uses background-size 200% so the gradient can translate
+   cleanly without stuttering. */
+@keyframes timeline-track-flow {
+  0%   { background-position: -50% 50%; }
+  100% { background-position: 150% 50%; }
+}
+.animate-timeline-track-flow {
+  animation: timeline-track-flow 8s linear infinite;
+  background-size: 200% 100%;
+  will-change: background-position;
+}
+
+/* Softly oscillating aura behind the card — rotates a gradient slowly
+   so the card surface catches different highlights. */
+@keyframes timeline-aura {
+  0%   { transform: rotate(0deg) scale(1); opacity: 0.22; }
+  50%  { transform: rotate(180deg) scale(1.08); opacity: 0.32; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.22; }
+}
+.animate-timeline-aura {
+  animation: timeline-aura 24s linear infinite;
+  will-change: transform, opacity;
+}
+
+/* "Now" marker on the timeline — a vertical hairline with a gold orb
+   that hovers mid-track. Slides microscopically left/right and pulses
+   so it reads as a live cursor, not a static rule. */
+@keyframes timeline-now-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(calc(-50% + 1px), -1px); }
+}
+.animate-timeline-now-bob {
+  animation: timeline-now-bob 3.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Radiating ring around a dot — periodic expanding halo that fades out.
+   Different delays make the dots pulse at different times so the whole
+   thing feels organic, not robotic. */
+@keyframes timeline-halo {
+  0%   { transform: translate(-50%, -50%) scale(0.6); opacity: 0.65; }
+  100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+}
+.animate-timeline-halo {
+  animation: timeline-halo 2.8s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Slow cinematic breathing of the card border — edges shift between
+   dim and bright noir tone so the frame itself feels responsive. */
+@keyframes timeline-frame-breathe {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0.00); border-color: var(--border); }
+  50%      { box-shadow: inset 0 0 24px 0 rgba(255,215,0,0.06); border-color: color-mix(in srgb, var(--gold) 25%, var(--border)); }
+}
+.animate-timeline-frame-breathe {
+  animation: timeline-frame-breathe 7s ease-in-out infinite;
+  will-change: box-shadow, border-color;
+}
+
+/* Soft gold spotlight that drifts across the top of the card. Gives a
+   subtle "reel projector" feeling — light moving across the frame. */
+@keyframes timeline-spotlight-drift {
+  0%   { transform: translateX(-30%); opacity: 0.0; }
+  30%  { opacity: 0.45; }
+  70%  { opacity: 0.45; }
+  100% { transform: translateX(130%); opacity: 0.0; }
+}
+.animate-timeline-spotlight-drift {
+  animation: timeline-spotlight-drift 14s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Respect user motion preferences — if someone has prefers-reduced-motion
+   set we still want the timeline to be interactive but stop the ambient
+   loops. These overrides kill any infinite animation on the timeline. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-timeline-dot-drift,
+  .animate-timeline-track-flow,
+  .animate-timeline-aura,
+  .animate-timeline-now-bob,
+  .animate-timeline-halo,
+  .animate-timeline-frame-breathe,
+  .animate-timeline-spotlight-drift { animation: none !important; }
+}
+
 .typing-dot {
   animation: typing-dot 1.4s ease-in-out infinite;
 }
@@ -1492,4 +1597,151 @@ input[type="range"]::-webkit-slider-thumb:active {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Sidebar AI Counsel — chat widget animations
+ * ──────────────────────────────────────────────────────────────
+ *
+ * Idle state:    slow gold breath pulse on the border — reads as
+ *                "waiting, listening, available."
+ * Active state:  faster purple-gold pulse — reads as "reasoning,
+ *                agentic, doing work."
+ *
+ * We use a 1px outline + box-shadow rather than border so the shadow
+ * can pulse without the border width shifting and nudging the layout.
+ * ------------------------------------------------------------------ */
+
+.sidebar-chat-panel {
+  border: 1px solid var(--border);
+  outline: 1px solid transparent;
+  outline-offset: 0;
+  transition: outline-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: box-shadow, outline-color;
+}
+
+/* Idle — slow gold breath. Subtle, invites interaction. */
+.sidebar-chat-panel-idle {
+  animation: sidebar-chat-pulse-gold 3.2s ease-in-out infinite;
+  border-color: var(--gold);
+}
+
+/* Active — faster, purple-gold handoff. Clearly different from idle. */
+.sidebar-chat-panel-active {
+  animation: sidebar-chat-pulse-active 1.6s ease-in-out infinite;
+  border-color: var(--purple);
+}
+
+@keyframes sidebar-chat-pulse-gold {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(179, 163, 105, 0.25),
+      0 0 14px 0 rgba(179, 163, 105, 0.18),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(179, 163, 105, 0.55),
+      0 0 28px 2px rgba(179, 163, 105, 0.36),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes sidebar-chat-pulse-active {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(106, 90, 158, 0.55),
+      0 0 22px 2px rgba(106, 90, 158, 0.40),
+      0 0 44px 0 rgba(179, 163, 105, 0.15),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+    border-color: rgba(106, 90, 158, 0.9);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(179, 163, 105, 0.55),
+      0 0 30px 4px rgba(106, 90, 158, 0.55),
+      0 0 60px 6px rgba(179, 163, 105, 0.22),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+    border-color: rgba(179, 163, 105, 0.9);
+  }
+}
+
+/* ── Thinking indicator inside the AI bubble ─────────────────── */
+
+/* The icon chip — gentle pulse + slow rotate. Reads as "processing". */
+.sidebar-chat-thinking-icon {
+  animation:
+    sidebar-chat-thinking-pulse 1.4s ease-in-out infinite,
+    sidebar-chat-thinking-rotate 6s linear infinite;
+}
+
+@keyframes sidebar-chat-thinking-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(179, 163, 105, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(179, 163, 105, 0);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sidebar-chat-thinking-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* The verb itself — fades in smoothly each time the word swaps. */
+.sidebar-chat-thinking-verb {
+  animation: sidebar-chat-thinking-fade 1.4s ease-in-out infinite;
+}
+
+@keyframes sidebar-chat-thinking-fade {
+  0%   { opacity: 0.4; }
+  35%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* Trailing dots — staggered bounce, classic "typing" feel but
+   tighter and monospace-aligned. */
+.sidebar-chat-thinking-dots {
+  display: inline-flex;
+  gap: 1px;
+  letter-spacing: -0.5px;
+}
+.sidebar-chat-thinking-dots > span {
+  display: inline-block;
+  animation: sidebar-chat-thinking-bounce 1s ease-in-out infinite;
+  opacity: 0.6;
+}
+.sidebar-chat-thinking-dots > span:nth-child(1) { animation-delay: 0s; }
+.sidebar-chat-thinking-dots > span:nth-child(2) { animation-delay: 0.15s; }
+.sidebar-chat-thinking-dots > span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes sidebar-chat-thinking-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+  40%           { transform: translateY(-2px); opacity: 1; }
+}
+
+/* Respect reduced-motion — kill the animations but keep color cues. */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-chat-panel-idle,
+  .sidebar-chat-panel-active,
+  .sidebar-chat-thinking-icon,
+  .sidebar-chat-thinking-verb,
+  .sidebar-chat-thinking-dots > span {
+    animation: none !important;
+  }
+  .sidebar-chat-panel-idle {
+    box-shadow:
+      0 0 0 1px rgba(179, 163, 105, 0.4),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+  }
+  .sidebar-chat-panel-active {
+    box-shadow:
+      0 0 0 1px rgba(106, 90, 158, 0.6),
+      0 0 22px 2px rgba(106, 90, 158, 0.4),
+      0 30px 80px rgba(0, 0, 0, 0.7);
+  }
 }
