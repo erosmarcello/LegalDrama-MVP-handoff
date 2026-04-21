@@ -18,6 +18,11 @@ import {
 import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
 import { DRAMA_LEVELS, type DramaLevel } from "@/lib/case-data"
+import {
+  ProtectThisWork,
+  RegisterCopyrightButton,
+  useToast,
+} from "@/components/legal-ui"
 
 // Forward-ref import for Module 6 — kept as a structural type only so this
 // file does not pull a runtime cycle with ingest-modal.tsx.
@@ -334,6 +339,9 @@ export function ContentModal({
   isOpen, onClose, initialTab = "upload", onOpenSettings,
   ingestedSources = [], onOpenIngest, onOpenSourceReport,
 }: ContentModalProps) {
+  // Toast channel for small confirmations (e.g. "Forwarded to Trademarkia…").
+  // Must live in the same tree as <ToastProvider> — the case page mounts one.
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<"upload" | "organize" | "screenplay" | "collab">(initialTab)
   // Dramatization axis — 5 brutalist stops (Court Record → Mythic), not a 0-100 slider.
   const [dramaLevel, setDramaLevel] = useState<DramaLevel>(2)
@@ -637,12 +645,42 @@ Based on: ${assetNames}`,
     // TODO: Integrate with share modal
     const textToShare = isEditing ? editableScript : generatedScript
     if (!textToShare) return
-    
+
     // For now, copy a shareable summary
     const shareText = `LegalDrama.ai Script (${dramLabel} · L${dramaLevel})\n\n${textToShare.slice(0, 500)}...`
     navigator.clipboard.writeText(shareText)
     setCopySuccess(true)
     setTimeout(() => setCopySuccess(false), 2000)
+  }
+
+  // Copyright registration — invoked by both the action-bar pill and the
+  // big "Protect This Work" CTA card below the output. Today this stubs a
+  // Trademarkia hand-off with a toast + console breadcrumb; real wire-up
+  // opens the external intake flow in a new tab with artifact metadata.
+  // Kept as one handler so both call sites stay in lockstep.
+  const handleRegisterCopyright = () => {
+    const body = isEditing ? editableScript : generatedScript
+    const wordCount = body ? body.trim().split(/\s+/).length : 0
+    const workSummary = scriptFormat === "treatment"
+      ? "Narrative Treatment"
+      : scriptFormat === "teleplay"
+      ? "Teleplay"
+      : scriptFormat === "stage"
+      ? "Stage Play"
+      : "Screenplay"
+    toast(
+      `${workSummary} — forwarded to Trademarkia® (${wordCount} words)`,
+      "var(--orange)"
+    )
+    // Dev breadcrumb so the intake flow wiring is easy to trace later.
+    if (typeof window !== "undefined") {
+      console.info("[copyright] intake payload", {
+        format: scriptFormat,
+        title: scriptTitle,
+        dramaLevel,
+        wordCount,
+      })
+    }
   }
 
   // ===== UPLOAD TAB HANDLERS =====
@@ -2161,7 +2199,14 @@ Based on: ${assetNames}`,
                       {copySuccess ? <Check size={16} /> : <Copy size={16} />}
                       {copySuccess ? "Copied!" : "Copy"}
                     </button>
-                    <button 
+                    {/* Register Copyright — sits between Copy and Share so
+                        the highest-intent protection moment is at the same
+                        altitude as the other post-generation actions. */}
+                    <RegisterCopyrightButton
+                      onRegister={handleRegisterCopyright}
+                      disabled={!generatedScript || isGenerating}
+                    />
+                    <button
                       onClick={handleShareScript}
                       disabled={!generatedScript || isGenerating}
                       className={cn(
@@ -2178,7 +2223,27 @@ Based on: ${assetNames}`,
                     </button>
                   </div>
                 </div>
-                
+
+                {/* Protect This Work — explainer card rendered once a fresh
+                    artifact exists. Placed below the action bar so it reads
+                    as a follow-on to the user's generation, not as ambient
+                    marketing copy. Hidden while editing so the surface stays
+                    a focused writing space. */}
+                {generatedScript && !isGenerating && !isEditing && (
+                  <ProtectThisWork
+                    onRegister={handleRegisterCopyright}
+                    artifactLabel={
+                      scriptFormat === "treatment"
+                        ? "an original narrative treatment"
+                        : scriptFormat === "teleplay"
+                        ? "an original teleplay"
+                        : scriptFormat === "stage"
+                        ? "an original stage play"
+                        : "an original screenplay"
+                    }
+                  />
+                )}
+
                 {/* Saved Scripts */}
                 {savedScripts.length > 0 && (
                   <div className="pt-6 border-t border-border">
