@@ -24,6 +24,7 @@ import {
 import { SettingsModal } from "@/components/settings-modal"
 import { ShareModal } from "@/components/share-modal"
 import { ContentModal } from "@/components/content-modal"
+import { IngestModal, type IngestedSource } from "@/components/ingest-modal"
 import { SidebarChat } from "@/components/sidebar-chat"
 import { DramaLevelSlider } from "@/components/drama-level-slider"
 import { SiteFooter, AiDisclaimerBar } from "@/components/site-footer"
@@ -118,7 +119,15 @@ function CaseWorkspaceContent() {
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [contentModalOpen, setContentModalOpen] = useState(false)
   const [contentModalTab, setContentModalTab] = useState<"upload" | "organize" | "collab">("upload")
-  
+
+  // ─── Module 6: Source Ingest ────────────────────────────────────────
+  // State lives at the case-page level so ingested sources survive when
+  // the content-modal closes; the IngestModal renders below as a
+  // separate overlay (zIndex 300) and reads/writes this same array.
+  const [ingestModalOpen, setIngestModalOpen] = useState(false)
+  const [ingestedSources, setIngestedSources] = useState<IngestedSource[]>([])
+  const [activeReport, setActiveReport] = useState<IngestedSource | null>(null)
+
 
   // Current chapter & section
   const currentChapter = chapters[currentChapterIndex]
@@ -354,6 +363,24 @@ function CaseWorkspaceContent() {
         onClose={() => setContentModalOpen(false)}
         initialTab={contentModalTab}
         onOpenSettings={() => { setContentModalOpen(false); setTimeout(() => setSettingsModalOpen(true), 200) }}
+        ingestedSources={ingestedSources}
+        onOpenIngest={() => setIngestModalOpen(true)}
+        onOpenSourceReport={(src) => { setActiveReport(src); setIngestModalOpen(true) }}
+      />
+
+      {/* ═══════════════════════════════════════════════════════════════
+          Module 6 — Source Ingest modal. Lives outside ContentModal so
+          it can render at a higher z-index and remain mounted across
+          ContentModal close events. State (ingestedSources, activeReport)
+          stays at the page level so sources persist for the session.
+          ═══════════════════════════════════════════════════════════════ */}
+      <IngestModal
+        isOpen={ingestModalOpen}
+        onClose={() => { setIngestModalOpen(false); setActiveReport(null) }}
+        ingestedSources={ingestedSources}
+        setIngestedSources={setIngestedSources}
+        activeReport={activeReport}
+        setActiveReport={setActiveReport}
       />
 
       {/* ═══ CINEMA-NOIR CHROME ═══ */}

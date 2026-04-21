@@ -19,11 +19,20 @@ import { cn } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
 import { DRAMA_LEVELS, type DramaLevel } from "@/lib/case-data"
 
+// Forward-ref import for Module 6 — kept as a structural type only so this
+// file does not pull a runtime cycle with ingest-modal.tsx.
+import type { IngestedSource } from "@/components/ingest-modal"
+
 interface ContentModalProps {
   isOpen: boolean
   onClose: () => void
   initialTab?: "upload" | "organize" | "screenplay" | "collab"
   onOpenSettings?: () => void
+  // Module 6 — Source Ingest. All three are optional so callers that
+  // haven't wired the ingest flow yet still mount cleanly.
+  ingestedSources?: IngestedSource[]
+  onOpenIngest?: () => void
+  onOpenSourceReport?: (s: IngestedSource) => void
 }
 
 // Case Evidence items with more detail
@@ -321,7 +330,10 @@ const LANES = {
   scheduling: { color: "var(--yellow)", label: "SCHEDULING" },
 }
 
-export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSettings }: ContentModalProps) {
+export function ContentModal({
+  isOpen, onClose, initialTab = "upload", onOpenSettings,
+  ingestedSources = [], onOpenIngest, onOpenSourceReport,
+}: ContentModalProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "organize" | "screenplay" | "collab">(initialTab)
   // Dramatization axis — 5 brutalist stops (Court Record → Mythic), not a 0-100 slider.
   const [dramaLevel, setDramaLevel] = useState<DramaLevel>(2)
@@ -332,6 +344,11 @@ export function ContentModal({ isOpen, onClose, initialTab = "upload", onOpenSet
   // which drives enabledCount and the generated-script pipeline.
   const [secondaryEvidence, setSecondaryEvidence] = useState<UserMoodAsset[]>(USER_MOOD_ASSETS)
   const [isDragging, setIsDragging] = useState(false)
+  // Corpus dropzone has its own drag state so the UI can glow aged-brass
+  // instead of purple while a book is being dragged. Hook-order rule: must
+  // live alongside the other useState declarations, never past the
+  // `if (!isOpen) return null` below.
+  const [isDraggingCorpus, setIsDraggingCorpus] = useState(false)
   const [inviteEmail, setInviteEmail] = useState("")
   const [inviteRole, setInviteRole] = useState("Collaborator")
   // Organize tab — 3-way evidence category filter (Case / User / All), defaults to All.
@@ -736,9 +753,9 @@ Based on: ${assetNames}`,
     handleFileUpload(e.dataTransfer.files)
   }
 
-  // Corpus dropzone has its own drag state + handler so the UI can
-  // glow aged-brass instead of purple while a book is being dragged.
-  const [isDraggingCorpus, setIsDraggingCorpus] = useState(false)
+  // Corpus dropzone has its own drag handlers so the UI can glow aged-brass
+  // instead of purple while a book is being dragged. (The matching useState
+  // lives up with the other hooks so the early-return doesn't skip it.)
   const handleCorpusDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDraggingCorpus(true)
@@ -1171,7 +1188,91 @@ Based on: ${assetNames}`,
                       </span>
                     ))}
                   </div>
+
+                  {/* ═══════════════════════════════════════════════════
+                      MODULE 6 — Source Ingest entry point. Different
+                      verb than the corpus dropzone above: the dropzone
+                      is for raw retrieval grounding ("dump these and
+                      cite them later"); this button is for structured
+                      narrative extraction ("read the book FOR me and
+                      give me characters/themes/arcs/beats").
+                      ═══════════════════════════════════════════════════ */}
+                  {onOpenIngest && (
+                    <div className="mt-3 flex items-center justify-between gap-3 px-3 py-2.5 border border-[var(--gold)]/30 bg-[var(--gold)]/[0.04]">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Brain size={14} className="text-[var(--gold)] shrink-0" />
+                        <div className="min-w-0">
+                          <div className="font-mono text-[10px] font-bold text-[var(--gold)] tracking-wider">
+                            NARRATIVE EXTRACTION
+                          </div>
+                          <div className="font-mono text-[10px] text-muted-foreground truncate">
+                            Have AI read a book or longform piece and break it into
+                            characters, themes, arcs, beats, season scope.
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={onOpenIngest}
+                        className="shrink-0 px-3 py-1.5 border-2 border-[var(--gold)] bg-[var(--gold)] text-[var(--background)] font-mono text-[10px] font-bold tracking-wider hover:brightness-110 transition-all flex items-center gap-1.5"
+                      >
+                        <Plus size={12} />
+                        INGEST SOURCE
+                      </button>
+                    </div>
+                  )}
                 </div>
+
+                {/* ═════════════════════════════════════════════════════
+                    SOURCE LIBRARY — renders one card per ingested source
+                    so the user can revisit reports without re-uploading.
+                    Hidden until at least one source has been ingested
+                    (no empty-state noise on first load).
+                    ═════════════════════════════════════════════════════ */}
+                {ingestedSources.length > 0 && onOpenSourceReport && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Library size={14} className="text-[var(--gold)]" />
+                      <span className="font-mono text-[10px] font-bold text-[var(--gold)] tracking-wider">
+                        SOURCE LIBRARY
+                      </span>
+                      <span className="font-mono text-[9px] text-muted-foreground">
+                        — {ingestedSources.length} ingested {ingestedSources.length === 1 ? "source" : "sources"}, click to revisit the report
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {ingestedSources.map(src => (
+                        <button
+                          key={src.id}
+                          onClick={() => onOpenSourceReport(src)}
+                          className={cn(
+                            "flex items-start gap-3 p-3 text-left",
+                            "border border-[var(--gold)]/30 bg-[var(--surface)]",
+                            "hover:border-[var(--gold)] hover:bg-[var(--gold)]/5 transition-all"
+                          )}
+                        >
+                          <div className="w-9 h-9 shrink-0 bg-[var(--gold)]/10 border border-[var(--gold)]/40 flex items-center justify-center">
+                            <BookOpen size={16} className="text-[var(--gold)]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-sans text-[12px] font-bold text-[var(--foreground)] truncate">
+                              {src.title}
+                            </div>
+                            <div className="font-mono text-[9px] text-muted-foreground truncate">
+                              {src.author} · {src.type} → {src.format}
+                            </div>
+                            <div className="mt-1 flex items-center gap-2 font-mono text-[9px] text-[var(--gold)]/80">
+                              <span>{src.report.characters.length} chars</span>
+                              <span className="opacity-50">·</span>
+                              <span>{src.report.beats.length} beats</span>
+                              <span className="opacity-50">·</span>
+                              <span>{src.report.seasonScope.seasons}×{src.report.seasonScope.episodes}</span>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Upload Progress */}
                 {Object.keys(uploadProgress).length > 0 && (
