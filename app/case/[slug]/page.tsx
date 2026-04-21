@@ -76,7 +76,10 @@ function CaseWorkspaceContent() {
 
   // Main state - default to "all" view
   const [activeTab, setActiveTab] = useState<ViewTab>("all")
-  const [dramatization, setDramatization] = useState(50)
+  // Story-level drama register — now mirrors the 5-stop axis used by
+  // characters/locations (Court Record → Mythic) so the Story tab and the
+  // Characters pane speak the same vocabulary. Default Docudrama (L1).
+  const [dramatization, setDramatization] = useState<DramaLevel>(1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0)
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
@@ -156,9 +159,10 @@ function CaseWorkspaceContent() {
     return () => clearInterval(interval)
   }, [isPlaying, currentChapter, chapters.length])
 
-  // Dramatization label & color
-  const dramLabel = dramatization < 33 ? "Factual" : dramatization < 66 ? "Dramatized" : "Creative"
-  const dramColor = dramatization < 33 ? "var(--green)" : dramatization < 66 ? "var(--orange)" : "var(--purple)"
+  // Drama-register derivations now come from DRAMA_LEVELS via
+  // <DramaLevelSlider>; the slider renders its own "Drama · L{n}" header
+  // and color-coded label on the right. No need to compute label/color
+  // locally anymore — deleted the old tri-state derivation.
 
   // Handlers
   const handlePrevSection = useCallback(() => {
@@ -1254,20 +1258,17 @@ function CaseWorkspaceContent() {
                   </button>
                 </div>
 
-                <div className="flex-1 flex items-center gap-3 min-w-[200px]">
-                  <span className="font-mono text-[10px] text-muted-foreground whitespace-nowrap">DRAMA</span>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
+                {/* Story-level drama register — matches the per-character
+                    slider on the Characters tab so both surfaces use the
+                    same 5-stop vocabulary (Court Record → Mythic). The
+                    slider supplies its own label row, so we don't wrap it
+                    in a prefix "DRAMA" or external chip. */}
+                <div className="flex-1 min-w-[200px] max-w-[260px]">
+                  <DramaLevelSlider
                     value={dramatization}
-                    onChange={(e) => setDramatization(Number(e.target.value))}
-                    className="flex-1 max-w-[150px]"
-                    style={{ accentColor: dramColor }}
+                    onChange={setDramatization}
+                    entityName="story"
                   />
-                  <Chip mono small style={{ color: dramColor, borderColor: dramColor }}>
-                    {dramLabel}
-                  </Chip>
                 </div>
 
                 <LegalButton
