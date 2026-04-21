@@ -416,9 +416,16 @@
    CINEMA NOIR — film grain, title shadows, status pulse
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Film grain overlay — drop onto any container as a sibling, or via ::before */
-.cinema-grain {
-  position: relative;
+/* Film grain overlay — drop onto any container as a sibling, or via ::before.
+   `.cinema-grain`'s `position: relative` lives in @layer components so any
+   Tailwind position utility (.sticky, .fixed, .absolute) — which sit in
+   @layer utilities — wins the cascade. Without the layer wrapper, cinema-grain
+   would be unlayered and outrank all layered utilities regardless of
+   specificity, trapping sticky elements as relative. */
+@layer components {
+  .cinema-grain {
+    position: relative;
+  }
 }
 .cinema-grain::before {
   content: '';
@@ -437,9 +444,13 @@
   opacity: 0.12;
 }
 
-/* Cinematic radial vignette from corners */
-.cinema-vignette {
-  position: relative;
+/* Cinematic radial vignette from corners — same layer-scoping trick as
+   cinema-grain so the host can be .sticky/.fixed/.absolute and the Tailwind
+   utility wins the cascade. */
+@layer components {
+  .cinema-vignette {
+    position: relative;
+  }
 }
 .cinema-vignette::after {
   content: '';

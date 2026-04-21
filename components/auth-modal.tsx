@@ -63,16 +63,16 @@ export function AuthModal({
     <LegalModal open={open} onClose={onClose} title="" shake={shake} maxWidth="420px">
       <div className="-m-5">
         {/* Brand header — cinema title card */}
-        <div className="px-6 pt-7 pb-5 border-b border-[var(--border)] bg-black/40 text-center">
+        <div className="px-6 pt-7 pb-5 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_40%,transparent)] text-center">
           <div className="cinema-label text-[9px] text-[var(--gold)] mb-2">
             The People · v. · Anonymous
           </div>
           <div className="flex items-baseline justify-center gap-1">
-            <span className="cinema-title text-[28px] text-white">legal</span>
+            <span className="cinema-title text-[28px] text-[var(--foreground)]">legal</span>
             <span className="cinema-title text-[28px] text-[var(--red)]">drama</span>
             <span className="cinema-label text-[11px] text-[var(--gold)] ml-1">.AI</span>
           </div>
-          <p className="cinema-contract-italic text-[10px] text-white/60 mt-3">
+          <p className="cinema-contract-italic text-[10px] text-[var(--foreground)]/60 mt-3">
             {mode === "signin"
               ? "Return to chambers. Your docket awaits."
               : "Enter the record. Five searches on the house."}
@@ -97,7 +97,7 @@ export function AuthModal({
                   "border-b-2 transition-colors duration-150",
                   mode === m.key
                     ? "text-[var(--red)] border-[var(--red)]"
-                    : "text-white/50 border-transparent hover:text-white"
+                    : "text-[var(--foreground)]/50 border-transparent hover:text-[var(--foreground)]"
                 )}
               >
                 {m.label}
@@ -155,14 +155,14 @@ export function AuthModal({
 
           {mode === "signin" && (
             <div className="text-center mt-4">
-              <span className="cinema-label text-[9px] text-white/50 hover:text-[var(--gold)] cursor-pointer transition-colors">
+              <span className="cinema-label text-[9px] text-[var(--foreground)]/50 hover:text-[var(--gold)] cursor-pointer transition-colors">
                 Forgot password?
               </span>
             </div>
           )}
 
           {mode === "signup" && (
-            <div className="text-center mt-4 cinema-contract text-[9px] text-white/50 leading-relaxed">
+            <div className="text-center mt-4 cinema-contract text-[9px] text-[var(--foreground)]/50 leading-relaxed">
               Continuance granted by signing up.
               <br />
               <span className="text-[var(--gold)]">5 searches</span> pro bono on
@@ -172,8 +172,8 @@ export function AuthModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[var(--border)] bg-black/40">
-          <div className="cinema-label text-[9px] text-white/40 text-center">
+        <div className="px-6 py-4 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_40%,transparent)]">
+          <div className="cinema-label text-[9px] text-[var(--foreground)]/40 text-center">
             {mode === "signin" ? "No docket? " : "Already filed? "}
             <span
               onClick={switchMode}

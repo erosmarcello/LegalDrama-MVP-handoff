@@ -63,7 +63,7 @@ export function LegalModal({
       <div
         onClick={e => e.stopPropagation()}
         className={cn(
-          "relative w-full mx-4 bg-[#0f0f0f] border border-[var(--border)]",
+          "relative w-full mx-4 bg-[var(--card)] border border-[var(--border)]",
           "max-h-[85vh] overflow-hidden flex flex-col",
           "shadow-[0_40px_120px_rgba(0,0,0,0.75)]",
           shake ? "animate-shake" : "animate-modal-in",
@@ -78,9 +78,9 @@ export function LegalModal({
         />
 
         {/* Header */}
-        <div className="px-5 py-4 border-b border-[var(--border)] bg-[#141414] flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--card)] flex items-center justify-between">
           <div>
-            <h2 className="cinema-title text-[20px] text-white leading-none">
+            <h2 className="cinema-title text-[20px] text-[var(--foreground)] leading-none">
               {title}
             </h2>
             {subtitle && (
@@ -109,7 +109,7 @@ export function LegalModal({
 
         {/* Footer */}
         {footer && (
-          <div className="px-5 py-3 border-t border-[var(--border)] bg-[#141414]">
+          <div className="px-5 py-3 border-t border-[var(--border)] bg-[var(--card)]">
             {footer}
           </div>
         )}

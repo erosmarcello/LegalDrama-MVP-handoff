@@ -42,7 +42,7 @@ export function LegalToggle({
         className="absolute top-[2px] w-3 h-3 transition-all duration-200"
         style={{
           left: active ? 18 : 2,
-          backgroundColor: active ? "#0a0a0a" : "var(--muted-foreground)",
+          backgroundColor: active ? "var(--background)" : "var(--muted-foreground)",
         }}
       />
     </div>
@@ -89,7 +89,7 @@ export function LegalCheckbox({
       {checked && (
         <span
           className="text-[10px] leading-none"
-          style={{ color: "#0a0a0a", fontWeight: 700 }}
+          style={{ color: "var(--background)", fontWeight: 700 }}
         >
           ✓
         </span>

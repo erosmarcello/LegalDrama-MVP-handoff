@@ -51,7 +51,7 @@ export function LegalSelect({
         className={cn(
           "w-full px-3 py-2 flex items-center justify-between gap-2",
           "border border-[var(--border)] bg-transparent",
-          "cinema-label text-[11px] text-white",
+          "cinema-label text-[11px] text-[var(--foreground)]",
           "transition-colors duration-150",
           "hover:border-[var(--gold)] focus:border-[var(--gold)] focus:outline-none",
           "disabled:opacity-50 disabled:cursor-not-allowed",
@@ -78,7 +78,7 @@ export function LegalSelect({
         <div
           className={cn(
             "absolute top-full left-0 right-0 z-50 mt-0.5",
-            "border border-[var(--border)] bg-[#141414]",
+            "border border-[var(--border)] bg-[var(--card)]",
             "max-h-60 overflow-auto",
             "animate-in fade-in-0 zoom-in-95 duration-150"
           )}
@@ -97,7 +97,7 @@ export function LegalSelect({
                 "transition-colors duration-100",
                 option.value === value
                   ? "bg-[color:color-mix(in_srgb,var(--gold)_14%,transparent)] text-[var(--gold)]"
-                  : "text-white hover:bg-[#1a1a1a]",
+                  : "text-[var(--foreground)] hover:bg-[#1a1a1a]",
                 i < options.length - 1 && "border-b border-[var(--border)]"
               )}
             >

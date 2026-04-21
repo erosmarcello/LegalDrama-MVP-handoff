@@ -100,7 +100,7 @@ function CourtSelector({ onSelect }: { onSelect: (court: string) => void }) {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "w-full max-w-[320px] px-4 py-3 flex items-center justify-between gap-3",
-          "border bg-[#0a0a0a] transition-colors",
+          "border bg-[var(--background)] transition-colors",
           isOpen
             ? "border-[var(--gold)]"
             : "border-[var(--border)] hover:border-[var(--gold)]"
@@ -109,7 +109,7 @@ function CourtSelector({ onSelect }: { onSelect: (court: string) => void }) {
         <span
           className={cn(
             "cinema-label text-[11px]",
-            selected ? "text-white" : "text-[var(--muted-foreground)]"
+            selected ? "text-[var(--foreground)]" : "text-[var(--muted-foreground)]"
           )}
         >
           {selected || "Select a district…"}
@@ -127,7 +127,7 @@ function CourtSelector({ onSelect }: { onSelect: (court: string) => void }) {
         <div
           className={cn(
             "absolute top-full left-0 z-50 mt-1 w-full max-w-[320px]",
-            "border border-[var(--gold)] bg-[#141414]",
+            "border border-[var(--gold)] bg-[var(--card)]",
             "max-h-[280px] overflow-y-auto"
           )}
         >
@@ -145,7 +145,7 @@ function CourtSelector({ onSelect }: { onSelect: (court: string) => void }) {
                 "border-b border-[var(--border)] last:border-b-0 transition-colors",
                 court === selected
                   ? "bg-[var(--gold)] text-[#0a0a0a]"
-                  : "text-[var(--muted-foreground)] hover:bg-[#1e1d1b] hover:text-white"
+                  : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
               )}
             >
               {court}
@@ -245,7 +245,7 @@ function DashboardContent() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0a0a] text-white">
+    <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)]">
       <Masthead
         user={user}
         onSignIn={() => setAuthOpen(true)}
@@ -284,7 +284,7 @@ function DashboardContent() {
             </span>
           </div>
           <h1
-            className="cinema-title text-[40px] md:text-[60px] lg:text-[72px] leading-[0.92] text-white"
+            className="cinema-title text-[40px] md:text-[60px] lg:text-[72px] leading-[0.92] text-[var(--foreground)]"
             style={{ textShadow: "2px 2px 0 #000" }}
           >
             Welcome Back,{" "}
@@ -315,7 +315,7 @@ function DashboardContent() {
               <div className="cinema-contract text-[11px] text-[var(--gold)] mb-1">
                 § Case Intake
               </div>
-              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-white">
+              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-[var(--foreground)]">
                 Bookmark A New Case
               </h2>
             </div>
@@ -327,7 +327,7 @@ function DashboardContent() {
             </Link>
           </div>
 
-          <div className="border border-[var(--border)] bg-[#141414] p-5 md:p-6">
+          <div className="border border-[var(--border)] bg-[var(--card)] p-5 md:p-6">
             <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-5 md:gap-8 items-end">
               <div>
                 <div className="cinema-label text-[9px] text-[var(--gold)] mb-2">
@@ -338,13 +338,13 @@ function DashboardContent() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/browse"
-                  className="h-10 px-5 border border-[var(--border)] cinema-label text-[10px] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white transition-colors inline-flex items-center gap-2"
+                  className="h-10 px-5 border border-[var(--border)] cinema-label text-[10px] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-2"
                 >
                   <Plus size={12} /> Search By Case №
                 </Link>
                 <Link
                   href="/browse"
-                  className="h-10 px-5 border border-[var(--border)] cinema-label text-[10px] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white transition-colors inline-flex items-center gap-2"
+                  className="h-10 px-5 border border-[var(--border)] cinema-label text-[10px] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-2"
                 >
                   <Plus size={12} /> Search By Name
                 </Link>
@@ -362,7 +362,7 @@ function DashboardContent() {
               <div className="cinema-contract text-[11px] text-[var(--gold)] mb-1">
                 § Bookmarked Legal Dramas
               </div>
-              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-white">
+              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-[var(--foreground)]">
                 {filteredCases.length} Cases Tracked
               </h2>
             </div>
@@ -372,7 +372,7 @@ function DashboardContent() {
                   {selectedIds.size} selected
                 </span>
                 <button
-                  className="h-9 px-4 border border-[var(--red)] text-[var(--red)] cinema-label text-[10px] hover:bg-[var(--red)] hover:text-white transition-colors inline-flex items-center gap-2"
+                  className="h-9 px-4 border border-[var(--red)] text-[var(--red)] cinema-label text-[10px] hover:bg-[var(--red)] hover:text-[var(--foreground)] transition-colors inline-flex items-center gap-2"
                   onClick={() => {
                     toast(`Removed ${selectedIds.size} bookmark${selectedIds.size > 1 ? "s" : ""}`, "var(--red)")
                     setSelectedIds(new Set())
@@ -405,8 +405,8 @@ function DashboardContent() {
                   className={cn(
                     "cinema-label text-[9px] px-3 py-1.5 border transition-colors",
                     active
-                      ? "bg-white text-[#0a0a0a] border-white"
-                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white"
+                      ? "bg-[var(--foreground)] text-[#0a0a0a] border-[var(--foreground)]"
+                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)]"
                   )}
                 >
                   {f.label}
@@ -420,7 +420,7 @@ function DashboardContent() {
                 "cinema-label text-[9px] px-3 py-1.5 border transition-colors inline-flex items-center gap-2",
                 showClosed
                   ? "border-[var(--gold)] text-[var(--gold)]"
-                  : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white"
+                  : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)]"
               )}
             >
               <NoirCheckbox checked={showClosed} onChange={() => {}} />
@@ -429,7 +429,7 @@ function DashboardContent() {
           </div>
 
           {/* Case list */}
-          <div className="border border-[var(--border)] bg-[#141414]">
+          <div className="border border-[var(--border)] bg-[var(--card)]">
             {filteredCases.length === 0 ? (
               <div className="py-16 px-6 text-center">
                 <Bookmark
@@ -437,7 +437,7 @@ function DashboardContent() {
                   strokeWidth={1}
                   className="mx-auto mb-3 text-[var(--muted-foreground)]"
                 />
-                <p className="cinema-title text-[18px] text-white">
+                <p className="cinema-title text-[18px] text-[var(--foreground)]">
                   No cases match these filters.
                 </p>
                 <p className="mt-2 font-sans text-[12px] text-[var(--muted-foreground)]">
@@ -481,7 +481,7 @@ function DashboardContent() {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/case/${caseItem.slug}`}
-                        className="block font-sans text-[13px] font-medium text-white group-hover:text-[var(--gold)] transition-colors leading-tight"
+                        className="block font-sans text-[13px] font-medium text-[var(--foreground)] group-hover:text-[var(--gold)] transition-colors leading-tight"
                       >
                         <span className="line-clamp-1">{caseItem.caseName}</span>
                       </Link>
@@ -548,7 +548,7 @@ function DashboardContent() {
               <div className="cinema-contract text-[11px] text-[var(--gold)] mb-1">
                 § Reference Files
               </div>
-              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-white">
+              <h2 className="cinema-title text-[28px] md:text-[36px] leading-[0.95] text-[var(--foreground)]">
                 Your Vault
               </h2>
             </div>
@@ -556,12 +556,12 @@ function DashboardContent() {
 
           <button
             onClick={() => toast("Reference Files coming soon", "var(--gold)")}
-            className="w-full border border-[var(--border)] bg-[#141414] hover:border-[var(--gold)] transition-colors p-6 flex items-center gap-4 text-left"
+            className="w-full border border-[var(--border)] bg-[var(--card)] hover:border-[var(--gold)] transition-colors p-6 flex items-center gap-4 text-left"
             style={{ borderLeft: "2px solid var(--gold)" }}
           >
             <FileText size={20} className="text-[var(--gold)] shrink-0" />
             <div className="flex-1">
-              <div className="cinema-title text-[20px] text-white leading-none">
+              <div className="cinema-title text-[20px] text-[var(--foreground)] leading-none">
                 Reference Files
               </div>
               <p className="mt-1.5 font-sans text-[12px] text-[var(--muted-foreground)]">
@@ -595,7 +595,7 @@ function StatTile({
 }) {
   return (
     <div
-      className="border border-[var(--border)] bg-[#141414] p-4"
+      className="border border-[var(--border)] bg-[var(--card)] p-4"
       style={{ borderTop: `2px solid ${accent}` }}
     >
       <div

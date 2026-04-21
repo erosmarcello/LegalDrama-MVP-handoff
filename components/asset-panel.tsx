@@ -66,7 +66,7 @@ export function AssetPanel({ isOpen, onClose, initialTab = "files" }: AssetPanel
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b-[2.5px] border-[var(--border)] bg-[var(--card)]">
-          <h2 className="font-sans text-lg font-extrabold text-[var(--foreground)]">Asset Panel</h2>
+          <h2 className="font-sans text-lg font-extrabold text-[var(--foreground)]">Drama Lab</h2>
           <button
             onClick={onClose}
             className="p-1.5 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)] transition-colors "
@@ -78,7 +78,7 @@ export function AssetPanel({ isOpen, onClose, initialTab = "files" }: AssetPanel
         {/* Tabs */}
         <div className="flex border-b-[2.5px] border-[var(--border)]">
           {[
-            { key: "files", label: "Assets", icon: Folder },
+            { key: "files", label: "Drama Lab", icon: Folder },
             { key: "characters", label: "Characters", icon: Users },
             { key: "ai", label: "AI Assistant", icon: Sparkles },
             { key: "share", label: "Share", icon: Share2 },
@@ -175,7 +175,7 @@ function AssetLibraryTab({ toast }: { toast: (msg: string, color?: string) => vo
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
           <input
             type="text"
-            placeholder="Search all assets..."
+            placeholder="Search Drama Lab..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-8 pr-3 py-2 border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-mono text-xs placeholder:text-[var(--muted-foreground)] focus:border-[var(--amber)] focus:outline-none"
@@ -368,7 +368,7 @@ function AllMasonryGrid({ assets, onToggleStar, onTogglePin, toast }: { assets: 
   return (
     <div className="px-3 pb-3">
       <div className="font-mono text-[9px] font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">
-        All Assets ({assets.length}) — Mood Board
+        Drama Lab ({assets.length}) — Mood Board
       </div>
       <div className="flex gap-2.5">
         {[col1, col2].map((col, ci) => (
@@ -399,7 +399,7 @@ function AllMasonryGrid({ assets, onToggleStar, onTogglePin, toast }: { assets: 
                         </div>
                       </div>
                       {asset.duration && (
-                        <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-black/80 text-white font-mono text-[8px] font-bold">{asset.duration}</div>
+                        <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-[color-mix(in_srgb,var(--background)_80%,transparent)] text-[var(--foreground)] font-mono text-[8px] font-bold">{asset.duration}</div>
                       )}
                     </div>
                   )}
@@ -510,7 +510,7 @@ function PhotoCard({ asset, onToggleStar, onTogglePin, toast }: { asset: Asset; 
         </div>
         {/* Pin badge */}
         {asset.pinned && (
-          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-[var(--cyan)] text-white font-mono text-[8px] font-bold flex items-center gap-0.5">
+          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-[var(--cyan)] text-[var(--foreground)] font-mono text-[8px] font-bold flex items-center gap-0.5">
             <Pin size={8} /> PINNED
           </div>
         )}
@@ -575,13 +575,13 @@ function VideoCard({ asset, onToggleStar, onTogglePin, toast }: { asset: Asset; 
         </div>
         {/* Duration badge */}
         {asset.duration && (
-          <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 text-white font-mono text-[10px] font-bold">
+          <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-[color-mix(in_srgb,var(--background)_80%,transparent)] text-[var(--foreground)] font-mono text-[10px] font-bold">
             {asset.duration}
           </div>
         )}
         {/* Pin badge */}
         {asset.pinned && (
-          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-[var(--cyan)] text-white font-mono text-[8px] font-bold flex items-center gap-0.5">
+          <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-[var(--cyan)] text-[var(--foreground)] font-mono text-[8px] font-bold flex items-center gap-0.5">
             <Pin size={8} /> PINNED
           </div>
         )}
@@ -651,7 +651,7 @@ function DocumentCard({ asset, onToggleStar, onTogglePin, toast }: { asset: Asse
           <AssetActions asset={asset} onToggleStar={onToggleStar} onTogglePin={onTogglePin} toast={toast} compact />
           <button
             onClick={() => toast("Opening " + asset.name, "var(--cyan)")}
-            className="ml-auto flex items-center gap-1 px-2 py-1 border-[2px] border-[var(--cyan)] text-[var(--cyan)] font-mono text-[9px] font-bold hover:bg-[var(--cyan)] hover:text-white transition-colors"
+            className="ml-auto flex items-center gap-1 px-2 py-1 border-[2px] border-[var(--cyan)] text-[var(--cyan)] font-mono text-[9px] font-bold hover:bg-[var(--cyan)] hover:text-[var(--foreground)] transition-colors"
           >
             <ExternalLink size={10} />
             View
@@ -715,7 +715,7 @@ function AudioRow({ asset, isPlaying, onTogglePlay, onToggleStar, onTogglePin, t
             className={cn(
               "w-10 h-10 flex-shrink-0 flex items-center justify-center border transition-colors",
               isPlaying
-                ? "border-[var(--green)] bg-[var(--green)] text-white"
+                ? "border-[var(--green)] bg-[var(--green)] text-[var(--foreground)]"
                 : "border-[var(--border)] bg-[var(--surface-alt)] text-[var(--foreground)] hover:border-[var(--green)]"
             )}
           >
@@ -792,7 +792,7 @@ function CharactersTab({ toast }: { toast: (msg: string, color?: string) => void
             {char.profile}
           </p>
 
-          <label className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 border border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold  hover:bg-[var(--cyan)] hover:text-white transition-colors cursor-pointer">
+          <label className="flex items-center justify-center gap-1.5 w-full px-3 py-1.5 border border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold  hover:bg-[var(--cyan)] hover:text-[var(--foreground)] transition-colors cursor-pointer">
             <Upload size={12} />
             Upload Evidence
             <input type="file" className="hidden" onChange={() => toast(`Upload evidence for ${char.name}`, "var(--cyan)")} />
@@ -901,10 +901,10 @@ function AITab({ toast }: { toast: (msg: string, color?: string) => void }) {
           <div className="flex items-center gap-2">
             <Sparkles size={12} className="text-[var(--purple)]" />
             <span className="font-mono text-[10px] font-bold text-[var(--foreground)] uppercase">
-              Context Assets
+              Drama Lab Context
             </span>
             {contextAssets.size > 0 && (
-              <span className="px-1.5 py-0.5 bg-[var(--purple)] text-white font-mono text-[8px] font-bold">
+              <span className="px-1.5 py-0.5 bg-[var(--purple)] text-[var(--foreground)] font-mono text-[8px] font-bold">
                 {contextAssets.size} active
               </span>
             )}
@@ -920,7 +920,7 @@ function AITab({ toast }: { toast: (msg: string, color?: string) => void }) {
                 <Search size={11} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
                 <input
                   type="text"
-                  placeholder="Filter assets..."
+                  placeholder="Filter Drama Lab..."
                   value={assetSearch}
                   onChange={(e) => setAssetSearch(e.target.value)}
                   className="w-full pl-7 pr-2 py-1.5 border-[2px] border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] font-mono text-[10px] placeholder:text-[var(--muted-foreground)] focus:border-[var(--purple)] focus:outline-none"
@@ -928,7 +928,7 @@ function AITab({ toast }: { toast: (msg: string, color?: string) => void }) {
               </div>
               <button
                 onClick={enableAll}
-                className="px-2 py-1.5 border-[2px] border-[var(--border)] font-mono text-[8px] font-bold text-[var(--purple)] hover:bg-[var(--purple)] hover:text-white hover:border-[var(--purple)] transition-colors"
+                className="px-2 py-1.5 border-[2px] border-[var(--border)] font-mono text-[8px] font-bold text-[var(--purple)] hover:bg-[var(--purple)] hover:text-[var(--foreground)] hover:border-[var(--purple)] transition-colors"
               >
                 All On
               </button>
@@ -1110,7 +1110,7 @@ function AITab({ toast }: { toast: (msg: string, color?: string) => void }) {
             className={cn(
               "px-3 py-2 border font-mono text-xs font-bold ",
               input.trim() && !isLoading
-                ? "border-[var(--purple)] bg-[var(--purple)] text-white"
+                ? "border-[var(--purple)] bg-[var(--purple)] text-[var(--foreground)]"
                 : "border-[var(--border)] bg-[var(--surface-alt)] text-[var(--muted-foreground)]"
             )}
           >
@@ -1215,7 +1215,7 @@ function ShareTab({ toast }: { toast: (msg: string, color?: string) => void }) {
           />
           <button
             onClick={handleInvite}
-            className="px-3 py-2 flex items-center gap-1.5 border border-[var(--green)] bg-[var(--green)] text-white font-mono text-[10px] font-bold "
+            className="px-3 py-2 flex items-center gap-1.5 border border-[var(--green)] bg-[var(--green)] text-[var(--foreground)] font-mono text-[10px] font-bold "
           >
             <UserPlus size={12} />
             Invite

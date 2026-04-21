@@ -192,7 +192,7 @@ function PricingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
       <Masthead
         user={user}
         onSignIn={() => setAuthOpen(true)}
@@ -230,7 +230,7 @@ function PricingContent() {
             </span>
           </div>
           <h1
-            className="cinema-title text-[44px] md:text-[72px] lg:text-[88px] leading-[0.9] text-white"
+            className="cinema-title text-[44px] md:text-[72px] lg:text-[88px] leading-[0.9] text-[var(--foreground)]"
             style={{ textShadow: "2px 2px 0 #000" }}
           >
             Free To{" "}
@@ -247,7 +247,7 @@ function PricingContent() {
           </p>
 
           {/* Billing toggle */}
-          <div className="mt-9 inline-flex items-center border border-[var(--border)] bg-[#141414] p-1">
+          <div className="mt-9 inline-flex items-center border border-[var(--border)] bg-[var(--card)] p-1">
             {(["monthly", "annual"] as Billing[]).map(b => (
               <button
                 key={b}
@@ -256,7 +256,7 @@ function PricingContent() {
                   "h-9 px-5 cinema-label text-[10px] transition-colors",
                   billing === b
                     ? "bg-[var(--gold)] text-[#0a0a0a]"
-                    : "text-[var(--muted-foreground)] hover:text-white"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 )}
               >
                 {b === "monthly" ? "Monthly" : "Annual · Save 35%"}
@@ -267,7 +267,7 @@ function PricingContent() {
       </section>
 
       {/* ─── Plan grid ─── */}
-      <section className="relative bg-[#0a0a0a] cinema-grain">
+      <section className="relative bg-[var(--background)] cinema-grain">
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-16">
           <div className="grid gap-5 md:grid-cols-3">
             {PLANS.map(plan => {
@@ -276,7 +276,7 @@ function PricingContent() {
                 <div
                   key={plan.id}
                   className={cn(
-                    "relative flex flex-col border bg-[#141414] transition-colors",
+                    "relative flex flex-col border bg-[var(--card)] transition-colors",
                     plan.featured
                       ? "border-[var(--gold)]"
                       : "border-[var(--border)] hover:border-[var(--gold)]"
@@ -300,7 +300,7 @@ function PricingContent() {
                     </div>
 
                     <h3
-                      className="cinema-title mt-5 text-[32px] md:text-[38px] leading-[0.95] text-white"
+                      className="cinema-title mt-5 text-[32px] md:text-[38px] leading-[0.95] text-[var(--foreground)]"
                       style={{ textShadow: "1px 1px 0 #000" }}
                     >
                       {plan.name}
@@ -334,7 +334,7 @@ function PricingContent() {
                             className="shrink-0 mt-0.5"
                             style={{ color: plan.accent }}
                           />
-                          <span className="font-sans text-[13px] leading-snug text-white">
+                          <span className="font-sans text-[13px] leading-snug text-[var(--foreground)]">
                             {feature}
                           </span>
                         </li>
@@ -348,8 +348,8 @@ function PricingContent() {
                         className={cn(
                           "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
                           plan.featured
-                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
-                            : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
+                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-[var(--foreground)]"
+                            : "bg-[var(--foreground)] text-[#0a0a0a] hover:bg-[var(--gold)]"
                         )}
                       >
                         {plan.cta} <ArrowRight size={12} />
@@ -360,8 +360,8 @@ function PricingContent() {
                         className={cn(
                           "mt-7 h-11 w-full flex items-center justify-center gap-2 cinema-label text-[10px] transition-colors",
                           plan.featured
-                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-white"
-                            : "bg-white text-[#0a0a0a] hover:bg-[var(--gold)]"
+                            ? "bg-[var(--gold)] text-[#0a0a0a] hover:bg-[var(--foreground)]"
+                            : "bg-[var(--foreground)] text-[#0a0a0a] hover:bg-[var(--gold)]"
                         )}
                       >
                         {plan.cta} <ArrowRight size={12} />
@@ -374,7 +374,7 @@ function PricingContent() {
           </div>
 
           {/* All tickets include */}
-          <div className="mt-12 border border-[var(--border)] bg-[#141414] p-6 md:p-8">
+          <div className="mt-12 border border-[var(--border)] bg-[var(--card)] p-6 md:p-8">
             <div className="flex items-center gap-3 mb-4">
               <Film size={14} className="text-[var(--gold)]" />
               <span className="cinema-contract text-[11px] text-[var(--gold)]">
@@ -401,14 +401,14 @@ function PricingContent() {
       </section>
 
       {/* ─── Trial mechanic explainer ─── */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section className="relative border-t border-[var(--border)] bg-[var(--background)] cinema-grain">
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-20">
           <div className="text-center mb-10">
             <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
               § How The Writer's Trial Works
             </div>
             <h2
-              className="cinema-title text-[32px] md:text-[48px] leading-[0.95] text-white"
+              className="cinema-title text-[32px] md:text-[48px] leading-[0.95] text-[var(--foreground)]"
               style={{ textShadow: "1px 1px 0 #000" }}
             >
               30 Days Of <span style={{ color: "var(--gold)" }}>Use</span>.
@@ -427,7 +427,7 @@ function PricingContent() {
               return (
                 <div
                   key={step.title}
-                  className="relative border border-[var(--border)] bg-[#141414] p-6 md:p-7 hover:border-[var(--gold)] transition-colors"
+                  className="relative border border-[var(--border)] bg-[var(--card)] p-6 md:p-7 hover:border-[var(--gold)] transition-colors"
                 >
                   <div className="flex items-center justify-between mb-5">
                     <div className="cinema-contract text-[10px] text-[var(--gold)]">
@@ -435,7 +435,7 @@ function PricingContent() {
                     </div>
                     <Icon size={18} className="text-[var(--gold)]" />
                   </div>
-                  <h3 className="cinema-title text-[22px] md:text-[24px] leading-[1.05] text-white mb-2">
+                  <h3 className="cinema-title text-[22px] md:text-[24px] leading-[1.05] text-[var(--foreground)] mb-2">
                     {step.title}
                   </h3>
                   <p className="font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]">
@@ -449,12 +449,12 @@ function PricingContent() {
       </section>
 
       {/* ─── FAQ ─── */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section className="relative border-t border-[var(--border)] bg-[var(--background)] cinema-grain">
         <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-8 py-14 md:py-20">
           <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3 text-center">
             § Director's Commentary
           </div>
-          <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white text-center">
+          <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-[var(--foreground)] text-center">
             Frequently Asked Questions
           </h2>
 
@@ -465,7 +465,7 @@ function PricingContent() {
                 <div
                   key={idx}
                   className={cn(
-                    "border-b last:border-b-0 border-[var(--border)] bg-[#141414]",
+                    "border-b last:border-b-0 border-[var(--border)] bg-[var(--card)]",
                     isOpen && "bg-[#1a1a1a]"
                   )}
                 >
@@ -477,7 +477,7 @@ function PricingContent() {
                       <span className="cinema-contract text-[10px] w-6 text-[var(--gold)]">
                         {String(idx + 1).padStart(2, "0")}
                       </span>
-                      <span className="font-sans text-[14px] font-medium text-white group-hover:text-[var(--gold)] transition-colors">
+                      <span className="font-sans text-[14px] font-medium text-[var(--foreground)] group-hover:text-[var(--gold)] transition-colors">
                         {item.q}
                       </span>
                     </div>
@@ -502,13 +502,13 @@ function PricingContent() {
       </section>
 
       {/* ─── Closing CTA ─── */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section className="relative border-t border-[var(--border)] bg-[var(--background)] cinema-grain">
         <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-8 py-14 md:py-16 text-center">
           <div className="cinema-contract text-[11px] text-[var(--gold)] mb-3">
             § Still Rolling
           </div>
           <h3
-            className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white"
+            className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-[var(--foreground)]"
             style={{ textShadow: "1px 1px 0 #000" }}
           >
             Not Ready To Pick A Tier?
@@ -521,7 +521,7 @@ function PricingContent() {
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/case/usa-v-mangione"
-              className="h-11 px-6 bg-white text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
+              className="h-11 px-6 bg-[var(--foreground)] text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
             >
               Open The Demo Case <ArrowRight size={12} />
             </Link>

@@ -507,7 +507,7 @@ export function SidebarChat() {
             "fixed bottom-6 right-6 z-[60]",
             "flex items-center gap-2 px-4 h-10",
             "border border-[var(--gold)]",
-            "bg-[#0f0f0f] text-[var(--gold)]",
+            "bg-[var(--card)] text-[var(--gold)]",
             "cinema-label text-[10px]",
             "hover:bg-[var(--gold)] hover:text-black",
             "transition-colors duration-200",
@@ -530,7 +530,7 @@ export function SidebarChat() {
             "fixed bottom-6 right-6 z-[60]",
             "w-[min(92vw,420px)] h-[min(80vh,600px)]",
             "flex flex-col",
-            "bg-[#0f0f0f] text-white cinema-grain",
+            "bg-[var(--card)] text-[var(--foreground)] cinema-grain",
             "shadow-[0_30px_80px_rgba(0,0,0,0.7)]",
             "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)] before:z-[1]",
             // Noir pulsing border — thinking state pulses purple (active
@@ -548,7 +548,7 @@ export function SidebarChat() {
             className={cn(
               "flex items-center justify-between px-4 py-3",
               "border-b border-[var(--border)]",
-              "bg-black/40",
+              "bg-[color-mix(in_srgb,var(--background)_40%,transparent)]",
             )}
           >
             <div className="flex items-center gap-2.5">
@@ -565,7 +565,7 @@ export function SidebarChat() {
                 <div className="cinema-label text-[9px] text-[var(--gold)]">
                   Chambers · AI Counsel
                 </div>
-                <div className="cinema-contract-italic text-[10px] text-white/60">
+                <div className="cinema-contract-italic text-[10px] text-[var(--foreground)]/60">
                   Approach the bench
                 </div>
               </div>
@@ -577,7 +577,7 @@ export function SidebarChat() {
               className={cn(
                 "w-8 h-8 flex items-center justify-center",
                 "border border-[var(--border)]",
-                "bg-transparent text-white/60",
+                "bg-transparent text-[var(--foreground)]/60",
                 "hover:border-[var(--red)] hover:text-[var(--red)]",
                 "transition-colors",
               )}
@@ -589,7 +589,7 @@ export function SidebarChat() {
           {/* Messages */}
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#0a0a0a]"
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[var(--background)]"
           >
             {messages.map((m, i) => (
               <MessageBubble
@@ -608,7 +608,7 @@ export function SidebarChat() {
           {/* Quick replies — grouped by intent */}
           <div
             className={cn(
-              "px-3 pt-2 pb-2.5 border-t border-[var(--border)] bg-black/40",
+              "px-3 pt-2 pb-2.5 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_40%,transparent)]",
               "space-y-1.5",
             )}
           >
@@ -683,7 +683,7 @@ export function SidebarChat() {
               className={cn(
                 "h-10 w-10 flex items-center justify-center shrink-0",
                 "border border-[var(--border)]",
-                "bg-[var(--purple)] text-white",
+                "bg-[var(--purple)] text-[var(--foreground)]",
                 "",
                 "hover:translate-x-[-1px] hover:translate-y-[-1px]",
                 "hover:",
@@ -725,7 +725,7 @@ function MessageBubble({
           isUser
             ? // Amber is a saturated light fill in both themes, so text must stay
               // near-black for AA contrast (≈9.2:1 on #EF9F27).
-              "bg-[var(--amber)] text-[#1C1810] font-sans font-semibold"
+              "bg-[var(--amber)] text-[var(--foreground)] font-sans font-semibold"
             : "bg-[var(--card)] text-[var(--foreground)] font-serif",
           "text-sm leading-relaxed whitespace-pre-wrap",
         )}
@@ -815,7 +815,7 @@ function renderContentWithPills(
           "font-mono text-[11px] font-bold",
           "border-2 border-[var(--border)] bg-[var(--background)]",
           "text-[var(--purple)]",
-          "hover:bg-[var(--purple)] hover:text-white",
+          "hover:bg-[var(--purple)] hover:text-[var(--foreground)]",
           "transition-colors",
         )}
       >

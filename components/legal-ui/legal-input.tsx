@@ -35,7 +35,7 @@ export const LegalInput = forwardRef<HTMLInputElement, LegalInputProps>(
           }}
           className={cn(
             "w-full px-3 py-2.5",
-            "cinema-label text-[11px] text-white",
+            "cinema-label text-[11px] text-[var(--foreground)]",
             "bg-transparent border transition-colors duration-150",
             "placeholder:text-[var(--muted-foreground)] placeholder:tracking-[0.12em]",
             focused

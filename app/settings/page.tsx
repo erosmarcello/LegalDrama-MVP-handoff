@@ -342,7 +342,7 @@ function NoirCard({
   return (
     <div
       className={cn(
-        "relative border border-[var(--border)] bg-[#141414] p-6",
+        "relative border border-[var(--border)] bg-[var(--card)] p-6",
         className
       )}
       style={accent ? { borderTop: `2px solid ${accent}` } : undefined}
@@ -447,7 +447,7 @@ function SettingsContent() {
   )
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
       <Masthead onSignIn={() => router.push("/")} />
 
       {/* ── Main content ── */}
@@ -458,7 +458,7 @@ function SettingsContent() {
             <div className="cinema-contract text-[11px] text-[var(--gold)] mb-2">
               § Production Office
             </div>
-            <h1 className="cinema-title text-[48px] text-white leading-none">
+            <h1 className="cinema-title text-[48px] text-[var(--foreground)] leading-none">
               Settings
             </h1>
             <p className="cinema-contract-italic text-[12px] text-[var(--muted-foreground)] mt-3">
@@ -490,8 +490,8 @@ function SettingsContent() {
                   "relative flex items-center gap-2 px-4 py-3 whitespace-nowrap",
                   "cinema-label text-[10px] transition-colors",
                   isActive
-                    ? "text-white"
-                    : "text-[var(--muted-foreground)] hover:text-white"
+                    ? "text-[var(--foreground)]"
+                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                 )}
               >
                 <Icon size={12} />
@@ -531,7 +531,7 @@ function SettingsContent() {
             <NoirCard accent="var(--gold)">
               <div className="flex items-start justify-between mb-5">
                 <div>
-                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                  <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                     Profile Photo
                   </h2>
                   <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)]">
@@ -584,7 +584,7 @@ function SettingsContent() {
                   }}
                   className={cn(
                     "relative w-36 h-36 shrink-0 overflow-hidden cursor-pointer",
-                    "border border-[var(--border)] bg-[#0f0f0f]",
+                    "border border-[var(--border)] bg-[var(--card)]",
                     "hover:border-[var(--gold)] transition-colors",
                     "focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/40"
                   )}
@@ -608,12 +608,12 @@ function SettingsContent() {
 
                 {/* Right side: instructions + action buttons */}
                 <div className="min-w-0">
-                  <div className="cinema-contract text-[12px] text-white mb-2">
+                  <div className="cinema-contract text-[12px] text-[var(--foreground)] mb-2">
                     Upload or drag & drop
                   </div>
                   <p className="font-sans text-[12px] text-[var(--muted-foreground)] leading-relaxed mb-4">
                     Square images work best. Max{" "}
-                    <span className="text-white">5&nbsp;MB</span>. PNG, JPG, or
+                    <span className="text-[var(--foreground)]">5&nbsp;MB</span>. PNG, JPG, or
                     WebP. Your headshot appears on shared screenplays, guild
                     exports, and collaborator mentions throughout LegalDrama.ai.
                   </p>
@@ -654,7 +654,7 @@ function SettingsContent() {
                       {[48, 32, 20].map(size => (
                         <div
                           key={size}
-                          className="border border-[var(--border)] bg-[#0f0f0f] overflow-hidden"
+                          className="border border-[var(--border)] bg-[var(--card)] overflow-hidden"
                           style={{ width: size, height: size }}
                           aria-label={`${size}px preview`}
                         >
@@ -677,7 +677,7 @@ function SettingsContent() {
 
             {/* ── Core profile fields ── */}
             <NoirCard>
-              <h2 className="cinema-title text-[24px] text-white mb-1">
+              <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                 Credits
               </h2>
               <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
@@ -750,8 +750,8 @@ function SettingsContent() {
                       rows={3}
                       maxLength={280}
                       className={cn(
-                        "w-full bg-[#0f0f0f] border border-[var(--border)]",
-                        "px-3 py-2 font-sans text-[13px] text-white",
+                        "w-full bg-[var(--card)] border border-[var(--border)]",
+                        "px-3 py-2 font-sans text-[13px] text-[var(--foreground)]",
                         "resize-none focus:outline-none focus:border-[var(--gold)]",
                         "transition-colors"
                       )}
@@ -778,7 +778,7 @@ function SettingsContent() {
         {activeTab === "account" && (
           <div className="space-y-4">
             <NoirCard accent="var(--gold)">
-              <h2 className="cinema-title text-[24px] text-white mb-1">
+              <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                 Security
               </h2>
               <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-5">
@@ -822,7 +822,7 @@ function SettingsContent() {
         {/* ═══ APPEARANCE ═══ */}
         {activeTab === "appearance" && (
           <NoirCard accent="var(--gold)">
-            <h2 className="cinema-title text-[24px] text-white mb-1">
+            <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
               Theme
             </h2>
             <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
@@ -860,8 +860,8 @@ function SettingsContent() {
                 subtitle="In Camera — sealed, off the record"
                 Icon={Moon}
                 preview={
-                  <div className="w-full h-32 bg-[#0a0a0a] border border-[#2a2822] overflow-hidden cinema-grain">
-                    <div className="h-6 bg-[#141414] border-b border-[#2a2822]" />
+                  <div className="w-full h-32 bg-[var(--background)] border border-[#2a2822] overflow-hidden cinema-grain">
+                    <div className="h-6 bg-[var(--card)] border-b border-[#2a2822]" />
                     <div className="h-[2px] bg-[#b3a369] w-full" />
                     <div className="p-3 space-y-2">
                       <div className="h-2 bg-[#262626] w-3/4" />
@@ -879,7 +879,7 @@ function SettingsContent() {
         {activeTab === "ai-usage" && (
           <div className="space-y-4">
             <NoirCard accent="var(--gold)">
-              <h2 className="cinema-title text-[24px] text-white mb-1">
+              <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                 AI Usage Report
               </h2>
               <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
@@ -903,7 +903,7 @@ function SettingsContent() {
                   {AI_CONTRIBUTIONS.map(item => (
                     <div key={item.label}>
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="font-sans text-[13px] text-white">
+                        <span className="font-sans text-[13px] text-[var(--foreground)]">
                           {item.label}
                         </span>
                         <span className="cinema-label text-[10px] text-[var(--gold)]">
@@ -938,7 +938,7 @@ function SettingsContent() {
                     <span className="cinema-label text-[9px] text-[var(--muted-foreground)] w-20 shrink-0">
                       {item.time}
                     </span>
-                    <span className="font-sans text-[13px] text-white flex-1">
+                    <span className="font-sans text-[13px] text-[var(--foreground)] flex-1">
                       {item.action}
                     </span>
                     <Chip color="var(--gold)" mono>
@@ -977,7 +977,7 @@ function SettingsContent() {
             <NoirCard accent="var(--gold)">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                  <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                     Current Plan
                   </h2>
                   <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)]">
@@ -1004,14 +1004,14 @@ function SettingsContent() {
             </NoirCard>
 
             <NoirCard>
-              <h2 className="cinema-title text-[20px] text-white mb-4">
+              <h2 className="cinema-title text-[20px] text-[var(--foreground)] mb-4">
                 Payment Method
               </h2>
               <div className="flex items-center justify-between p-4 border border-[var(--border)]">
                 <div className="flex items-center gap-3">
                   <CreditCard size={18} className="text-[var(--muted-foreground)]" />
                   <div>
-                    <div className="font-sans text-[13px] text-white font-semibold">
+                    <div className="font-sans text-[13px] text-[var(--foreground)] font-semibold">
                       Visa ending in 4242
                     </div>
                     <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-0.5">
@@ -1034,7 +1034,7 @@ function SettingsContent() {
                   <Link2 size={20} className="text-[var(--gold)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="cinema-title text-[24px] text-white mb-1">
+                  <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
                     Connected Services
                   </h2>
                   <p className="font-sans text-[13px] text-[var(--muted-foreground)] leading-relaxed">
@@ -1064,7 +1064,7 @@ function SettingsContent() {
               return (
                 <div
                   key={category.id}
-                  className="border border-[var(--border)] bg-[#141414] overflow-hidden"
+                  className="border border-[var(--border)] bg-[var(--card)] overflow-hidden"
                 >
                   <button
                     onClick={() =>
@@ -1077,7 +1077,7 @@ function SettingsContent() {
                         <category.icon size={18} className="text-[var(--gold)]" />
                       </div>
                       <div className="text-left">
-                        <div className="cinema-contract text-[12px] text-white">
+                        <div className="cinema-contract text-[12px] text-[var(--foreground)]">
                           {category.name}
                         </div>
                         <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-1">
@@ -1100,7 +1100,7 @@ function SettingsContent() {
                   </button>
 
                   {isExpanded && (
-                    <div className="border-t border-[var(--border)] p-4 space-y-3 bg-[#0f0f0f]">
+                    <div className="border-t border-[var(--border)] p-4 space-y-3 bg-[var(--card)]">
                       {category.integrations.map(integration => (
                         <div
                           key={integration.id}
@@ -1108,13 +1108,13 @@ function SettingsContent() {
                             "border p-4 transition-colors",
                             integration.connected
                               ? "border-[var(--gold)]/40 bg-[color:color-mix(in_srgb,var(--gold)_5%,transparent)]"
-                              : "border-[var(--border)] bg-[#141414] hover:border-[var(--muted-foreground)]"
+                              : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--muted-foreground)]"
                           )}
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="cinema-contract text-[12px] text-white">
+                                <span className="cinema-contract text-[12px] text-[var(--foreground)]">
                                   {integration.name}
                                 </span>
                                 {integration.connected ? (
@@ -1226,7 +1226,7 @@ function SettingsContent() {
                   className="text-[var(--gold)] shrink-0 mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="cinema-contract text-[12px] text-white mb-1">
+                  <div className="cinema-contract text-[12px] text-[var(--foreground)] mb-1">
                     Need help connecting?
                   </div>
                   <p className="font-sans text-[12px] text-[var(--muted-foreground)] mb-4 leading-relaxed">
@@ -1253,7 +1253,7 @@ function SettingsContent() {
         {/* ═══ API KEYS ═══ */}
         {activeTab === "api" && (
           <NoirCard accent="var(--gold)">
-            <h2 className="cinema-title text-[24px] text-white mb-1">
+            <h2 className="cinema-title text-[24px] text-[var(--foreground)] mb-1">
               API Keys
             </h2>
             <p className="cinema-contract-italic text-[11px] text-[var(--muted-foreground)] mb-6">
@@ -1268,7 +1268,7 @@ function SettingsContent() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                      <div className="cinema-contract text-[12px] text-white mb-1">
+                      <div className="cinema-contract text-[12px] text-[var(--foreground)] mb-1">
                         {apiKey.name}
                       </div>
                       <div className="cinema-label text-[10px] text-[var(--gold)] mb-2 truncate">
@@ -1334,7 +1334,7 @@ function SecurityRow({
   return (
     <div className="flex items-center justify-between py-4">
       <div>
-        <div className="cinema-contract text-[12px] text-white">{title}</div>
+        <div className="cinema-contract text-[12px] text-[var(--foreground)]">{title}</div>
         <div className="cinema-label text-[9px] text-[var(--muted-foreground)] mt-0.5">
           {subtitle}
         </div>
@@ -1410,7 +1410,7 @@ function ThemeCard({
         <span
           className={cn(
             "cinema-contract text-[12px]",
-            selected ? "text-[var(--gold)]" : "text-white"
+            selected ? "text-[var(--gold)]" : "text-[var(--foreground)]"
           )}
         >
           {title}

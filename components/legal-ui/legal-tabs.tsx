@@ -58,8 +58,8 @@ export function LegalTabs({
               sizeClasses[size],
               "cinema-label transition-colors duration-150",
               isActive
-                ? "text-white"
-                : "text-[var(--muted-foreground)] hover:text-white"
+                ? "text-[var(--foreground)]"
+                : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             {Icon && <Icon size={iconSizes[size]} />}
@@ -129,8 +129,8 @@ export function LegalTabsVertical({
               "cinema-label transition-colors duration-150",
               "border-l-2",
               isActive
-                ? "text-white bg-[#141414] border-l-[var(--gold)]"
-                : "text-[var(--muted-foreground)] border-l-transparent hover:text-white hover:bg-[#141414]"
+                ? "text-[var(--foreground)] bg-[var(--card)] border-l-[var(--gold)]"
+                : "text-[var(--muted-foreground)] border-l-transparent hover:text-[var(--foreground)] hover:bg-[var(--card)]"
             )}
           >
             {Icon && <Icon size={iconSizes[size]} />}

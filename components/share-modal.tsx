@@ -159,7 +159,7 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
       <div
         className={cn(
           "relative w-full max-w-xl mx-4",
-          "bg-[#0f0f0f] border border-[var(--border)]",
+          "bg-[var(--card)] border border-[var(--border)]",
           "animate-scale-in",
           "shadow-[0_40px_100px_rgba(0,0,0,0.7)]",
           "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
@@ -171,8 +171,8 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
             <div className="cinema-label text-[9px] text-[var(--gold)] mb-1 flex items-center gap-2">
               <Share2 size={10} /> Co-counsel Access
             </div>
-            <h2 className="cinema-title text-[22px] text-white">Distribute Docket</h2>
-            <p className="cinema-contract text-[10px] text-white/50 mt-1">
+            <h2 className="cinema-title text-[22px] text-[var(--foreground)]">Distribute Docket</h2>
+            <p className="cinema-contract text-[10px] text-[var(--foreground)]/50 mt-1">
               {caseTitle} · {caseNumber}
             </p>
           </div>
@@ -181,7 +181,7 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
             className={cn(
               "w-9 h-9 flex items-center justify-center",
               "border border-[var(--border)] bg-transparent",
-              "text-white/60 hover:text-[var(--red)] hover:border-[var(--red)]",
+              "text-[var(--foreground)]/60 hover:text-[var(--red)] hover:border-[var(--red)]",
               "transition-colors duration-150",
             )}
           >
@@ -199,7 +199,7 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
               "flex items-center justify-center gap-2",
               activeTab === "share"
                 ? "text-[var(--red)] border-[var(--red)]"
-                : "text-white/50 border-transparent hover:text-white",
+                : "text-[var(--foreground)]/50 border-transparent hover:text-[var(--foreground)]",
             )}
           >
             <Users size={12} />
@@ -213,7 +213,7 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
               "flex items-center justify-center gap-2",
               activeTab === "export"
                 ? "text-[var(--red)] border-[var(--red)]"
-                : "text-white/50 border-transparent hover:text-white",
+                : "text-[var(--foreground)]/50 border-transparent hover:text-[var(--foreground)]",
             )}
           >
             <Download size={12} />
@@ -227,7 +227,7 @@ export function ShareModal({ isOpen, onClose, caseTitle = "USA v. Mangione", cas
               "flex items-center justify-center gap-2",
               activeTab === "activity"
                 ? "text-[var(--red)] border-[var(--red)]"
-                : "text-white/50 border-transparent hover:text-white",
+                : "text-[var(--foreground)]/50 border-transparent hover:text-[var(--foreground)]",
             )}
           >
             <Clock size={12} />

@@ -405,16 +405,29 @@ function CaseWorkspaceContent() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setContentModalTab("upload")
-                setContentModalOpen(true)
-              }}
-              className="h-7 px-2.5 flex items-center gap-1.5 border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cinema-label text-[9px]"
+            {/*
+              Defendant portrait — swapped in for the redundant marquee
+              "+ Assets" button. The gold-ringed hero "+ DRAMA LAB" button below
+              (line ~527) remains the single entry point for drama-lab uploads.
+
+              To upgrade from the placeholder silhouette to a real photo:
+                1. Drop the photo file at /public/mangione.jpg
+                2. Change the <img src> below from "/mangione.svg" to "/mangione.jpg"
+              The wrapping <div> already enforces a 28×28 square crop with
+              object-cover, so portrait aspect ratios render correctly.
+            */}
+            <div
+              className="w-7 h-7 overflow-hidden border border-[var(--border)] hover:border-[var(--gold)] transition-colors shrink-0"
+              aria-label="Luigi Mangione — defendant"
+              title="Luigi Mangione — defendant"
             >
-              <Plus size={11} />
-              <span className="hidden md:inline">Assets</span>
-            </button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/mangione.svg"
+                alt="Luigi Mangione, defendant"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <button
               onClick={() => setShareModalOpen(true)}
               className="h-7 px-2.5 flex items-center gap-1.5 border border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cinema-label text-[9px]"
@@ -522,7 +535,7 @@ function CaseWorkspaceContent() {
                       className="hover-lift"
                     >
                       <Plus size={12} />
-                      ASSETS
+                      DRAMA LAB
                     </LegalButton>
                   </div>
                 </div>
@@ -575,11 +588,11 @@ function CaseWorkspaceContent() {
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
                   {/* Main Story */}
                   <div className="flex-1 animate-enter-left" style={{ animationDelay: '0.1s' }}>
-                    <h2 className="font-sans text-xl md:text-2xl font-black text-white mb-4 flex items-center gap-3">
+                    <h2 className="font-sans text-xl md:text-2xl font-black text-[var(--foreground)] mb-4 flex items-center gap-3">
                       <BookOpen size={24} className="animate-idle-float" />
                       <span className="tracking-tight">THE STORY SO FAR</span>
                     </h2>
-                    <p className="font-serif text-base md:text-lg text-white/90 leading-relaxed max-w-[60ch]">
+                    <p className="font-serif text-base md:text-lg text-[var(--foreground)]/90 leading-relaxed max-w-[60ch]">
                       <span className="font-bold">USA v. Mangione</span> - from complaint to trial. A federal prosecution 
                       following the December 2024 shooting of UnitedHealthcare CEO Brian Thompson. 
                       Four counts filed, two dismissed. Death penalty withdrawn. Trial scheduled for October 2026.
@@ -588,27 +601,27 @@ function CaseWorkspaceContent() {
                   
                   {/* What Is Going On? - Latest Event */}
                   <div className="lg:w-80 shrink-0 animate-enter-right" style={{ animationDelay: '0.2s' }}>
-                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 shadow-2xl hover-lift-premium">
+                    <div className="bg-[var(--foreground)]/10 backdrop-blur-md rounded-xl p-5 border border-[var(--foreground)]/20 shadow-2xl hover-lift-premium">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-2 h-2 rounded-full bg-green animate-pulse shadow-lg" style={{ boxShadow: '0 0 8px var(--green)' }} />
-                        <span className="font-mono text-[10px] font-bold text-white/80 tracking-widest">
+                        <span className="font-mono text-[10px] font-bold text-[var(--foreground)]/80 tracking-widest">
                           WHAT IS GOING ON?
                         </span>
                       </div>
-                      <div className="font-sans text-sm font-bold text-white mb-1">
+                      <div className="font-sans text-sm font-bold text-[var(--foreground)] mb-1">
                         Death Penalty Dropped
                       </div>
-                      <div className="font-mono text-[10px] text-white/60 mb-2">
+                      <div className="font-mono text-[10px] text-[var(--foreground)]/60 mb-2">
                         Feb 27, 2026 - Dkt #113
                       </div>
-                      <p className="font-serif text-sm text-white/80 leading-relaxed">
+                      <p className="font-serif text-sm text-[var(--foreground)]/80 leading-relaxed">
                         Government formally withdrew notice of intent to seek capital punishment. 
                         Case now proceeds as non-capital federal murder prosecution with maximum 
                         sentence of life imprisonment.
                       </p>
-                      <div className="mt-4 pt-3 border-t border-white/20">
+                      <div className="mt-4 pt-3 border-t border-[var(--foreground)]/20">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-[9px] text-white/50 tracking-wider">NEXT UP</span>
+                          <span className="font-mono text-[9px] text-[var(--foreground)]/50 tracking-wider">NEXT UP</span>
                           <span className="font-mono text-[10px] text-cyan font-bold">Trial: Oct 13, 2026</span>
                         </div>
                       </div>
@@ -713,7 +726,7 @@ function CaseWorkspaceContent() {
                       </span>
                     ))}
                     <span className={cn(
-                      "px-3 py-1 font-mono text-[10px] font-bold text-white bg-red rounded-sm",
+                      "px-3 py-1 font-mono text-[10px] font-bold text-[var(--foreground)] bg-red rounded-sm",
                       "animate-pulse-soft shadow-lg",
                       "relative overflow-hidden"
                     )}>
@@ -775,7 +788,7 @@ function CaseWorkspaceContent() {
                                 className={cn(
                                   "absolute top-1/2 rounded-full cursor-pointer timeline-dot",
                                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                                  isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-card z-10",
+                                  isSelected && "ring-2 ring-[var(--foreground)]/50 ring-offset-2 ring-offset-card z-10",
                                   "animate-dot-pop"
                                 )}
                                 style={{
@@ -797,7 +810,7 @@ function CaseWorkspaceContent() {
                                     the "live" signal so nothing else has to. */}
                                 {(isHovered || isSelected) && (
                                   <span
-                                    className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft"
+                                    className="absolute inset-1 rounded-full bg-[var(--foreground)]/30 animate-pulse-soft"
                                   />
                                 )}
                               </button>
@@ -893,7 +906,7 @@ function CaseWorkspaceContent() {
                               )}
                             </span>
                             {hovered.docketNum && (
-                              <span className="cinema-label text-[9px] text-white/40">
+                              <span className="cinema-label text-[9px] text-[var(--foreground)]/40">
                                 · DKT {hovered.docketNum}
                               </span>
                             )}
@@ -918,7 +931,7 @@ function CaseWorkspaceContent() {
                             </span>
                           </div>
                           <div
-                            className="cinema-title text-[14px] text-white leading-tight mb-2"
+                            className="cinema-title text-[14px] text-[var(--foreground)] leading-tight mb-2"
                             style={{ textShadow: "1px 1px 0 #000" }}
                           >
                             {hovered.title}
@@ -928,7 +941,7 @@ function CaseWorkspaceContent() {
                               {hovered.beat}
                             </div>
                           ) : hovered.description ? (
-                            <div className="font-serif italic text-[11px] text-white/70 leading-snug">
+                            <div className="font-serif italic text-[11px] text-[var(--foreground)]/70 leading-snug">
                               {hovered.description}
                             </div>
                           ) : null}
@@ -1626,7 +1639,7 @@ function CaseWorkspaceContent() {
                                 <div 
                                   className={cn(
                                     "rounded-full transition-all duration-300",
-                                    isSelected && "ring-2 ring-white/50 ring-offset-2 ring-offset-surface-alt"
+                                    isSelected && "ring-2 ring-[var(--foreground)]/50 ring-offset-2 ring-offset-surface-alt"
                                   )}
                                   style={{ 
                                     backgroundColor: lane.color,
@@ -1641,7 +1654,7 @@ function CaseWorkspaceContent() {
                                 >
                                   {/* Inner glow */}
                                   {(isHovered || isSelected) && (
-                                    <span className="absolute inset-1 rounded-full bg-white/30 animate-pulse-soft" />
+                                    <span className="absolute inset-1 rounded-full bg-[var(--foreground)]/30 animate-pulse-soft" />
                                   )}
                                 </div>
                                 {(isHovered || isSelected) && (
@@ -1739,7 +1752,7 @@ function CaseWorkspaceContent() {
                         <label className="relative w-16 h-16 flex-shrink-0 cursor-pointer group border border-[var(--border)] bg-[var(--surface-alt)] flex items-center justify-center  overflow-hidden">
                           <Users size={24} className="text-[var(--muted-foreground)] group-hover:opacity-50 transition-opacity" />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Pencil size={14} className="text-white" />
+                            <Pencil size={14} className="text-[var(--foreground)]" />
                           </div>
                           <input type="file" accept="image/*" className="hidden" onChange={() => toast("Photo updated!", "var(--green)")} />
                         </label>
@@ -1757,14 +1770,14 @@ function CaseWorkspaceContent() {
 
                           <div className="flex items-center gap-2">
                             <button
-                              className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold  hover:bg-[var(--cyan)] hover:text-white transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 border border-[var(--cyan)] text-[var(--cyan)] font-mono text-[10px] font-bold  hover:bg-[var(--cyan)] hover:text-[var(--foreground)] transition-colors"
                               onClick={() => toast("Upload evidence for " + char.name, "var(--cyan)")}
                             >
                               <Upload size={12} />
                               Upload Evidence
                             </button>
                             {char.evidenceCount > 0 && (
-                              <span className="font-mono text-[9px] bg-[var(--cyan)] text-white px-2 py-0.5 font-bold">{char.evidenceCount} files</span>
+                              <span className="font-mono text-[9px] bg-[var(--cyan)] text-[var(--foreground)] px-2 py-0.5 font-bold">{char.evidenceCount} files</span>
                             )}
                           </div>
                         </div>

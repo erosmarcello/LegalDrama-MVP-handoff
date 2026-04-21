@@ -129,7 +129,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       <div
         className={cn(
           "relative w-full max-w-2xl mx-4",
-          "bg-[#0f0f0f] border border-[var(--border)]",
+          "bg-[var(--card)] border border-[var(--border)]",
           "animate-scale-in",
           "shadow-[0_40px_100px_rgba(0,0,0,0.7)]",
           "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[var(--gold)]",
@@ -141,7 +141,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <div className="cinema-label text-[9px] text-[var(--gold)] mb-1">
               Chambers · Integrations
             </div>
-            <h2 className="cinema-title text-[22px] text-white">
+            <h2 className="cinema-title text-[22px] text-[var(--foreground)]">
               Court Connections
             </h2>
           </div>
@@ -150,7 +150,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             className={cn(
               "w-9 h-9 flex items-center justify-center",
               "border border-[var(--border)] bg-transparent",
-              "text-white/60 hover:text-[var(--red)] hover:border-[var(--red)]",
+              "text-[var(--foreground)]/60 hover:text-[var(--red)] hover:border-[var(--red)]",
               "transition-colors duration-150",
             )}
           >
@@ -616,7 +616,7 @@ function AlertToggle({
         )}
       >
         <span className={cn(
-          "absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all duration-200",
+          "absolute top-1 w-4 h-4 rounded-full bg-[var(--foreground)] shadow-md transition-all duration-200",
           checked ? "left-7" : "left-1"
         )} />
       </button>

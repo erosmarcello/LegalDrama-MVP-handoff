@@ -28,7 +28,7 @@ export function LegalCard({
     <div
       onClick={onClick}
       className={cn(
-        "relative border border-[var(--border)] bg-[#141414] p-4",
+        "relative border border-[var(--border)] bg-[var(--card)] p-4",
         "transition-colors duration-150",
         animated && "animate-card-in",
         onClick &&
@@ -93,7 +93,7 @@ export function LegalPanel({ children, className }: LegalPanelProps) {
   return (
     <div
       className={cn(
-        "bg-[#141414] border border-[var(--border)] p-4",
+        "bg-[var(--card)] border border-[var(--border)] p-4",
         "animate-panel-in",
         className
       )}

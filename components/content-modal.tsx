@@ -896,18 +896,18 @@ Based on: ${assetNames}`,
     <div className="fixed inset-0 z-[100] animate-fade-in" style={{ animationDuration: '0.2s' }}>
       {/* Full-screen backdrop — deep black + cinema grain */}
       <div
-        className="absolute inset-0 bg-black/95 cinema-grain"
+        className="absolute inset-0 bg-[color-mix(in_srgb,var(--background)_95%,transparent)] cinema-grain"
         onClick={onClose}
       />
 
       {/* Full-screen modal container */}
-      <div className="relative h-full flex flex-col animate-enter-up bg-[#0a0a0a] text-white" style={{ animationDuration: '0.35s' }}>
+      <div className="relative h-full flex flex-col animate-enter-up bg-[var(--background)] text-[var(--foreground)]" style={{ animationDuration: '0.35s' }}>
         {/* Top Nav Bar — cinema masthead */}
-        <div className="relative z-10 bg-[#0f0f0f] border-b border-[var(--border)]">
+        <div className="relative z-10 bg-[var(--card)] border-b border-[var(--border)]">
           <div className="flex items-center justify-between px-5 h-14">
             {/* Logo */}
             <div className="flex items-baseline gap-1">
-              <span className="cinema-title text-[22px] text-white">legal</span>
+              <span className="cinema-title text-[22px] text-[var(--foreground)]">legal</span>
               <span className="cinema-title text-[22px] text-[var(--red)]">drama</span>
               <span className="cinema-label text-[10px] text-[var(--gold)] ml-1">.AI</span>
             </div>
@@ -919,7 +919,7 @@ Based on: ${assetNames}`,
                 onClick={() => { onOpenSettings?.(); onClose(); }}
                 className={cn(
                   "px-3 h-8 flex items-center gap-2",
-                  "border border-[var(--border)] text-white/60",
+                  "border border-[var(--border)] text-[var(--foreground)]/60",
                   "cinema-label text-[10px]",
                   "hover:border-[var(--gold)] hover:text-[var(--gold)] transition-colors cursor-pointer",
                 )}
@@ -943,14 +943,14 @@ Based on: ${assetNames}`,
         </div>
 
         {/* Case Header Bar — cinema marquee */}
-        <div className="relative z-10 bg-[#0a0a0a] border-b border-[var(--border)]">
+        <div className="relative z-10 bg-[var(--background)] border-b border-[var(--border)]">
           <div className="flex items-center justify-between px-5 h-12">
             <div className="flex items-center gap-4">
-              <h1 className="cinema-title text-[20px] text-white tracking-wider">
+              <h1 className="cinema-title text-[20px] text-[var(--foreground)] tracking-wider">
                 USA <span className="text-[var(--red)]">v.</span> MANGIONE
               </h1>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 border border-[var(--border)] cinema-label text-[9px] text-white/70">
+                <span className="px-2 py-0.5 border border-[var(--border)] cinema-label text-[9px] text-[var(--foreground)]/70">
                   1:25-cr-00176-MMG
                 </span>
                 <span className="px-2 py-0.5 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[9px]">
@@ -962,11 +962,11 @@ Based on: ${assetNames}`,
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="cinema-pulse-dot" style={{ backgroundColor: "var(--gold)" }} />
-                <span className="cinema-contract text-[10px] text-white/60">
+                <span className="cinema-contract text-[10px] text-[var(--foreground)]/60">
                   Motion to Continue pending · Trial <span className="text-[var(--red)]">Oct 13 &apos;26</span>
                 </span>
               </div>
-              <div className="px-3 py-1 border border-[var(--border)] cinema-label text-[9px] text-white/70">
+              <div className="px-3 py-1 border border-[var(--border)] cinema-label text-[9px] text-[var(--foreground)]/70">
                 {enabledCount}/{totalCount} sources active
               </div>
             </div>
@@ -1443,7 +1443,7 @@ Based on: ${assetNames}`,
                       <div className="flex items-center gap-2">
                         <Grid3X3 size={14} className="text-orange" />
                         <span className="font-mono text-[10px] font-bold text-orange tracking-wider">FROM CASE EVIDENCE</span>
-                        <span className="px-1.5 py-0.5 bg-orange/10 border border-orange/30 font-mono text-[9px] font-bold text-orange">{MOOD_CATEGORIES.length} ASSETS</span>
+                        <span className="px-1.5 py-0.5 bg-orange/10 border border-orange/30 font-mono text-[9px] font-bold text-orange">{MOOD_CATEGORIES.length} ITEMS</span>
                         <span className="font-mono text-[9px] text-muted-foreground">— scene reference library derived from the record</span>
                       </div>
                       {/* Modality legend */}
@@ -1467,7 +1467,7 @@ Based on: ${assetNames}`,
                         className="border-2 border-dashed border-purple/40 flex flex-col items-center justify-center py-10 hover:border-purple hover:bg-purple/5 cursor-pointer transition-all"
                       >
                         <Plus size={18} className="text-purple mb-1" />
-                        <span className="font-mono text-[10px] text-purple font-bold">Add asset</span>
+                        <span className="font-mono text-[10px] text-purple font-bold">Add item</span>
                         <span className="font-mono text-[8px] text-muted-foreground mt-0.5">photo · audio · video · doc</span>
                       </button>
                     </div>
@@ -1481,7 +1481,7 @@ Based on: ${assetNames}`,
                       <div className="flex items-center gap-2">
                         <ImagePlus size={14} className="text-purple" />
                         <span className="font-mono text-[10px] font-bold text-purple tracking-wider">USER EVIDENCE — MOOD BOARD</span>
-                        <span className="px-1.5 py-0.5 bg-purple/10 border border-purple/30 font-mono text-[9px] font-bold text-purple">{secondaryEvidence.length} ASSETS</span>
+                        <span className="px-1.5 py-0.5 bg-purple/10 border border-purple/30 font-mono text-[9px] font-bold text-purple">{secondaryEvidence.length} ITEMS</span>
                         <span className="font-mono text-[9px] text-muted-foreground">— your uploads &amp; writer&apos;s reference scrapbook</span>
                       </div>
                       {/* Modality legend (mirrors the case mood-board header). */}
@@ -1523,7 +1523,7 @@ Based on: ${assetNames}`,
                     <div className="flex gap-2">
                       <button
                         onClick={() => setActiveTab("upload")}
-                        className="px-4 py-2 flex items-center gap-2 bg-purple text-white font-mono text-xs font-bold hover:bg-purple/90 transition-colors"
+                        className="px-4 py-2 flex items-center gap-2 bg-purple text-[var(--foreground)] font-mono text-xs font-bold hover:bg-purple/90 transition-colors"
                       >
                         <Upload size={14} />
                         Upload More
@@ -1577,7 +1577,7 @@ Based on: ${assetNames}`,
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={() => handleQuickAction("AI Summarize")}
-                      className="px-4 py-2 flex items-center gap-2 bg-red text-white font-mono text-xs font-bold hover:bg-red/90 transition-colors"
+                      className="px-4 py-2 flex items-center gap-2 bg-red text-[var(--foreground)] font-mono text-xs font-bold hover:bg-red/90 transition-colors"
                     >
                       <Sparkles size={14} />
                       AI Summarize
@@ -1973,7 +1973,7 @@ Based on: ${assetNames}`,
                       disabled={isGenerating}
                       className={cn(
                         "px-6 py-3 flex items-center gap-2",
-                        "bg-gradient-to-r from-pink to-purple text-white",
+                        "bg-gradient-to-r from-pink to-purple text-[var(--foreground)]",
                         "font-mono text-sm font-bold",
                         "rounded-lg shadow-lg shadow-pink/20",
                         "hover:shadow-xl hover:shadow-pink/30 hover:scale-[1.02]",
@@ -1983,7 +1983,7 @@ Based on: ${assetNames}`,
                     >
                       {isGenerating ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-[var(--foreground)] border-t-transparent rounded-full animate-spin" />
                           Generating...
                         </>
                       ) : (
@@ -2167,7 +2167,7 @@ Based on: ${assetNames}`,
                       disabled={inviteSending || !inviteEmail.trim()}
                       className={cn(
                         "px-6 py-3",
-                        "bg-green text-white",
+                        "bg-green text-[var(--foreground)]",
                         "font-mono text-sm font-bold",
                         "",
                         "hover:bg-green/90 transition-colors",
@@ -2175,7 +2175,7 @@ Based on: ${assetNames}`,
                       )}
                     >
                       {inviteSending ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-[var(--foreground)] border-t-transparent rounded-full animate-spin" />
                       ) : (
                         "INVITE"
                       )}
@@ -2213,7 +2213,7 @@ Based on: ${assetNames}`,
                       >
                         <div className="flex items-center gap-3">
                           <div 
-                            className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--foreground)] font-bold"
                             style={{ backgroundColor: member.color }}
                           >
                             {member.name.charAt(0)}
@@ -2340,7 +2340,7 @@ Based on: ${assetNames}`,
                 <div className="font-mono text-[11px] font-bold text-foreground">Mot. in Limine</div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[9px] text-muted-foreground">Apr 25, 2026</span>
-                  <span className="px-1.5 py-0.5 bg-red text-white font-mono text-[8px] font-bold">17 DAYS</span>
+                  <span className="px-1.5 py-0.5 bg-red text-[var(--foreground)] font-mono text-[8px] font-bold">17 DAYS</span>
                 </div>
               </div>
 
@@ -2397,7 +2397,7 @@ Based on: ${assetNames}`,
           className={cn(
             "absolute top-20 right-4 z-20",
             "px-4 py-2 flex items-center gap-2",
-            "bg-red text-white",
+            "bg-red text-[var(--foreground)]",
             "font-mono text-xs font-bold",
             "",
             "hover:bg-red/90 transition-colors shadow-lg"
@@ -2497,7 +2497,7 @@ function DramaScrubber({
 
   return (
     <div className="space-y-4">
-      {/* Header row — current label + assets counter */}
+      {/* Header row — current label + drama lab counter */}
       <div className="flex items-end justify-between gap-4">
         <div className="flex items-baseline gap-3">
           <span
@@ -2514,7 +2514,7 @@ function DramaScrubber({
           </span>
         </div>
         <div className="flex items-center gap-3 font-mono text-[10px] text-muted-foreground">
-          <span>{assetsSelected} assets</span>
+          <span>{assetsSelected} drama lab items</span>
           <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
           <span>{active.short}</span>
         </div>
@@ -2534,7 +2534,7 @@ function DramaScrubber({
         >
           {/* Dim veil past the thumb so "unreached" levels feel quieter */}
           <div
-            className="absolute top-0 bottom-0 right-0 bg-black/55"
+            className="absolute top-0 bottom-0 right-0 bg-[color-mix(in_srgb,var(--background)_55%,transparent)]"
             style={{ left: `${pct}%` }}
           />
         </div>
@@ -2558,7 +2558,7 @@ function DramaScrubber({
             "[&::-webkit-slider-thumb]:appearance-none",
             "[&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6",
             "[&::-webkit-slider-thumb]:rounded-full",
-            "[&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-white",
+            "[&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-[var(--foreground)]",
             "[&::-webkit-slider-thumb]:shadow-[0_4px_12px_rgba(0,0,0,0.6)]",
             "[&::-webkit-slider-thumb]:transition-transform",
             "[&::-webkit-slider-thumb]:cursor-grab",
@@ -2567,7 +2567,7 @@ function DramaScrubber({
             // firefox thumb
             "[&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6",
             "[&::-moz-range-thumb]:rounded-full",
-            "[&::-moz-range-thumb]:border-[3px] [&::-moz-range-thumb]:border-white",
+            "[&::-moz-range-thumb]:border-[3px] [&::-moz-range-thumb]:border-[var(--foreground)]",
             "[&::-moz-range-thumb]:shadow-[0_4px_12px_rgba(0,0,0,0.6)]",
             "[&::-moz-range-thumb]:cursor-grab",
             "active:[&::-moz-range-thumb]:cursor-grabbing"
@@ -2728,9 +2728,9 @@ function MoodAssetCard({
       )}
 
       {/* ═══ BOTTOM META — shared across all modalities ═══ */}
-      <div className="px-4 py-3 border-t border-[var(--border)] bg-[#0a0a0a]">
+      <div className="px-4 py-3 border-t border-[var(--border)] bg-[var(--background)]">
         <div className="flex items-baseline justify-between gap-2">
-          <div className="font-sans text-[14px] font-bold text-white truncate">{asset.title}</div>
+          <div className="font-sans text-[14px] font-bold text-[var(--foreground)] truncate">{asset.title}</div>
         </div>
         <div className="font-sans text-[11px] text-[var(--muted-foreground)] truncate mt-0.5">
           {asset.subtitle}
@@ -2826,7 +2826,7 @@ function AudioPreview({
       </div>
 
       {/* Duration */}
-      <div className="relative shrink-0 font-mono text-[11px] font-bold text-white/90 tabular-nums">
+      <div className="relative shrink-0 font-mono text-[11px] font-bold text-[var(--foreground)]/90 tabular-nums">
         {asset.duration}
       </div>
     </div>
@@ -2859,22 +2859,22 @@ function VideoPreview({
         className={cn(
           "relative w-14 h-14 rounded-full flex items-center justify-center",
           "border-2 transition-all group-hover:scale-110",
-          "bg-black/40 backdrop-blur-sm"
+          "bg-[color-mix(in_srgb,var(--background)_40%,transparent)] backdrop-blur-sm"
         )}
         style={{ borderColor: "rgba(255,255,255,0.6)" }}
         aria-label={`Play ${asset.title}`}
       >
-        <Play size={20} fill="white" className="text-white ml-0.5" />
+        <Play size={20} fill="white" className="text-[var(--foreground)] ml-0.5" />
       </button>
 
       {/* Duration pill, bottom-right */}
-      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-sm font-mono text-[11px] font-bold text-white tabular-nums">
+      <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-[color-mix(in_srgb,var(--background)_80%,transparent)] backdrop-blur-sm font-mono text-[11px] font-bold text-[var(--foreground)] tabular-nums">
         {asset.duration}
       </div>
 
       {/* Tag chip, top-left */}
       <div
-        className="absolute top-2 left-2 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider bg-black/60 backdrop-blur-sm"
+        className="absolute top-2 left-2 px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider bg-[color-mix(in_srgb,var(--background)_60%,transparent)] backdrop-blur-sm"
         style={{ color: asset.tagColor }}
       >
         {asset.tag}

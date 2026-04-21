@@ -223,7 +223,7 @@ function laneLabel(lane: FeaturedCase["lane"]) {
 
 function SkeletonCard() {
   return (
-    <div className="border border-[var(--border)] bg-[#141414] animate-pulse">
+    <div className="border border-[var(--border)] bg-[var(--card)] animate-pulse">
       <div className="h-[200px] bg-[#1a1a1a]" />
       <div className="p-4 space-y-3">
         <div className="h-6 bg-[#1a1a1a] w-3/4" />
@@ -293,7 +293,7 @@ function BrowseContent() {
     (laneFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0)
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
       <Masthead
         user={user}
         onSignIn={() => setAuthOpen(true)}
@@ -335,7 +335,7 @@ function BrowseContent() {
             </span>
           </div>
           <h1
-            className="cinema-title text-[48px] md:text-[72px] lg:text-[92px] leading-[0.92] text-white"
+            className="cinema-title text-[48px] md:text-[72px] lg:text-[92px] leading-[0.92] text-[var(--foreground)]"
             style={{ textShadow: "2px 2px 0 #000" }}
           >
             Browse The{" "}
@@ -353,7 +353,7 @@ function BrowseContent() {
       </section>
 
       {/* ─── Filter rail ─── */}
-      <section className="relative border-b border-[var(--border)] bg-[#0a0a0a] sticky top-14 z-40 backdrop-blur-sm">
+      <section className="relative border-b border-[var(--border)] bg-[var(--background)] sticky top-14 z-40 backdrop-blur-sm">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8 py-4 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 shrink-0">
             <Filter size={13} className="text-[var(--gold)]" />
@@ -378,8 +378,8 @@ function BrowseContent() {
                   className={cn(
                     "cinema-label text-[9px] px-3 py-1.5 border transition-colors",
                     active
-                      ? "bg-white text-[#0a0a0a] border-white"
-                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white"
+                      ? "bg-[var(--foreground)] text-[#0a0a0a] border-[var(--foreground)]"
+                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)]"
                   )}
                   style={active && f.key !== "all" ? { background: f.accent, borderColor: f.accent } : undefined}
                 >
@@ -403,7 +403,7 @@ function BrowseContent() {
                     "cinema-label text-[9px] px-3 py-1.5 border transition-colors inline-flex items-center gap-1.5",
                     active
                       ? "border-[var(--gold)] text-[var(--gold)] bg-[var(--gold)]/10"
-                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-white"
+                      : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--gold)] hover:text-[var(--foreground)]"
                   )}
                 >
                   {f.key === "live" && (
@@ -438,7 +438,7 @@ function BrowseContent() {
               <div className="cinema-label text-[9px] text-[var(--gold)] mb-1">
                 § Case Catalog
               </div>
-              <h2 className="cinema-title text-[24px] md:text-[32px] leading-[0.95] text-white">
+              <h2 className="cinema-title text-[24px] md:text-[32px] leading-[0.95] text-[var(--foreground)]">
                 {isLoading ? "Loading…" : `${filteredCases.length} Cases`}
                 {debouncedQuery && (
                   <span className="text-[var(--muted-foreground)]">
@@ -460,13 +460,13 @@ function BrowseContent() {
               ))}
             </div>
           ) : filteredCases.length === 0 ? (
-            <div className="border border-[var(--border)] bg-[#141414] py-20 px-6 text-center">
+            <div className="border border-[var(--border)] bg-[var(--card)] py-20 px-6 text-center">
               <BookOpen
                 size={40}
                 className="mx-auto mb-4 text-[var(--muted-foreground)]"
                 strokeWidth={1}
               />
-              <p className="cinema-title text-[22px] text-white mb-2">
+              <p className="cinema-title text-[22px] text-[var(--foreground)] mb-2">
                 No Matches On The Docket
               </p>
               <p className="font-sans text-[13px] text-[var(--muted-foreground)] max-w-[40ch] mx-auto">
@@ -479,7 +479,7 @@ function BrowseContent() {
                   setStatusFilter("all")
                   setSearchQuery("")
                 }}
-                className="mt-6 h-9 px-5 bg-white text-[#0a0a0a] cinema-label text-[10px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
+                className="mt-6 h-9 px-5 bg-[var(--foreground)] text-[#0a0a0a] cinema-label text-[10px] hover:bg-[var(--gold)] transition-colors inline-flex items-center gap-2"
               >
                 Reset Everything
               </button>
@@ -510,7 +510,7 @@ function PosterCard({ data }: { data: FeaturedCase }) {
   return (
     <Link
       href={`/case/${data.slug}`}
-      className="group relative flex flex-col border border-[var(--border)] bg-[#141414] hover:border-[var(--gold)] transition-colors"
+      className="group relative flex flex-col border border-[var(--border)] bg-[var(--card)] hover:border-[var(--gold)] transition-colors"
     >
       {/* Poster */}
       <div
@@ -529,7 +529,7 @@ function PosterCard({ data }: { data: FeaturedCase }) {
         />
 
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="cinema-label text-[8px] text-white/70">
+          <span className="cinema-label text-[8px] text-[var(--foreground)]/70">
             {data.court}
           </span>
         </div>
@@ -546,15 +546,15 @@ function PosterCard({ data }: { data: FeaturedCase }) {
           <Gavel
             size={72}
             strokeWidth={1}
-            className="text-white/25 group-hover:text-white/60 transition-colors"
+            className="text-[var(--foreground)]/25 group-hover:text-[var(--foreground)]/60 transition-colors"
             style={{ filter: "drop-shadow(3px 3px 0 #000)" }}
           />
         </div>
 
         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
           <div className="flex items-center gap-2">
-            <Clock size={10} className="text-white/40" />
-            <span className="cinema-label text-[8px] text-white/50">
+            <Clock size={10} className="text-[var(--foreground)]/40" />
+            <span className="cinema-label text-[8px] text-[var(--foreground)]/50">
               {data.year} · {data.reels} reels
             </span>
           </div>
@@ -574,7 +574,7 @@ function PosterCard({ data }: { data: FeaturedCase }) {
         </p>
         <div className="flex items-start justify-between gap-2 mt-2">
           <h2
-            className="cinema-title text-[22px] leading-[0.95] text-white flex-1"
+            className="cinema-title text-[22px] leading-[0.95] text-[var(--foreground)] flex-1"
             style={{ textShadow: "1px 1px 0 #000" }}
           >
             {data.title}

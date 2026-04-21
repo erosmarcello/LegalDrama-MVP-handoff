@@ -79,7 +79,7 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
       <footer
         className={cn(
           "w-full border-t border-[var(--border)]",
-          "bg-[#0a0a0a]",
+          "bg-[var(--background)]",
           "cinema-grain",
           "px-5 py-3",
           className
@@ -87,7 +87,7 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
           <div className="flex items-baseline gap-1">
-            <span className="cinema-title text-[14px] text-white leading-none">
+            <span className="cinema-title text-[14px] text-[var(--foreground)] leading-none">
               LEGAL
             </span>
             <span
@@ -126,7 +126,7 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
     <footer
       className={cn(
         "w-full border-t border-[var(--border)]",
-        "bg-[#0a0a0a]",
+        "bg-[var(--background)]",
         "cinema-grain",
         "mt-auto",
         className
@@ -170,7 +170,7 @@ export function SiteFooter({ className, variant = "default" }: SiteFooterProps) 
           <div className="col-span-2">
             <Link href="/" className="flex items-baseline gap-1 group">
               <span
-                className="cinema-title text-[28px] text-white leading-none"
+                className="cinema-title text-[28px] text-[var(--foreground)] leading-none"
                 style={{ textShadow: "1px 1px 0 #000" }}
               >
                 LEGAL
@@ -331,7 +331,7 @@ function FooterColumn({
           <li key={link.href}>
             <Link
               href={link.href}
-              className="font-sans text-[12px] text-[var(--muted-foreground)] hover:text-white transition-colors"
+              className="font-sans text-[12px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
             >
               {link.label}
             </Link>

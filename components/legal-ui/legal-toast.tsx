@@ -64,8 +64,8 @@ function ToastContainer({ toasts }: { toasts: Toast[] }) {
             key={t.id}
             className={cn(
               "relative px-5 py-2.5 min-w-[200px] text-center",
-              "cinema-label text-[10px] text-white",
-              "bg-[#0f0f0f] border border-[var(--border)]",
+              "cinema-label text-[10px] text-[var(--foreground)]",
+              "bg-[var(--card)] border border-[var(--border)]",
               "animate-toast whitespace-nowrap shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
             )}
             style={{ borderTop: `2px solid ${accent}` }}
