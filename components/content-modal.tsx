@@ -38,6 +38,12 @@ interface ContentModalProps {
   ingestedSources?: IngestedSource[]
   onOpenIngest?: () => void
   onOpenSourceReport?: (s: IngestedSource) => void
+  // Clicking the "USA v. MANGIONE" marquee title closes the modal and
+  // routes the parent case page back to the "Story So Far" landing tab.
+  // Optional so callers that prefer the old behavior (title is just a
+  // label) still mount cleanly. The case page wires this to the
+  // activeTab="all" switch.
+  onReturnToStory?: () => void
 }
 
 // Case Evidence items with more detail
@@ -338,6 +344,7 @@ const LANES = {
 export function ContentModal({
   isOpen, onClose, initialTab = "upload", onOpenSettings,
   ingestedSources = [], onOpenIngest, onOpenSourceReport,
+  onReturnToStory,
 }: ContentModalProps) {
   // Toast channel for small confirmations (e.g. "Forwarded to Trademarkia…").
   // Must live in the same tree as <ToastProvider> — the case page mounts one.
@@ -991,7 +998,7 @@ Based on: ${assetNames}`,
                 "cinema-label text-[10px] bg-transparent",
               )}>
                 <Layers size={11} />
-                Mission Control
+                Drama Lab
               </button>
             </div>
           </div>
@@ -1001,9 +1008,29 @@ Based on: ${assetNames}`,
         <div className="relative z-10 bg-[var(--background)] border-b border-[var(--border)]">
           <div className="flex items-center justify-between px-5 h-12">
             <div className="flex items-center gap-4">
-              <h1 className="cinema-title text-[20px] text-[var(--foreground)] tracking-wider">
+              {/*
+                Masthead title doubles as the "take me home" control.
+                Clicking it closes the Drama Lab modal and routes the
+                parent case page back to THE STORY SO FAR landing tab
+                (the timeline main landing page). The parent wires the
+                tab switch via onReturnToStory; this component owns the
+                onClose + onReturnToStory call ordering so the modal exit
+                animation plays before the tab swap commits.
+              */}
+              <button
+                type="button"
+                onClick={() => { onReturnToStory?.(); onClose(); }}
+                className={cn(
+                  "cinema-title text-[20px] text-[var(--foreground)] tracking-wider",
+                  "bg-transparent border-0 p-0 m-0 cursor-pointer",
+                  "transition-colors hover:text-[var(--gold)]",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]",
+                )}
+                aria-label="Return to the Story So Far — timeline main landing page"
+                title="Return to THE STORY SO FAR"
+              >
                 USA <span className="text-[var(--red)]">v.</span> MANGIONE
-              </h1>
+              </button>
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 border border-[var(--border)] cinema-label text-[9px] text-[var(--foreground)]/70">
                   1:25-cr-00176-MMG

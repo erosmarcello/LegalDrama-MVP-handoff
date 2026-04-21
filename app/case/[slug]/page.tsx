@@ -361,7 +361,7 @@ function CaseWorkspaceContent() {
         caseNumber="1:25-cr-00176-MMG"
       />
       
-      {/* Content Modal (Mission Control) */}
+      {/* Content Modal (Drama Lab) */}
       <ContentModal
         isOpen={contentModalOpen}
         onClose={() => setContentModalOpen(false)}
@@ -370,6 +370,18 @@ function CaseWorkspaceContent() {
         ingestedSources={ingestedSources}
         onOpenIngest={() => setIngestModalOpen(true)}
         onOpenSourceReport={(src) => { setActiveReport(src); setIngestModalOpen(true) }}
+        // Clicking the "USA v. MANGIONE" title in the Drama Lab modal should
+        // feel like "take me home" — close the modal AND route the case
+        // page back to THE STORY SO FAR landing tab, scrolled to the top.
+        // Parent owns the tab because the tab state lives here; we wrap
+        // the scroll-to-top in rAF so it fires after React commits the
+        // tab swap (otherwise it scrolls the now-unmounted tab's body).
+        onReturnToStory={() => {
+          setActiveTab("all")
+          requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          })
+        }}
       />
 
       {/* ═══════════════════════════════════════════════════════════════
@@ -557,15 +569,31 @@ function CaseWorkspaceContent() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
+                    {/*
+                      Drama Lab beacon — the primary creative action on a case
+                      page. Styled as an outline-gold button with a slow gold
+                      breath (see .drama-lab-beacon in globals.css) so it reads
+                      as the main affordance without fighting the marquee.
+
+                      - variant="outline" + color="var(--gold)" gives the gold
+                        border + gold text at rest (vs. the default muted border).
+                      - `drama-lab-beacon` adds the 3.2s ambient gold glow +
+                        plus-icon sparkle. Hover freezes the glow at peak so the
+                        button feels "armed" as the user approaches it.
+                      - `hover-lift` carries the existing case-page hover grammar.
+                      - Not `small` — this is a primary action, not a toolbar chip.
+                    */}
                     <LegalButton
-                      small
+                      variant="outline"
+                      color="var(--gold)"
                       onClick={() => {
                         setContentModalTab("upload")
                         setContentModalOpen(true)
                       }}
-                      className="hover-lift"
+                      aria-label="Open the Drama Lab"
+                      className="drama-lab-beacon hover-lift font-bold tracking-[0.15em]"
                     >
-                      <Plus size={12} />
+                      <Plus size={14} strokeWidth={2.5} />
                       DRAMA LAB
                     </LegalButton>
                   </div>

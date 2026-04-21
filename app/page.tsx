@@ -170,6 +170,59 @@ function laneColor(lane: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  useReveal — fire CSS animations when a section enters the viewport */
+/*                                                                      */
+/*  Hero motion fires on mount, but the rest of the landing page lives  */
+/*  below the fold — animating those on page-load either happens before */
+/*  the user can see them (wasted) or fights their scroll. Gate each    */
+/*  below-the-fold section on an IntersectionObserver so its staggered  */
+/*  children wake up exactly when the user arrives at them.             */
+/*                                                                      */
+/*  Returns a ref + a boolean. Once revealed, we stop observing — the   */
+/*  animation plays once per page visit and stays in its final state.   */
+/* ------------------------------------------------------------------ */
+function useReveal<T extends HTMLElement>(options?: {
+  rootMargin?: string
+  threshold?: number
+}) {
+  const ref = useRef<T>(null)
+  const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    // Respect reduced-motion — skip the observer entirely so content is
+    // painted without the animated transforms.
+    if (typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setRevealed(true)
+      return
+    }
+
+    const io = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setRevealed(true)
+            io.disconnect()
+            break
+          }
+        }
+      },
+      {
+        rootMargin: options?.rootMargin ?? "0px 0px -10% 0px",
+        threshold: options?.threshold ?? 0.15,
+      },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [options?.rootMargin, options?.threshold])
+
+  return [ref, revealed] as const
+}
+
+/* ------------------------------------------------------------------ */
 /*  HomePage (inner, needs ToastProvider ancestor)                      */
 /* ------------------------------------------------------------------ */
 
@@ -203,6 +256,21 @@ function HomePage() {
   const [canScrollRight, setCanScrollRight] = useState(true)
   const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [carouselHovered, setCarouselHovered] = useState(false)
+
+  /* ---- Below-the-fold reveal refs ---------------------------------- */
+  /*                                                                    */
+  /*  Hero fires on mount (already wired via animation-delay). The      */
+  /*  rest of the landing lives below the fold, so each section gets    */
+  /*  its own IntersectionObserver — staggered children animate in      */
+  /*  exactly as the user scrolls to them, not before.                  */
+  /*                                                                    */
+  /*  One ref per section keeps the animation graph flat and makes it   */
+  /*  trivial to tune timing per section without cross-talk.            */
+  const [searchRef,       searchRevealed]       = useReveal<HTMLElement>()
+  const [featuredHeroRef, featuredHeroRevealed] = useReveal<HTMLElement>()
+  const [carouselRef,     carouselRevealed]     = useReveal<HTMLElement>()
+  const [dualRef,         dualRevealed]         = useReveal<HTMLElement>()
+  const [ctaRef,          ctaRevealed]          = useReveal<HTMLElement>()
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current
@@ -350,8 +418,32 @@ function HomePage() {
         />
 
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 pt-14 md:pt-20 pb-16 md:pb-24">
+          {/*
+            Hero cinematic reveal — fires on mount.
+            Timing diagram (ms):
+               0   marquee label slides up
+             180   headline line 1 "Every Docket" lifts from the mask
+             340   headline line 2 "Is A Screenplay" lifts
+                   (+~700ms the word "Screenplay" flashes ink-set red)
+             500   headline line 3 "Waiting To Be"
+             660   headline line 4 "Written."
+                   (+~700ms the word "Written." flashes ink-set gold)
+             920   subtitle paragraph rises
+            1080   primary CTA scales in
+            1140   secondary CTA scales in
+            1280+  ticker strip — stat chips rise left→right, 80ms apart
+
+            Designed to feel like a film-strip threading through a
+            projector — content is lifted into frame line by line. The
+            mask + translateY construction is safe because cinema-title
+            is uppercase (no descenders to clip).
+          */}
+
           {/* Marquee label */}
-          <div className="flex items-center gap-3 mb-6">
+          <div
+            className="flex items-center gap-3 mb-6 animate-slide-up"
+            style={{ animationDuration: "0.5s" }}
+          >
             <span className="cinema-pulse-dot" aria-hidden />
             <span className="cinema-contract text-[12px] text-[var(--gold)]">
               Now Streaming · Federal Court Records Reimagined
@@ -361,19 +453,46 @@ function HomePage() {
           <h1
             className="cinema-title text-[54px] sm:text-[72px] md:text-[92px] lg:text-[112px] leading-[0.88] text-white max-w-[18ch]"
             style={{ textShadow: "3px 3px 0 #000" }}
+            aria-label="Every docket is a screenplay waiting to be written."
           >
-            Every Docket
-            <br />
-            Is A{" "}
-            <span style={{ color: "var(--red)" }}>Screenplay</span>
-            <br />
-            Waiting To Be
-            <br />
-            <span style={{ color: "var(--gold)" }}>Written.</span>
+            <span className="hero-line-mask">
+              <span className="hero-line-content" style={{ animationDelay: "180ms" }}>
+                Every Docket
+              </span>
+            </span>
+            <span className="hero-line-mask">
+              <span className="hero-line-content" style={{ animationDelay: "340ms" }}>
+                Is A{" "}
+                <span
+                  className="cinema-ink-set"
+                  style={{ color: "var(--red)", animationDelay: "1040ms" }}
+                >
+                  Screenplay
+                </span>
+              </span>
+            </span>
+            <span className="hero-line-mask">
+              <span className="hero-line-content" style={{ animationDelay: "500ms" }}>
+                Waiting To Be
+              </span>
+            </span>
+            <span className="hero-line-mask">
+              <span className="hero-line-content" style={{ animationDelay: "660ms" }}>
+                <span
+                  className="cinema-ink-set"
+                  style={{ color: "var(--gold)", animationDelay: "1360ms" }}
+                >
+                  Written.
+                </span>
+              </span>
+            </span>
           </h1>
 
           <div className="mt-8 md:mt-10 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
-            <p className="font-sans text-[15px] md:text-[17px] leading-relaxed text-[var(--muted-foreground)] max-w-[60ch]">
+            <p
+              className="font-sans text-[15px] md:text-[17px] leading-relaxed text-[var(--muted-foreground)] max-w-[60ch] animate-slide-up"
+              style={{ animationDelay: "920ms", animationDuration: "0.55s" }}
+            >
               LegalDrama.ai turns real federal court cases into cinematic legal
               dramas. Public record goes in — scripts, timelines, and mood boards
               come out. Built for screenwriters, true-crime obsessives, and
@@ -387,8 +506,10 @@ function HomePage() {
                   "h-11 px-6 flex items-center gap-2",
                   "bg-white text-[#0a0a0a]",
                   "cinema-label text-[11px]",
-                  "hover:bg-[var(--gold)] transition-colors"
+                  "hover:bg-[var(--gold)] transition-colors",
+                  "animate-scale-in"
                 )}
+                style={{ animationDelay: "1080ms" }}
               >
                 <Play size={13} /> Start Free Trial
               </button>
@@ -398,46 +519,78 @@ function HomePage() {
                   "h-11 px-6 flex items-center gap-2",
                   "border border-[var(--gold)] text-[var(--gold)]",
                   "cinema-label text-[11px]",
-                  "hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors"
+                  "hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors",
+                  "animate-scale-in"
                 )}
+                style={{ animationDelay: "1140ms" }}
               >
                 Browse Active Cases <ArrowRight size={13} />
               </Link>
             </div>
           </div>
 
-          {/* ticker strip */}
+          {/* ticker strip — stagger the 4 chips left→right so the ticker
+              feels like it's threading on after the hero lands. */}
           <div className="mt-12 md:mt-14 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-[var(--border)] pt-5">
-            <StatChip label="Cases Indexed" value="12,847" />
-            <StatChip label="Docket Entries" value="4.2M" accent="var(--gold)" />
-            <StatChip label="Scripts Generated" value="38,201" accent="var(--red)" />
-            <StatChip label="Screenwriters Onboard" value="2,106" />
+            <StatChip label="Cases Indexed" value="12,847" animationDelay="1280ms" />
+            <StatChip label="Docket Entries" value="4.2M" accent="var(--gold)" animationDelay="1360ms" />
+            <StatChip label="Scripts Generated" value="38,201" accent="var(--red)" animationDelay="1440ms" />
+            <StatChip label="Screenwriters Onboard" value="2,106" animationDelay="1520ms" />
           </div>
         </div>
       </section>
 
       {/* ============================================================ */}
       {/*  SEARCH — the investigation console                           */}
+      {/*                                                                */}
+      {/*  Reveal order (once the section enters the viewport):          */}
+      {/*    stagger-1 §  label                                          */}
+      {/*    stagger-2 h2 "Pull A Case. Write The Scene."                */}
+      {/*    stagger-3 description paragraph                             */}
+      {/*    stagger-4 right-side console (whole module lifts in)        */}
       {/* ============================================================ */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section
+        ref={searchRef}
+        className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain"
+      >
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-16 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8 md:gap-12">
           <div className="max-w-[320px]">
-            <div className="cinema-label text-[9px] text-[var(--gold)] mb-3">
+            <div
+              className={cn(
+                "cinema-label text-[9px] text-[var(--gold)] mb-3",
+                searchRevealed ? "animate-slide-up stagger-1" : "opacity-0"
+              )}
+            >
               § Case Intake
             </div>
-            <h2 className="cinema-title text-[32px] md:text-[42px] leading-[0.95] text-white">
+            <h2
+              className={cn(
+                "cinema-title text-[32px] md:text-[42px] leading-[0.95] text-white",
+                searchRevealed ? "animate-slide-up stagger-2" : "opacity-0"
+              )}
+            >
               Pull A Case.
               <br />
               <span style={{ color: "var(--red)" }}>Write The Scene.</span>
             </h2>
-            <p className="mt-4 font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]">
+            <p
+              className={cn(
+                "mt-4 font-sans text-[13px] leading-relaxed text-[var(--muted-foreground)]",
+                searchRevealed ? "animate-slide-up stagger-3" : "opacity-0"
+              )}
+            >
               Enter a federal case number, defendant name, or search by district
               court. We lift the docket off the public record and stage it for
               you — ready to be adapted, dramatized, or studied.
             </p>
           </div>
 
-          <div className="border border-[var(--border)] bg-[#141414]">
+          <div
+            className={cn(
+              "border border-[var(--border)] bg-[#141414]",
+              searchRevealed ? "animate-slide-up stagger-4" : "opacity-0"
+            )}
+          >
             {/* Mode tabs */}
             <div className="grid grid-cols-3 border-b border-[var(--border)]">
               {(
@@ -633,21 +786,43 @@ function HomePage() {
 
       {/* ============================================================ */}
       {/*  FEATURED HERO — USA v. Mangione as a cinematic one-sheet     */}
+      {/*                                                                */}
+      {/*  Reveal order:                                                 */}
+      {/*    stagger-1 § label                                           */}
+      {/*    stagger-2 "Watch The Story Unfold"                          */}
+      {/*    stagger-2 "View All Features" link (enters on the right)    */}
+      {/*    stagger-4 one-sheet card (heavy composite — rises last)     */}
       {/* ============================================================ */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section
+        ref={featuredHeroRef}
+        className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain"
+      >
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-20">
           <div className="flex items-end justify-between mb-6 gap-4">
             <div>
-              <div className="cinema-label text-[9px] text-[var(--red)] mb-2">
+              <div
+                className={cn(
+                  "cinema-label text-[9px] text-[var(--red)] mb-2",
+                  featuredHeroRevealed ? "animate-slide-up stagger-1" : "opacity-0"
+                )}
+              >
                 § Feature Presentation
               </div>
-              <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white">
+              <h2
+                className={cn(
+                  "cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white",
+                  featuredHeroRevealed ? "animate-slide-up stagger-2" : "opacity-0"
+                )}
+              >
                 Watch The Story Unfold
               </h2>
             </div>
             <Link
               href="/browse"
-              className="hidden md:inline-flex items-center gap-2 cinema-label text-[10px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors"
+              className={cn(
+                "hidden md:inline-flex items-center gap-2 cinema-label text-[10px] text-[var(--muted-foreground)] hover:text-[var(--gold)] transition-colors",
+                featuredHeroRevealed ? "animate-slide-in-right stagger-2" : "opacity-0"
+              )}
             >
               View All Features <ArrowRight size={12} />
             </Link>
@@ -655,7 +830,10 @@ function HomePage() {
 
           <Link
             href="/case/usa-v-mangione"
-            className="block group border border-[var(--border)] bg-[#141414] overflow-hidden"
+            className={cn(
+              "block group border border-[var(--border)] bg-[#141414] overflow-hidden",
+              featuredHeroRevealed ? "animate-card-in stagger-4" : "opacity-0"
+            )}
           >
             <div className="grid grid-cols-1 md:grid-cols-[42%_1fr]">
               {/* Poster panel */}
@@ -821,8 +999,15 @@ function HomePage() {
 
       {/* ============================================================ */}
       {/*  FEATURED CASES CAROUSEL — the movie-poster wall               */}
+      {/*                                                                */}
+      {/*  Reveal order:                                                 */}
+      {/*    stagger-1 § label                                           */}
+      {/*    stagger-2 "Blockbusters Of The Docket"                      */}
+      {/*    stagger-2 arrow controls (slide in from right)              */}
+      {/*    stagger-3…N cards rise in sequence (capped at stagger-8)    */}
       {/* ============================================================ */}
       <section
+        ref={carouselRef}
         className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain"
         onMouseEnter={() => setCarouselHovered(true)}
         onMouseLeave={() => setCarouselHovered(false)}
@@ -830,14 +1015,29 @@ function HomePage() {
         <div className="relative z-10 max-w-[1400px] mx-auto px-5 md:px-8 py-14 md:py-20">
           <div className="flex items-end justify-between mb-6 gap-4">
             <div>
-              <div className="cinema-label text-[9px] text-[var(--gold)] mb-2">
+              <div
+                className={cn(
+                  "cinema-label text-[9px] text-[var(--gold)] mb-2",
+                  carouselRevealed ? "animate-slide-up stagger-1" : "opacity-0"
+                )}
+              >
                 § Now Showing
               </div>
-              <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white">
+              <h2
+                className={cn(
+                  "cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white",
+                  carouselRevealed ? "animate-slide-up stagger-2" : "opacity-0"
+                )}
+              >
                 Blockbusters Of The Docket
               </h2>
             </div>
-            <div className="flex gap-2">
+            <div
+              className={cn(
+                "flex gap-2",
+                carouselRevealed ? "animate-slide-in-right stagger-2" : "opacity-0"
+              )}
+            >
               {(["left", "right"] as const).map(dir => {
                 const enabled = dir === "left" ? canScrollLeft : canScrollRight
                 return (
@@ -869,13 +1069,21 @@ function HomePage() {
             className="flex gap-4 overflow-x-auto pb-3 cinema-scrollbar-hidden"
             style={{ scrollbarWidth: "none" }}
           >
-            {FEATURED_CASES.map(c => {
+            {FEATURED_CASES.map((c, i) => {
               const accent = laneColor(c.lane)
+              // Cap the stagger so a very long list doesn't create a long
+              // dead tail — after ~8 cards the tail is off-screen anyway.
+              const cardStagger = Math.min(8, i + 3)
               return (
                 <Link
                   key={c.id}
                   href={`/case/${c.slug}`}
-                  className="group relative flex w-[260px] sm:w-[300px] shrink-0 flex-col border border-[var(--border)] bg-[#141414] hover:border-[var(--gold)] transition-colors"
+                  className={cn(
+                    "group relative flex w-[260px] sm:w-[300px] shrink-0 flex-col border border-[var(--border)] bg-[#141414] hover:border-[var(--gold)] transition-colors",
+                    carouselRevealed
+                      ? `animate-card-in stagger-${cardStagger}`
+                      : "opacity-0"
+                  )}
                 >
                   {/* Poster */}
                   <div
@@ -962,13 +1170,34 @@ function HomePage() {
 
       {/* ============================================================ */}
       {/*  DUAL-AUDIENCE STRIP — writers vs true-crime                  */}
+      {/*                                                                */}
+      {/*  Reveal order:                                                 */}
+      {/*    stagger-1 § label                                           */}
+      {/*    stagger-2 h2 headline                                       */}
+      {/*    stagger-4 left card slides in from the left                 */}
+      {/*    stagger-5 right card slides in from the right               */}
+      {/*  (the 1-tick gap between the two cards gives the pair a        */}
+      {/*   cinematic "open reveal" like credits splitting on a cut.)    */}
       {/* ============================================================ */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section
+        ref={dualRef}
+        className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain"
+      >
         <div className="relative z-10 max-w-[1200px] mx-auto px-5 md:px-8 py-14 md:py-20">
-          <div className="cinema-label text-[9px] text-[var(--gold)] mb-3">
+          <div
+            className={cn(
+              "cinema-label text-[9px] text-[var(--gold)] mb-3",
+              dualRevealed ? "animate-slide-up stagger-1" : "opacity-0"
+            )}
+          >
             § Two Audiences · One Docket
           </div>
-          <h2 className="cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white max-w-[20ch]">
+          <h2
+            className={cn(
+              "cinema-title text-[32px] md:text-[44px] leading-[0.95] text-white max-w-[20ch]",
+              dualRevealed ? "animate-slide-up stagger-2" : "opacity-0"
+            )}
+          >
             Built For People Who Think{" "}
             <span style={{ color: "var(--red)" }}>The Record</span>{" "}
             Already Reads Like A Script.
@@ -985,6 +1214,9 @@ function HomePage() {
                 "Automatic character sheets",
                 "Fair-use citation export",
               ]}
+              animationClass={
+                dualRevealed ? "animate-slide-in stagger-4" : "opacity-0"
+              }
             />
             <AudienceCard
               accent="var(--red)"
@@ -997,6 +1229,9 @@ function HomePage() {
                 "Story-so-far timelines",
               ]}
               borderLeft
+              animationClass={
+                dualRevealed ? "animate-slide-in-right stagger-5" : "opacity-0"
+              }
             />
           </div>
         </div>
@@ -1004,8 +1239,25 @@ function HomePage() {
 
       {/* ============================================================ */}
       {/*  CLOSING CTA                                                  */}
+      {/*                                                                */}
+      {/*  Mirror of the hero: a two-line headline lifted from an        */}
+      {/*  overflow-hidden mask, then subtitle, then buttons. Same       */}
+      {/*  hero-line-mask primitive as the top so the opening and        */}
+      {/*  closing beats rhyme visually — the landing page opens on      */}
+      {/*  a line-reveal and closes on a line-reveal.                    */}
+      {/*                                                                */}
+      {/*  Reveal order (relative to section entering viewport):         */}
+      {/*    stagger-1 § label                                           */}
+      {/*    stagger-2 headline line 1  "Five Free Searches."            */}
+      {/*    stagger-3 headline line 2  "No Camera Crew Needed."         */}
+      {/*    stagger-5 subtitle                                          */}
+      {/*    stagger-6 primary CTA                                       */}
+      {/*    stagger-7 secondary CTA                                     */}
       {/* ============================================================ */}
-      <section className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain">
+      <section
+        ref={ctaRef}
+        className="relative border-t border-[var(--border)] bg-[#0a0a0a] cinema-grain"
+      >
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -1015,31 +1267,75 @@ function HomePage() {
           aria-hidden
         />
         <div className="relative z-10 max-w-[900px] mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
-          <div className="cinema-label text-[9px] text-[var(--gold)] mb-4">
+          <div
+            className={cn(
+              "cinema-label text-[9px] text-[var(--gold)] mb-4",
+              ctaRevealed ? "animate-slide-up stagger-1" : "opacity-0"
+            )}
+          >
             § Final Reel
           </div>
           <h2
             className="cinema-title text-[44px] md:text-[72px] leading-[0.9] text-white"
             style={{ textShadow: "2px 2px 0 #000" }}
+            aria-label="Five free searches. No camera crew needed."
           >
-            Five Free Searches.
-            <br />
-            <span style={{ color: "var(--red)" }}>No Camera Crew Needed.</span>
+            {ctaRevealed ? (
+              <>
+                <span className="hero-line-mask">
+                  <span
+                    className="hero-line-content"
+                    style={{ animationDelay: "100ms" }}
+                  >
+                    Five Free Searches.
+                  </span>
+                </span>
+                <span className="hero-line-mask">
+                  <span
+                    className="hero-line-content"
+                    style={{ animationDelay: "260ms", color: "var(--red)" }}
+                  >
+                    No Camera Crew Needed.
+                  </span>
+                </span>
+              </>
+            ) : (
+              // Pre-reveal — render the raw text hidden so layout is stable
+              // and the a11y tree still has the headline text via aria-label
+              // above. Once the section is observed, the masked version
+              // swaps in and animates.
+              <span className="opacity-0" aria-hidden>
+                Five Free Searches.
+                <br />
+                No Camera Crew Needed.
+              </span>
+            )}
           </h2>
-          <p className="mt-5 font-sans text-[15px] text-[var(--muted-foreground)] max-w-[52ch] mx-auto">
+          <p
+            className={cn(
+              "mt-5 font-sans text-[15px] text-[var(--muted-foreground)] max-w-[52ch] mx-auto",
+              ctaRevealed ? "animate-slide-up stagger-5" : "opacity-0"
+            )}
+          >
             Sign up and start pulling federal cases. Turn the next one into a
             spec, a podcast arc, or just a late-night rabbit hole.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={handleSignUp}
-              className="h-12 px-8 flex items-center gap-2 bg-white text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors"
+              className={cn(
+                "h-12 px-8 flex items-center gap-2 bg-white text-[#0a0a0a] cinema-label text-[11px] hover:bg-[var(--gold)] transition-colors",
+                ctaRevealed ? "animate-scale-in stagger-6" : "opacity-0"
+              )}
             >
               <Play size={13} /> Start Free Trial
             </button>
             <Link
               href="/pricing"
-              className="h-12 px-8 flex items-center gap-2 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[11px] hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors"
+              className={cn(
+                "h-12 px-8 flex items-center gap-2 border border-[var(--gold)] text-[var(--gold)] cinema-label text-[11px] hover:bg-[var(--gold)] hover:text-[#0a0a0a] transition-colors",
+                ctaRevealed ? "animate-scale-in stagger-7" : "opacity-0"
+              )}
             >
               See Subscription Tiers
             </Link>
@@ -1071,13 +1367,27 @@ function StatChip({
   label,
   value,
   accent = "#ffffff",
+  animationDelay,
 }: {
   label: string
   value: string
   accent?: string
+  /**
+   * Optional delay for the slide-up reveal. When omitted, the chip
+   * renders statically — keeps the component safe to reuse outside
+   * the landing ticker without forcing motion.
+   */
+  animationDelay?: string
 }) {
+  const animate = animationDelay !== undefined
   return (
-    <div className="flex items-baseline gap-2">
+    <div
+      className={cn(
+        "flex items-baseline gap-2",
+        animate && "animate-slide-up"
+      )}
+      style={animate ? { animationDelay, animationDuration: "0.5s" } : undefined}
+    >
       <span
         className="cinema-title text-[28px] md:text-[32px] leading-none"
         style={{ color: accent, textShadow: "1px 1px 0 #000" }}
@@ -1098,6 +1408,7 @@ function AudienceCard({
   body,
   bullets,
   borderLeft = false,
+  animationClass,
 }: {
   accent: string
   label: string
@@ -1105,12 +1416,19 @@ function AudienceCard({
   body: string
   bullets: string[]
   borderLeft?: boolean
+  /**
+   * Optional className for entry animation (e.g. "animate-slide-in stagger-3").
+   * When omitted, the card renders statically — keeps the component reusable
+   * outside the landing dual-audience strip.
+   */
+  animationClass?: string
 }) {
   return (
     <div
       className={cn(
         "p-6 md:p-8 bg-[#141414]",
-        borderLeft && "md:border-l border-[var(--border)]"
+        borderLeft && "md:border-l border-[var(--border)]",
+        animationClass
       )}
       style={{ borderTop: `2px solid ${accent}` }}
     >
